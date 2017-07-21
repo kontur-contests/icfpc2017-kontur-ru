@@ -1,0 +1,23 @@
+<html>
+<head>
+	<script src="https://www.gstatic.com/firebasejs/4.1.3/firebase.js"></script>
+	<script>
+		// Initialize Firebase
+		var config = {
+			apiKey: "AIzaSyBRYZvtAg1Vm5fZZ-r80vCISm0A8IhA7vM",
+			authDomain: "icfpc2017.firebaseapp.com",
+			databaseURL: "https://icfpc2017.firebaseio.com",
+			projectId: "icfpc2017",
+			storageBucket: "icfpc2017.appspot.com",
+			messagingSenderId: "329939456017"
+		};
+		firebase.initializeApp(config);
+		firebase.auth()
+			.signInWithEmailAndPassword("pe@kontur.ru", "W1nnerzz")
+			.catch(function(error) {console.log(error);});
+		firebase.database().ref('problems').once('value', function(sn){
+			console.log(sn.val());
+		});
+	</script>
+</head>
+</html>
