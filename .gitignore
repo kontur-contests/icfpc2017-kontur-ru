@@ -72,3 +72,4 @@ packages/*
 # Ignore Ansible generated files
 ansible/roles
 ansible/*.retry
+/.idea
