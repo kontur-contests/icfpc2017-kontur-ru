@@ -68,3 +68,7 @@ packages/*
 # This line needs to be after the ignore of the build folder
 # (and the packages folder if the line above has been uncommented)
 !packages/build/
+
+# Ignore Ansible generated files
+ansible/roles
+ansible/*.retry

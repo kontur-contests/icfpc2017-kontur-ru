@@ -1,0 +1,53 @@
+- hosts: brokers
+  become: yes
+  roles:
+    - common-all
+    - youshallnotpasser
+    - kafka
+
+- hosts: brokers
+  become: true
+  serial: 1
+  gather_facts: false
+  tasks:
+    - name: restart kafka
+      service: name=kafka state=restarted
+      when: kafka_restart is defined
+      tags:
+        - config
+
+    - name: wait for kafka to start
+      wait_for: host="{{ kafka_host }}" port="{{ kafka_client_port }}" state=started
+      when: kafka_restart is defined
+      tags:
+        - config
+
+    - name: wait a little bit more
+      pause: seconds=15
+      when: kafka_restart is defined
+      tags:
+        - config
+
+- hosts: brokers
+  become: true
+  serial: 1
+  gather_facts: false
+  tasks:
+    - name: restart schema registry
+      service: name=schema-registry state=restarted
+      when: schema_registry_restart is defined
+      tags:
+        - config
+
+    - name: wait for schema registry to start
+      wait_for: host="{{ kafka_schema_registry_host }}" port="{{ kafka_schema_registry_port }}" state=started
+      when: schema_registry_restart is defined
+      tags:
+        - config
+
+    - name: wait a little bit more
+      pause: seconds=15
+      when: schema_registry_restart is defined
+      tags:
+        - config
+

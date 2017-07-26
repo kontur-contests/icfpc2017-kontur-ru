@@ -1,0 +1,3 @@
+- git: git@git.skbkontur.ru:devops/ansible-common-roles.git
+  version: master
+  dst: roles/

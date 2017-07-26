@@ -1,0 +1,9 @@
+kafka_data_dir: /var/kafka
+kafka_delete_topic_enable: true
+kafka_zookeeper_connect: "{% for item in groups['brokers'] %}{{ hostvars[item]['ansible_default_ipv4']['address'] }}:{{ zookeeper_client_port }}{% if not loop.last %},{% endif %}{% endfor %}"
+
+kafka_host: "{{ ansible_default_ipv4.address }}"
+kafka_schema_registry_host: "{{ kafka_host }}"
+kafka_client_port: "9092"
+kafka_schema_registry_port: "8881"
+kafka_heap_size: "2G"

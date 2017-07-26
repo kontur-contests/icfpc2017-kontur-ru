@@ -1,0 +1,7 @@
+os_tuning_disable_swap: false
+firewalld_enable: false
+
+youshallnotpasser_users:
+  - alexkir
+
+java_default: oracle

@@ -1,0 +1,29 @@
+- hosts: brokers
+  become: true
+  roles:
+    - common-all
+    - youshallnotpasser
+    - zookeeper
+
+- hosts: brokers
+  become: true
+  serial: 1
+  gather_facts: false
+  tasks:
+    - name: restart zookeeper
+      service: name=zookeeper state=restarted
+      when: zookeeper_restart is defined
+      tags:
+        - config
+
+    - name: wait for zookeeper to start
+      wait_for: port="{{ zookeeper_client_port }}" state=started
+      when: zookeeper_restart is defined
+      tags:
+        - config
+
+    - name: wait a little bit more
+      pause: seconds=15
+      when: zookeeper_restart is defined
+      tags:
+        - config
