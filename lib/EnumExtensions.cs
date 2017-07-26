@@ -1,4 +1,5 @@
 ﻿using System;
+using JetBrains.Annotations;
 
 namespace lib
 {
@@ -7,6 +8,7 @@ namespace lib
         /// <summary>
         ///     Gets an attribute on an enum field value
         /// </summary>
+        [CanBeNull]
         public static TAttribute GetAttribute<TAttribute>(this Enum value) where TAttribute : Attribute
         {
             var type = value.GetType();

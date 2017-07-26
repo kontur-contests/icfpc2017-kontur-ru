@@ -6,14 +6,9 @@ namespace lib
 {
     public static class FileSystemExtensions
     {
-        public static bool HasSubdirectory(this DirectoryInfo root, string name)
+        public static bool HasSubdir(this DirectoryInfo root, string name)
         {
-            return root.Subdirectory(name).Exists;
-        }
-
-        public static DirectoryInfo Subdirectory(this DirectoryInfo root, string name)
-        {
-            return new DirectoryInfo(Path.Combine(root.FullName, name));
+            return root.GetSubdir(name).Exists;
         }
 
         public static FileInfo GetFile(this DirectoryInfo dir, string filename)
@@ -34,7 +29,7 @@ namespace lib
             return subdir;
         }
 
-        public static string GetRelativePath(this FileSystemInfo file, string folder)
+        public static string GetRelativePathTo(this FileSystemInfo file, string folder)
         {
             var pathUri = new Uri(file.FullName);
             if (!folder.EndsWith(Path.DirectorySeparatorChar.ToString()))

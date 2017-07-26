@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -9,11 +10,8 @@ namespace lib
 {
     public static class MoreExtensions
     {
-        public static Random r = new Random(2345432);
-
-        public static IEnumerable<T> Shuffle<T>(this IEnumerable<T> items, Random random = null)
+        public static IEnumerable<T> Shuffle<T>(this IEnumerable<T> items, Random random)
         {
-            random = random ?? r;
             var copy = items.ToList();
             for (var i = 0; i < copy.Count; i++)
             {
@@ -23,9 +21,8 @@ namespace lib
             }
         }
 
-        public static void ShuffleInPlace<T>(this IList<T> items, Random random = null)
+        public static void ShuffleInPlace<T>(this IList<T> items, Random random)
         {
-            random = random ?? r;
             for (var i = 0; i < items.Count; i++)
             {
                 var nextIndex = random.Next(i, items.Count);
@@ -149,7 +146,7 @@ namespace lib
             return sb.ToString();
         }
 
-        public static string GetString(this Stream inputStream)
+        public static string ReadAllText(this Stream inputStream)
         {
             var codeBytes = new MemoryStream();
             inputStream.CopyTo(codeBytes);

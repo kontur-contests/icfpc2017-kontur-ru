@@ -9,7 +9,7 @@ namespace lib.Firebase
     [TestFixture]
     public class FbClient_Tests
     {
-        [Test]
+        [Test, Explicit]
         public void FirebaseSmokeTest()
         {
             var client = new FbClient();
