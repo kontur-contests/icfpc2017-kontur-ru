@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using System.Threading;
 using MoreLinq;
 using NUnit.Framework;
 using Shouldly;
