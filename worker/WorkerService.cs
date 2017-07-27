@@ -48,10 +48,11 @@ namespace worker
                         
                             deliveryReport.ContinueWith(task =>
                             {
-                                // TODO сделать, чтобы эта запись попадала в логи, если сервис останавливают во время обработки 
                                 logger.Info($"Sent result | Partition: {task.Result.Partition}, Offset: {task.Result.Offset}");
                             });
                         }
+                        
+                        producer.Flush(TimeSpan.FromSeconds(10));
                     }                    
                 });
             workerThread.Start();
