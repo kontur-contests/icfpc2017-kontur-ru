@@ -32,7 +32,28 @@ namespace worker
                     using (var consumer = new Consumer<Null, string>(config, null, new StringDeserializer(Encoding.UTF8)))
                     using (var producer = new Producer<Null, string>(config, null, new StringSerializer(Encoding.UTF8)))
                     {
-                        consumer.Assign(new List<TopicPartitionOffset> {new TopicPartitionOffset(inputTopicName, 0, 0)});
+                        consumer.OnPartitionEOF += (_, end)
+                            => logger.Info($"Reached end of topic {end.Topic} partition {end.Partition}, next message will be at offset {end.Offset}");
+
+                        consumer.OnError += (_, error)
+                            => logger.Error($"Error: {error}");
+
+                        consumer.OnPartitionsAssigned += (_, partitions) =>
+                        {
+                            logger.Info($"Assigned partitions: [{string.Join(", ", partitions)}], member id: {consumer.MemberId}");
+                            consumer.Assign(partitions);
+                        };
+
+                        consumer.OnPartitionsRevoked += (_, partitions) =>
+                        {
+                            logger.Info($"Revoked partitions: [{string.Join(", ", partitions)}]");
+                            consumer.Unassign();
+                        };
+
+                        consumer.OnStatistics += (_, json)
+                            => logger.Info($"Statistics: {json}");
+
+                        consumer.Subscribe(inputTopicName);
 
                         while (!cancelled)
                         {
