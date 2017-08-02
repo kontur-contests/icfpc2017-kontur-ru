@@ -10,13 +10,13 @@ namespace worker
 {
     public class WorkerService
     {
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
         private readonly Dictionary<string, object> config;
         private readonly string inputTopicName;
         private readonly string outputTopicName;
         private bool cancelled;
-        private static Logger logger = LogManager.GetCurrentClassLogger();
         private Thread workerThread;
-        
+
         public WorkerService(Dictionary<string, object> conf, string input, string output)
         {
             config = conf;
@@ -29,18 +29,21 @@ namespace worker
             workerThread = new Thread(
                 () =>
                 {
-                    using (var consumer = new Consumer<Null, string>(config, null, new StringDeserializer(Encoding.UTF8)))
+                    using (var consumer =
+                        new Consumer<Null, string>(config, null, new StringDeserializer(Encoding.UTF8)))
                     using (var producer = new Producer<Null, string>(config, null, new StringSerializer(Encoding.UTF8)))
                     {
                         consumer.OnPartitionEOF += (_, end)
-                            => logger.Info($"Reached end of topic {end.Topic} partition {end.Partition}, next message will be at offset {end.Offset}");
+                            => logger.Info(
+                                $"Reached end of topic {end.Topic} partition {end.Partition}, next message will be at offset {end.Offset}");
 
                         consumer.OnError += (_, error)
                             => logger.Error($"Error: {error}");
 
                         consumer.OnPartitionsAssigned += (_, partitions) =>
                         {
-                            logger.Info($"Assigned partitions: [{string.Join(", ", partitions)}], member id: {consumer.MemberId}");
+                            logger.Info(
+                                $"Assigned partitions: [{string.Join(", ", partitions)}], member id: {consumer.MemberId}");
                             consumer.Assign(partitions);
                         };
 
@@ -59,22 +62,25 @@ namespace worker
                         {
                             Message<Null, string> msg;
                             if (!consumer.Consume(out msg, TimeSpan.FromSeconds(1))) continue;
-                    
-                            logger.Info($"Got message | Topic: {msg.Topic} Partition: {msg.Partition} Offset: {msg.Offset} {msg.Value}");
+
+                            logger.Info(
+                                $"Got message | Topic: {msg.Topic} Partition: {msg.Partition} Offset: {msg.Offset} {msg.Value}");
 
                             // hurr durr... making expensive computations...
                             Thread.Sleep(TimeSpan.FromSeconds(15));
 
                             var deliveryReport = producer.ProduceAsync(outputTopicName, null, msg.Value);
-                        
-                            deliveryReport.ContinueWith(task =>
-                            {
-                                logger.Info($"Sent result | Partition: {task.Result.Partition}, Offset: {task.Result.Offset}");
-                            });
+
+                            deliveryReport.ContinueWith(
+                                task =>
+                                {
+                                    logger.Info(
+                                        $"Sent result | Partition: {task.Result.Partition}, Offset: {task.Result.Offset}");
+                                });
                         }
-                        
+
                         producer.Flush(TimeSpan.FromSeconds(10));
-                    }                    
+                    }
                 });
             workerThread.Start();
         }
