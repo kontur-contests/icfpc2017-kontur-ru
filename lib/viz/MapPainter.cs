@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using lib.viz.Detalization;
@@ -22,14 +23,14 @@ namespace lib.viz
 
         public void Paint(Graphics g, PointF mouseLogicalPos, RectangleF clipRect)
         {
-            var visibleSites = map.Sites.Where(s => clipRect.Contains(s.Point())).Select(s => s.Id).ToHashSet();
+            var sw = Stopwatch.StartNew();
             foreach (var river in map.Rivers)
-                if (visibleSites.Contains(river.Source) || visibleSites.Contains(river.Target))
                     DrawRiver(g, river);
-            foreach (var site in visibleSites.Select(id => map.SiteById[id]))
+            foreach (var site in map.Sites)
                 DrawSite(g, site);
             foreach (var site in map.Sites)
                 DrawSiteText(g, site, mouseLogicalPos);
+            g.DrawString(sw.Elapsed.TotalMilliseconds.ToString("0ms"), SystemFonts.DefaultFont, Brushes.Black, PointF.Empty);
         }
 
         private void DrawRiver(Graphics g, River river)
