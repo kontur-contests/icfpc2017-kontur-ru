@@ -2,10 +2,9 @@ using System;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
-using lib;
 using NUnit.Framework;
 
-namespace CinemaLib
+namespace lib.viz
 {
     public class MapPainter : IScenePainter
     {
@@ -58,7 +57,7 @@ namespace CinemaLib
             var form = new Form();
             var painter = new MapPainter();
             painter.Map = MapLoader.LoadMap(
-                    Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\..\maps\tube.json"))
+                    Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\..\maps\oxford-sparse.json"))
                 .Map;
             var panel = new ScaledViewPanel(painter)
             {

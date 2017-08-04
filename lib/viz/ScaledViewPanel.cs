@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Drawing;
 using System.Windows.Forms;
-using NUnit.Framework;
 
-namespace CinemaLib
+namespace lib.viz
 {
 	public class ScaledViewPanel : Panel
 	{

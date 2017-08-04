@@ -1,9 +1,9 @@
-﻿using FluentAssertions;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Drawing;
+using FluentAssertions;
 using NUnit.Framework;
 
-namespace CinemaLib
+namespace lib.viz
 {
     [TestFixture]
     public class PointNormalization_Tests
