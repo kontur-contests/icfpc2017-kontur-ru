@@ -30,11 +30,11 @@ namespace lib
 
     public class Map
     {
-        [JsonProperty("mines", Order = 3)] public int[] Mines;
+        [JsonProperty("mines", Order = 3)] public int[] Mines = new int[0];
 
-        [JsonProperty("rivers", Order = 2)] public River[] Rivers;
+        [JsonProperty("rivers", Order = 2)] public River[] Rivers = new River[0];
 
-        [JsonProperty("sites", Order = 1)] public Site[] Sites;
+        [JsonProperty("sites", Order = 1)] public Site[] Sites = new Site[0];
 
         public Map()
         {

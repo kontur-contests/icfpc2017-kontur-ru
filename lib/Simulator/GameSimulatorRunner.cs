@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using lib.Scores;
 
 namespace lib
@@ -18,6 +20,13 @@ namespace lib
             var state = gameSimulator.NextMove();
             while (!state.IsGameOver)
             {
+                var last = state.PreviousMoves.Last();
+
+                if (last is Move move)
+                    Console.WriteLine($"PunterId: {move.PunterId} move source: {move.Source} target: {move.Target}");
+                if (last is Pass pass)
+                    Console.WriteLine($"PunterId: { pass.PunterId} pass");
+
                 state = gameSimulator.NextMove();
             }
 

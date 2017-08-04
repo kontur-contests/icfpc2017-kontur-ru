@@ -1,9 +1,8 @@
 using System;
 using System.Drawing;
 using System.IO;
-using lib;
-using System.Linq;
 using System.Windows.Forms;
+using lib;
 using NUnit.Framework;
 
 namespace CinemaLib
@@ -24,6 +23,7 @@ namespace CinemaLib
         public void Paint(Graphics g)
         {
             g.Clear(Color.White);
+
             foreach (var river in map.Rivers)
                 g.DrawLine(Pens.Blue, map.Sites[river.Source].Point(), map.Sites[river.Target].Point());
             foreach (var site in map.Sites)
@@ -32,9 +32,9 @@ namespace CinemaLib
 
         private void DrawSite(Graphics g, Site site)
         {
-            var radius = 15;
+            var radius = 3;
             g.FillEllipse(GetSiteColor(site), site.X - radius, site.Y - radius, 2 * radius, 2 * radius);
-            g.DrawEllipse(Pens.Black, site.X - radius, site.Y - radius, 2 * radius, 2 * radius);
+            //g.DrawEllipse(Pens.Black, site.X - radius, site.Y - radius, 2 * radius, 2 * radius);
         }
 
         private Brush GetSiteColor(Site site)
@@ -54,7 +54,8 @@ namespace CinemaLib
             var form = new Form();
             var painter = new MapPainter();
             painter.Map = MapLoader.LoadMap(
-                Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\..\maps\circle.json")).Map;
+                    Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\..\maps\oxford-sparse.json"))
+                .Map;
             var panel = new ScaledViewPanel(painter)
             {
                 Dock = DockStyle.Fill
