@@ -1,3 +1,4 @@
+using System.Linq;
 using Newtonsoft.Json;
 
 namespace lib
@@ -45,6 +46,11 @@ namespace lib
             Rivers = rivers;
             Mines = mines;
         }
+
+        public Map Clone()
+        {
+            return new Map(Sites, Rivers.Select(r => r.Clone()).ToArray(), Mines);
+        }
     }
 
     public class River
@@ -69,6 +75,11 @@ namespace lib
         public override string ToString()
         {
             return $"{nameof(Source)}: {Source}, {nameof(Target)}: {Target}, {nameof(Owner)}: {Owner}";
+        }
+
+        public River Clone()
+        {
+            return new River(Source, Target, Owner);
         }
     }
 }

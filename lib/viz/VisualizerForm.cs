@@ -13,6 +13,7 @@ namespace lib.viz
         private readonly MapPainter mapPainter;
         private readonly ScorePanel scorePanel;
         private readonly StartGameConfigPanel startGameConfigPanel;
+        private GameSimulator gameSimulator;
 
         public VisualizerForm()
         {
@@ -41,12 +42,11 @@ namespace lib.viz
             scorePanel = new ScorePanel { Dock = DockStyle.Top, Height = 40 };
             rightPanel.Controls.Add(scorePanel);
             rightPanel.Controls.Add(mapPanel);
-            var simulator = new GameSimulator(startGameConfigPanel.SelectedMap.Map);
+            ChangeMap(startGameConfigPanel.SelectedMap);
 
             startGameConfigPanel.MapChanged += map =>
             {
-                simulator = new GameSimulator(startGameConfigPanel.SelectedMap.Map);
-                mapPainter.Map = map.Map;
+                ChangeMap(map);
                 mapPanel.Refresh();
             };
 
@@ -58,12 +58,18 @@ namespace lib.viz
 
             startGameConfigPanel.AiSelected += factory =>
             {
-                simulator.StartGame(startGameConfigPanel.SelectedAis);
+                ChangeMap(startGameConfigPanel.SelectedMap);
                 scorePanel.SetPlayers(startGameConfigPanel.SelectedAis);
             };
             makeStepButton.Click += (sender, args) =>
             {
-                var gameState = simulator.NextMove();
+                if (gameSimulator == null)
+                {
+                    gameSimulator = new GameSimulator(mapPainter.Map);
+                    gameSimulator.StartGame(startGameConfigPanel.SelectedAis);
+                    scorePanel.SetPlayers(startGameConfigPanel.SelectedAis);
+                }
+                var gameState = gameSimulator.NextMove();
                 mapPainter.GameState = gameState;
                 mapPanel.Refresh();
             };
@@ -71,6 +77,14 @@ namespace lib.viz
             Controls.Add(rightPanel);
             Controls.Add(makeStepButton);
             Controls.Add(startGameConfigPanel);
+        }
+
+        private void ChangeMap(NamedMap map)
+        {
+            var mapClone = map.Map.Clone();
+            gameSimulator = null;
+            mapPainter.Map = mapClone;
+            mapPainter.GameState = null;
         }
 
         protected override void OnLoad(EventArgs e)

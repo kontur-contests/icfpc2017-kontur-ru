@@ -14,7 +14,7 @@ namespace lib
 
         public GameSimulator(Map map)
         {
-            this.map = map;
+            this.map = map.Clone();
             punters = new List<IAi>();
             moves = new List<Move>();
         }

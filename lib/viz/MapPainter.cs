@@ -43,7 +43,8 @@ namespace lib.viz
             set
             {
                 gameState = value;
-                Map = gameState.CurrentMap;
+                if (gameState != null)
+                    Map = gameState.CurrentMap;
             }
         }
 
