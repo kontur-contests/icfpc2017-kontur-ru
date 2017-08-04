@@ -11,8 +11,15 @@ namespace lib
 {
     public static class MapLoader
     {
-        public static readonly string DefaultPath =
-            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\..\..\maps");
+        private static string LocateMapsFolder()
+        {
+            var dir = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
+            while (dir != null && !dir.HasSubdir("maps"))
+            {
+                dir = dir.Parent;
+            }
+            return dir.GetSubdir("maps").FullName;
+        }
 
         [NotNull]
         public static NamedMap LoadMap([NotNull] string path)
@@ -20,10 +27,17 @@ namespace lib
             if (!File.Exists(path))
                 throw new Exception($"File {path} not exists");
             Map map = JsonConvert.DeserializeObject<Map>(Encoding.UTF8.GetString(File.ReadAllBytes(path)));
-            
+
             return new NamedMap(
                 Path.GetFileNameWithoutExtension(path),
                 map);
+        }
+
+        [NotNull]
+        public static NamedMap LoadMapByName([NotNull] string filenameWithoutPath)
+        {
+            var fn = Path.Combine(LocateMapsFolder(), filenameWithoutPath);
+            return LoadMap(fn);
         }
 
         [NotNull]
@@ -38,7 +52,7 @@ namespace lib
         [NotNull]
         public static IEnumerable<NamedMap> LoadDefaultMaps()
         {
-            return LoadMaps(DefaultPath);
+            return LoadMaps(LocateMapsFolder());
         }
     }
 
