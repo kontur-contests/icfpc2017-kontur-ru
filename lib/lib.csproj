@@ -34,4 +34,10 @@
     </Reference>
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="viz\ScaledViewPanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+  </ItemGroup>
 </Project>

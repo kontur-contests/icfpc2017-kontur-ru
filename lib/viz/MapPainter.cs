@@ -45,7 +45,7 @@ namespace CinemaLib
         {
             var form = new Form();
             var painter = new MapPainter();
-            painter.Map = MapLoader.LoadMap(Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\maps\circle.json")).Map;
+            painter.Map = MapLoader.LoadMap(Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\..\maps\circle.json")).Map;
             var panel = new ScaledViewPanel(painter)
             {
                 Dock = DockStyle.Fill
