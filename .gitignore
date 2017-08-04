@@ -73,3 +73,6 @@ packages/*
 ansible/roles
 ansible/*.retry
 /.idea
+
+# official vm image dir
+/vm-debian-9
