@@ -17,7 +17,7 @@ namespace lib
         [SetUp]
         public void SetUp()
         {
-            map = MapLoader.LoadMap(Path.Combine(MapLoader.DefaultPath, "sample.json"));
+            map = MapLoader.LoadMapByName("sample.json");
             simulator = new GameSimulator(map.Map);
         }
 

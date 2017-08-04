@@ -95,9 +95,10 @@ namespace lib.viz
 			}
 			else
 			{
-				Invalidate(new Rectangle(0, 0, 100, 50));
-                var loc = e.Location;
-                Invalidate(new Rectangle(loc.X - 100, loc.Y - 100, loc.X + 100, loc.Y + 100));
+				//Invalidate(new Rectangle(0, 0, 100, 50));
+                //var loc = e.Location;
+				Invalidate();
+				//Invalidate(new Rectangle(loc.X - 100, loc.Y - 100, loc.X + 100, loc.Y + 100));
 			}
 		}
 

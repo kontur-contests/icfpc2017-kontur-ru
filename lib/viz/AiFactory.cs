@@ -2,7 +2,7 @@ using System;
 
 namespace lib
 {
-    internal class AiFactory
+    public class AiFactory
     {
         private readonly Func<IAi> create;
         public string Name;

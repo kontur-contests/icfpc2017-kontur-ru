@@ -25,7 +25,8 @@ namespace lib
             };
             mapsList.SelectedValueChanged += (sender, args) =>
             {
-                MapChanged?.Invoke((NamedMap) mapsList.SelectedItem);
+                if (mapsList.SelectedItem != null)
+                    MapChanged?.Invoke((NamedMap) mapsList.SelectedItem);
             };
             var allAisListLabel = new Label
             {
@@ -37,7 +38,11 @@ namespace lib
                 Dock = DockStyle.Bottom,
                 Height = 200
             };
-            allAisList.DoubleClick += (sender, args) => { AiSelected?.Invoke((AiFactory) allAisList.SelectedItem); };
+            allAisList.DoubleClick += (sender, args) =>
+            {
+                if (allAisList.SelectedItem != null)
+                    AiSelected?.Invoke((AiFactory) allAisList.SelectedItem);
+            };
             var selectedAisListLabel = new Label
             {
                 Dock = DockStyle.Bottom,
@@ -64,8 +69,8 @@ namespace lib
                 SelectedAis.RemoveAt(index);
             };
             MapChanged += map => { SelectedMap = map; };
-            Controls.Add(mapsListLabel);
             Controls.Add(mapsList);
+            Controls.Add(mapsListLabel);
             Controls.Add(allAisListLabel);
             Controls.Add(allAisList);
             Controls.Add(selectedAisListLabel);
