@@ -88,6 +88,11 @@ namespace lib
 
         private bool TryExtendComponent(Graph graph, out Move move)
         {
+            if (myMines.Count == 0)
+            {
+                move = null;
+                return false;
+            }
             var queue = new Queue<ExtendQueueItem>();
             var used = new HashSet<int>();
             foreach (var mineId in graph.Mines.Keys.Where(id => !myMines.Contains(id)))
@@ -104,7 +109,7 @@ namespace lib
             while (queue.Count > 0)
             {
                 var current = queue.Dequeue();
-                if (current.CurrentVertex.Edges.Any(x => x.Owner == punterId) && current.Edge != null)
+                if (current.CurrentVertex.Edges.Any(x => x.Owner == punterId))
                 {
                     int edgeFrom = current.Edge.From;
                     if (graph.Mines.ContainsKey(edgeFrom))
