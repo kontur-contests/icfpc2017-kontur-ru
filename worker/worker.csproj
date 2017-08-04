@@ -1,18 +1,28 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>net461</TargetFramework>
     <OutputType>Exe</OutputType>
     <AssemblyName>worker</AssemblyName>
     <RootNamespace>worker</RootNamespace>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="Confluent.Kafka" Version="0.11.0" />
     <PackageReference Include="librdkafka.redist" Version="0.11.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
     <PackageReference Include="NLog" Version="4.4.11" />
+    <PackageReference Include="NUnit" Version="3.7.1" />
+    <PackageReference Include="NUnit.ConsoleRunner" Version="3.7.0" />
+    <PackageReference Include="NUnit.Extension.NUnitProjectLoader" Version="3.6.0" />
+    <PackageReference Include="NUnit.Extension.NUnitV2Driver" Version="3.7.0" />
+    <PackageReference Include="NUnit.Extension.NUnitV2ResultWriter" Version="3.6.0" />
+    <PackageReference Include="NUnit.Extension.TeamCityEventListener" Version="1.0.2" />
+    <PackageReference Include="NUnit.Extension.VSProjectLoader" Version="3.6.0" />
+    <PackageReference Include="NUnit.Runners" Version="3.7.0" />
     <PackageReference Include="Topshelf" Version="4.0.3" />
     <PackageReference Include="Topshelf.NLog" Version="4.0.3" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\lib\lib.csproj" />
   </ItemGroup>
 
   <ItemGroup>

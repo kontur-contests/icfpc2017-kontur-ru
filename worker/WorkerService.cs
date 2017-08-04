@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading;
 using Confluent.Kafka;
 using Confluent.Kafka.Serialization;
+using Newtonsoft.Json;
 using NLog;
 
 namespace worker
@@ -14,74 +15,77 @@ namespace worker
         private readonly Dictionary<string, object> config;
         private readonly string inputTopicName;
         private readonly string outputTopicName;
+        private readonly IPlayer player;
         private bool cancelled;
         private Thread workerThread;
 
-        public WorkerService(Dictionary<string, object> conf, string input, string output)
+        public WorkerService(Dictionary<string, object> conf, string input, string output, IPlayer player)
         {
             config = conf;
             inputTopicName = input;
             outputTopicName = output;
+            this.player = player;
         }
 
         public void Start()
         {
-            workerThread = new Thread(
-                () =>
+            workerThread = new Thread(() =>
+            {
+                using (var consumer = new Consumer<Null, string>(config, null, new StringDeserializer(Encoding.UTF8)))
+                using (var producer = new Producer<Null, string>(config, null, new StringSerializer(Encoding.UTF8)))
                 {
-                    using (var consumer =
-                        new Consumer<Null, string>(config, null, new StringDeserializer(Encoding.UTF8)))
-                    using (var producer = new Producer<Null, string>(config, null, new StringSerializer(Encoding.UTF8)))
+                    consumer.OnPartitionEOF += (_, end) => logger.Info(
+                        $"Reached end of topic {end.Topic} partition {end.Partition}, next message will be at offset {end.Offset}");
+
+                    consumer.OnError += (_, error) => logger.Error($"Error: {error}");
+
+                    consumer.OnPartitionsAssigned += (_, partitions) =>
                     {
-                        consumer.OnPartitionEOF += (_, end)
-                            => logger.Info(
-                                $"Reached end of topic {end.Topic} partition {end.Partition}, next message will be at offset {end.Offset}");
+                        logger.Info($"Assigned partitions: [{string.Join(", ", partitions)}], member id: {consumer.MemberId}");
+                        consumer.Assign(partitions);
+                    };
 
-                        consumer.OnError += (_, error)
-                            => logger.Error($"Error: {error}");
+                    consumer.OnPartitionsRevoked += (_, partitions) =>
+                    {
+                        logger.Info($"Revoked partitions: [{string.Join(", ", partitions)}]");
+                        consumer.Unassign();
+                    };
 
-                        consumer.OnPartitionsAssigned += (_, partitions) =>
+                    consumer.OnStatistics += (_, json) => logger.Info($"Statistics: {json}");
+
+                    consumer.Subscribe(inputTopicName);
+
+                    while (!cancelled)
+                    {
+                        Message<Null, string> msg;
+                        if (!consumer.Consume(out msg, TimeSpan.FromSeconds(1))) continue;
+
+                        logger.Info($"Got message | Topic: {msg.Topic} Partition: {msg.Partition} Offset: {msg.Offset} {msg.Value}");
+
+                        try
                         {
-                            logger.Info(
-                                $"Assigned partitions: [{string.Join(", ", partitions)}], member id: {consumer.MemberId}");
-                            consumer.Assign(partitions);
-                        };
+                            var task = JsonConvert.DeserializeObject<Task>(msg.Value);
+                            var result = player.Play(task);
+                            var resultString = JsonConvert.SerializeObject(result);
 
-                        consumer.OnPartitionsRevoked += (_, partitions) =>
-                        {
-                            logger.Info($"Revoked partitions: [{string.Join(", ", partitions)}]");
-                            consumer.Unassign();
-                        };
-
-                        consumer.OnStatistics += (_, json)
-                            => logger.Info($"Statistics: {json}");
-
-                        consumer.Subscribe(inputTopicName);
-
-                        while (!cancelled)
-                        {
-                            Message<Null, string> msg;
-                            if (!consumer.Consume(out msg, TimeSpan.FromSeconds(1))) continue;
-
-                            logger.Info(
-                                $"Got message | Topic: {msg.Topic} Partition: {msg.Partition} Offset: {msg.Offset} {msg.Value}");
-
-                            // hurr durr... making expensive computations...
-                            Thread.Sleep(TimeSpan.FromSeconds(15));
-
-                            var deliveryReport = producer.ProduceAsync(outputTopicName, null, msg.Value);
+                            var deliveryReport = producer.ProduceAsync(outputTopicName, null, resultString);
 
                             deliveryReport.ContinueWith(
-                                task =>
+                                x =>
                                 {
                                     logger.Info(
-                                        $"Sent result | Partition: {task.Result.Partition}, Offset: {task.Result.Offset}");
+                                        $"Sent result | Partition: {x.Result.Partition}, Offset: {x.Result.Offset}");
                                 });
                         }
-
-                        producer.Flush(TimeSpan.FromSeconds(10));
+                        catch (Exception e)
+                        {
+                            logger.Warn(e);
+                        }
                     }
-                });
+
+                    producer.Flush(TimeSpan.FromSeconds(10));
+                }
+            });
             workerThread.Start();
         }
 
