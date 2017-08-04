@@ -10,7 +10,7 @@ namespace lib.Scores.Simple
             var n = map.Sites.Length;
             var dist = Enumerable
                 .Range(0, n)
-                .Select(x => Enumerable.Repeat(int.MaxValue, n).ToArray())
+                .Select(x => Enumerable.Repeat(int.MaxValue/2, n).ToArray())
                 .ToArray();
 
             for (var i = 0; i < n; i++)
