@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace lib
 {
@@ -20,11 +19,6 @@ namespace lib
         public IMove GetNextMove(IMove[] prevMoves, Map map)
         {
             throw new NotImplementedException();
-        }
-
-        public Move GetNextMove(Move[] prevMoves, Map map)
-        {
-            throw new InvalidOperationException();
             //if (myMines.Any())
             //{
             //    // bfs от myMines до ближайшей шахты
