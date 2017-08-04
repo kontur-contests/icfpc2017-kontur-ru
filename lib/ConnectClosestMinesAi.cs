@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using lib.GraphImpl;
 using lib.viz;
 using NUnit.Framework;
+using Shouldly;
 
 namespace lib
 {
@@ -100,6 +101,10 @@ namespace lib
                 var current = queue.Dequeue();
                 if (current.CurrentVertex.Edges.Any(x => x.Owner == punterId))
                 {
+                    if (graph.Mines.ContainsKey(current.Edge.From))
+                        myMines.Add(current.Edge.From);
+                    if (graph.Mines.ContainsKey(current.Edge.To))
+                        myMines.Add(current.Edge.To);
                     move = MakeMove(current.Edge);
                     return true;
                 }
@@ -227,8 +232,43 @@ namespace lib
     }
 
     [TestFixture]
-    public class MapPainter_ShouldNot
+    public class ConnectClosestMinesAi_Should
     {
+        [Test]
+        public void Test1()
+        {
+            var map = MapLoader.LoadMap(Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\..\maps\sample.json")).Map;
+            var ai = new ConnectClosestMinesAi();
+            ai.StartRound(0, 1, map);
+            var move = ai.GetNextMove(null, map);
+            move.ShouldBe(new Move(0, 5, 7));
+        }
+
+        [Test]
+        public void Test2()
+        {
+            var map = MapLoader.LoadMap(Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\..\maps\sample.json")).Map;
+            var ai = new ConnectClosestMinesAi();
+            var simulator = new GameSimulator(map);
+            simulator.StartGame(new List<IAi> {ai});
+            var gameState = simulator.NextMove();
+            var move = ai.GetNextMove(null, gameState.CurrentMap);
+            move.ShouldBe(new Move(0, 1, 7));
+        }
+
+        [Test]
+        public void Test3()
+        {
+            var map = MapLoader.LoadMap(Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\..\maps\sample.json")).Map;
+            var ai = new ConnectClosestMinesAi();
+            var simulator = new GameSimulator(map);
+            simulator.StartGame(new List<IAi> {ai});
+            simulator.NextMove();
+            var gameState = simulator.NextMove();
+            var move = ai.GetNextMove(null, gameState.CurrentMap);
+            move.ShouldBe(new Move(0, 0, 1));
+        }
+
         [Test]
         [STAThread]
         [Explicit]
