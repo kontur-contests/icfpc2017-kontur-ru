@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
-using lib.Score.Simple;
+using lib.Scores.Simple;
 using NUnit.Framework;
 
-namespace lib.Score
+namespace lib.Scores
 {
     [TestFixture]
     public class ScoreCalculator_Tests

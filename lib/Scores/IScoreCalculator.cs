@@ -1,4 +1,4 @@
-namespace lib.Score
+namespace lib.Scores
 {
     public interface IScoreCalculator
     {

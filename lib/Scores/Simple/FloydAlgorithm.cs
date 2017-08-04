@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 
-namespace lib.Score.Simple
+namespace lib.Scores.Simple
 {
     public static class FloydAlgorithm
     {
