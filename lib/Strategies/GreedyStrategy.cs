@@ -15,6 +15,7 @@ namespace lib.Strategies
 		public GreedyStrategy(Graph graph, SimpleScoreBuilder scorer)
 		{
 			Graph = graph;
+			ScoreBuilder = scorer;
 		}
 
 		public List<TurnResult> Turn(Graph graph, IList<int> activePoints)

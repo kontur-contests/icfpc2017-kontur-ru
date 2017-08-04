@@ -40,15 +40,14 @@ namespace lib.Strategies
 
 				foreach (var edge in vertexNode.Edges)
 				{
-					if (edge.Owner >= 0)
-						break;
 					if (used.ContainsKey(edge.To))
 					{
 						if(used[edge.To].Distance == vertexCharct.Distance + 1)
-							used[edge.To].PathsCountToMine++;
+							used[edge.To].PreviousOptimalEdges.Add(vertex);
 						continue;
 					}
 					used[edge.To] = new MineNodeCharacteristic{Vertex = edge.To, Mine = mine, Distance = vertexCharct.Distance + 1};
+					used[edge.To].PreviousOptimalEdges.Add(vertex);
 				}
 			}
 
@@ -61,6 +60,6 @@ namespace lib.Strategies
 		public int Mine;
 		public int Vertex;
 		public int Distance;
-		public int PathsCountToMine = 1;
+		public List<int> PreviousOptimalEdges = new List<int>();
 	}
 }
