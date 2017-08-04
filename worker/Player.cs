@@ -5,41 +5,23 @@ using Newtonsoft.Json;
 
 namespace worker
 {
-    public class TaskPlayer
+    public class PlayerWithParams
     {
         public string Name { get; set; }
-        public List<int> Values { get; set; }
+        public Dictionary<string, double> Params { get; set; }
+        public int Rank { get; set; } = 0;
     }
     
     public class Task
     {
-        public List<TaskPlayer> Players { get; set; }
-    }
-
-    public class ResultPlayer
-    {
-        public string Name { get; set; }
-        public int Rank { get; set; }
+        public List<PlayerWithParams> Players { get; set; }
     }
 
     public class Result
     {
-        public IEnumerable<ResultPlayer> Players { get; set; }
+        public IEnumerable<PlayerWithParams> Players { get; set; }
     }
 
-    public interface IPlayerStrategy
-    {
-        IEnumerable<TaskPlayer> Play(List<TaskPlayer> players);
-    }
-    
-    public class DummySumPlayerStrategy : IPlayerStrategy
-    {
-        public IEnumerable<TaskPlayer> Play(List<TaskPlayer> players)
-        {
-            return players.OrderByDescending(player => player.Values.Sum());
-        }
-    }
-    
     public interface IPlayer
     {
         Result Play(Task task);
@@ -58,10 +40,11 @@ namespace worker
         {
             var players = playerStrategy
                 .Play(task.Players)
-                .Select((player, i) => new ResultPlayer
+                .Select(pair => new PlayerWithParams
                 {
-                    Name = player.Name,
-                    Rank = i
+                    Name = pair.Item1.Name,
+                    Params = pair.Item1.Params,
+                    Rank = pair.Item2
                 });
 
             return new Result
