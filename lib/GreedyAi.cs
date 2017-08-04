@@ -59,10 +59,8 @@ namespace lib.Strategies
             if (bestEdge != null)
             {
                 nextMove = new Move(punterId, bestEdge.From, bestEdge.To);
-                Console.WriteLine($"TAKE {bestEdge.From} {bestEdge.To} with score {maxAddScore}");
                 return true;
             }
-            Console.WriteLine("PASS");
             nextMove = null;
             return false;
         }
@@ -125,11 +123,37 @@ namespace lib.Strategies
             var gameSimulator = new GameSimulatorRunner(new SimpleScoreCalculator());
 
             var results = gameSimulator.SimulateGame(
-                gamers, MapLoader.LoadMapByName("Sierpinski-triangle.json").Map);
+                gamers, MapLoader.LoadMapByName("sample.json").Map);
 
             foreach (var gameSimulationResult in results)
             {
                 Console.Out.WriteLine("gameSimulationResult = {0}:{1}", gameSimulationResult.Gamer.Name, gameSimulationResult.Score);
+            }
+        }
+
+        [Test]
+        [Explicit]
+        public void TestAllMaps()
+        {
+            var maps = MapLoader.LoadDefaultMaps().OrderBy(m => m.Map.Rivers.Length).ToList();
+
+            foreach (var map in maps)
+            {
+                var gamers = new List<IAi> { new GreedyAi(),  };
+                var gameSimulator = new GameSimulatorRunner(new SimpleScoreCalculator());
+                
+
+                Console.WriteLine($"MAP: {map.Name}");
+                var results = gameSimulator.SimulateGame(
+                    gamers, map.Map);
+
+                foreach (var gameSimulationResult in results)
+                    Console.Write($"{gameSimulationResult.Gamer.Name} ");
+                Console.WriteLine();
+                foreach (var gameSimulationResult in results)
+                    Console.Write($"{gameSimulationResult.Score} ");
+                Console.WriteLine();
+                Console.Out.Flush();
             }
         }
     }

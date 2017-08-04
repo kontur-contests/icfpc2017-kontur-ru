@@ -8,9 +8,12 @@ namespace lib
     public class GameSimulatorRunner
     {
         private readonly IScoreCalculator scoreCalculator;
-        public GameSimulatorRunner(IScoreCalculator scoreCalculator)
+        private readonly bool silent;
+
+        public GameSimulatorRunner(IScoreCalculator scoreCalculator, bool silent = false)
         {
             this.scoreCalculator = scoreCalculator;
+            this.silent = silent;
         }
 
         public List<GameSimulationResult> SimulateGame(List<IAi> gamers, Map map)
@@ -22,9 +25,9 @@ namespace lib
             {
                 var last = state.PreviousMoves.Last();
 
-                if (last is Move move)
+                if (last is Move move && !silent)
                     Console.WriteLine($"PunterId: {move.PunterId} move source: {move.Source} target: {move.Target}");
-                if (last is Pass pass)
+                if (last is Pass pass && !silent)
                     Console.WriteLine($"PunterId: { pass.PunterId} pass");
 
                 state = gameSimulator.NextMove();
