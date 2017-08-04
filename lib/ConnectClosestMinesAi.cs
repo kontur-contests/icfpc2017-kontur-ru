@@ -1,7 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Windows.Forms;
+using CinemaLib;
 using lib.GraphImpl;
+using NUnit.Framework;
 
 namespace lib
 {
@@ -219,6 +223,33 @@ namespace lib
         {
             public Vertex CurrentVertex;
             public Edge Edge;
+        }
+    }
+
+    [TestFixture]
+    public class MapPainter_ShouldNot
+    {
+        [Test]
+        [STAThread]
+        [Explicit]
+        public void Show()
+        {
+            var form = new Form();
+            var painter = new MapPainter();
+            var map = MapLoader.LoadMap(Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\..\maps\sample.json"));
+
+            var ai = new ConnectClosestMinesAi();
+            var simulator = new GameSimulator(map.Map);
+            simulator.StartGame(new List<IAi> { ai });
+            var gameState = simulator.NextMove();
+            painter.Map = gameState.CurrentMap;
+
+            var panel = new ScaledViewPanel(painter)
+            {
+                Dock = DockStyle.Fill
+            };
+            form.Controls.Add(panel);
+            form.ShowDialog();
         }
     }
 }

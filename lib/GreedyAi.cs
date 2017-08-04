@@ -21,8 +21,9 @@ namespace lib.Strategies
         public IMove GetNextMove(IMove[] prevMoves, Map map)
         {
             var graph = new Graph(map);
-
+            var calculator = new ConnectedCalculator(graph, punterId);
             
+
 
             return new Pass();
         }
