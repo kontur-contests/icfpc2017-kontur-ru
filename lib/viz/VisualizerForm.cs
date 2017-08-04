@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Windows.Forms;
-using lib.Strategies;
+using lib.Scores.Simple;
 using lib.viz.Detalization;
 using NUnit.Framework;
 
@@ -9,32 +9,45 @@ namespace lib.viz
 {
     public class VisualizerForm : Form
     {
+        private readonly Timer timer;
+        private readonly MapPainter mapPainter;
+        private readonly ScorePanel scorePanel;
+        private readonly StartGameConfigPanel startGameConfigPanel;
+
         public VisualizerForm()
         {
-            var startGameConfigPanel = new StartGameConfigPanel
+            timer = new Timer();
+            startGameConfigPanel = new StartGameConfigPanel
             {
                 Dock = DockStyle.Left
             };
             startGameConfigPanel.SetMaps(MapLoader.LoadDefaultMaps().ToArray());
             startGameConfigPanel.SetAis(AiFactoryRegistry.Factories);
 
-            var painter = new MapPainter
+            mapPainter = new MapPainter
             {
                 Map = startGameConfigPanel.SelectedMap.Map,
                 PainterAugmentor = new DefaultPainterAugmentor()
             };
 
-            var panel = new ScaledViewPanel(painter)
+            var rightPanel = new Panel
             {
                 Dock = DockStyle.Fill
             };
-            GameSimulator simulator = new GameSimulator(startGameConfigPanel.SelectedMap.Map);
+            var mapPanel = new ScaledViewPanel(mapPainter)
+            {
+                Dock = DockStyle.Fill
+            };
+            scorePanel = new ScorePanel { Dock = DockStyle.Top, Height = 40 };
+            rightPanel.Controls.Add(scorePanel);
+            rightPanel.Controls.Add(mapPanel);
+            var simulator = new GameSimulator(startGameConfigPanel.SelectedMap.Map);
 
             startGameConfigPanel.MapChanged += map =>
             {
                 simulator = new GameSimulator(startGameConfigPanel.SelectedMap.Map);
-                painter.Map = map.Map;
-                panel.Refresh();
+                mapPainter.Map = map.Map;
+                mapPanel.Refresh();
             };
 
             var makeStepButton = new Button
@@ -46,17 +59,45 @@ namespace lib.viz
             startGameConfigPanel.AiSelected += factory =>
             {
                 simulator.StartGame(startGameConfigPanel.SelectedAis);
+                scorePanel.SetPlayers(startGameConfigPanel.SelectedAis);
             };
-
             makeStepButton.Click += (sender, args) =>
             {
-                painter.GameState = simulator.NextMove();
-                panel.Refresh();
+                var gameState = simulator.NextMove();
+                mapPainter.GameState = gameState;
+                mapPanel.Refresh();
             };
 
-            Controls.Add(startGameConfigPanel);
-            Controls.Add(panel);
+            Controls.Add(rightPanel);
             Controls.Add(makeStepButton);
+            Controls.Add(startGameConfigPanel);
+        }
+
+        protected override void OnLoad(EventArgs e)
+        {
+            base.OnLoad(e);
+            timer.Interval = 500;
+            timer.Tick += OnTick;
+            timer.Start();
+        }
+
+        private void OnTick(object sender, EventArgs e)
+        {
+            timer.Stop();
+            UpdateScores();
+            timer.Start();
+        }
+
+        private void UpdateScores()
+        {
+            var gameState = mapPainter.GameState;
+            if (gameState == null) return;
+            var simpleScoreCalculator = new SimpleScoreCalculator();
+            var scores = startGameConfigPanel.SelectedAis
+                .Select(
+                    (ai, i) => new GameSimulationResult(
+                        ai, simpleScoreCalculator.GetScore(i, gameState.CurrentMap)));
+            scorePanel.SetScores(scores.ToArray());
         }
     }
 
@@ -68,7 +109,8 @@ namespace lib.viz
         {
             var types = typeof(AiFactoryRegistry).Assembly.GetTypes()
                 .Where(x => typeof(IAi).IsAssignableFrom(x) && x.GetConstructor(Type.EmptyTypes) != null);
-            Factories = types.Select(type => new AiFactory(type.Name, () => (IAi)Activator.CreateInstance(type))).ToArray();
+            Factories = types.Select(type => new AiFactory(type.Name, () => (IAi) Activator.CreateInstance(type)))
+                .ToArray();
         }
     }
 
