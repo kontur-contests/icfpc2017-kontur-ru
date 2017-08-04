@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace lib
+namespace lib.Interaction
 {
     public interface IServerInteraction
     {

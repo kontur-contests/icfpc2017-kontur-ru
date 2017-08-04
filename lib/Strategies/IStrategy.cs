@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
+using lib.GraphImpl;
 
 namespace lib.Strategies
 {
     public interface IStrategy
     {
-        void Init(Map map);
-        List<TurnResult> Turn(Map map);
+        List<TurnResult> Turn(Graph graph, IList<int> activePositions);
     }
 }

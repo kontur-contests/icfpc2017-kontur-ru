@@ -1,6 +1,7 @@
 ﻿using System;
+using lib.Interaction.Internal;
 
-namespace lib
+namespace lib.Interaction
 {
     public class OnlineInteraction : IServerInteraction
     {
@@ -21,7 +22,7 @@ namespace lib
                 var moves = transport.ReadMoves();
                 var result = HandleMove.Invoke(moves, state);
                 state = result.Item2;
-                transport.SendMove(result.Item1);
+                transport.WriteMove(result.Item1);
                 if (moves.Length + 1 == setup.Map.Rivers.Length)
                     break;
             }
