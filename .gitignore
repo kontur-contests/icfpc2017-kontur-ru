@@ -78,3 +78,7 @@ ansible/*.retry
 /vm-debian-9
 .idea
 __pycache__
+
+
+/tools
+!/tools/packages.config

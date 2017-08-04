@@ -1,75 +1,31 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\packages\librdkafka.redist.0.11.0\build\net\librdkafka.redist.props" />
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{282B1902-191B-40F0-9A76-C8E4ED1EC474}</ProjectGuid>
-    <ProjectTypeGuids>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <TargetFramework>net461</TargetFramework>
     <OutputType>Exe</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>worker</RootNamespace>
     <AssemblyName>worker</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <RootNamespace>worker</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Confluent.Kafka, Version=0.11.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\packages\Confluent.Kafka.0.11.0\lib\net46\Confluent.Kafka.dll</HintPath>
-    </Reference>
-    <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
-      <HintPath>..\packages\NLog.4.4.11\lib\net45\NLog.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
-    <Reference Include="Topshelf, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b800c4cfcdeea87b">
-      <HintPath>..\packages\Topshelf.4.0.3\lib\net452\Topshelf.dll</HintPath>
-    </Reference>
-    <Reference Include="Topshelf.NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b800c4cfcdeea87b">
-      <HintPath>..\packages\Topshelf.NLog.4.0.3\lib\net452\Topshelf.NLog.dll</HintPath>
-    </Reference>
+    <PackageReference Include="Confluent.Kafka" Version="0.11.0" />
+    <PackageReference Include="librdkafka.redist" Version="0.11.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+    <PackageReference Include="NLog" Version="4.4.11" />
+    <PackageReference Include="NUnit" Version="3.7.1" />
+    <PackageReference Include="NUnit.ConsoleRunner" Version="3.7.0" />
+    <PackageReference Include="NUnit.Extension.NUnitProjectLoader" Version="3.6.0" />
+    <PackageReference Include="NUnit.Extension.NUnitV2Driver" Version="3.7.0" />
+    <PackageReference Include="NUnit.Extension.NUnitV2ResultWriter" Version="3.6.0" />
+    <PackageReference Include="NUnit.Extension.TeamCityEventListener" Version="1.0.2" />
+    <PackageReference Include="NUnit.Extension.VSProjectLoader" Version="3.6.0" />
+    <PackageReference Include="NUnit.Runners" Version="3.7.0" />
+    <PackageReference Include="Topshelf" Version="4.0.3" />
+    <PackageReference Include="Topshelf.NLog" Version="4.0.3" />
   </ItemGroup>
+
   <ItemGroup>
-    <Compile Include="Program.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="WorkerService.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="NLog.config">
+    <None Update="NLog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="packages.config" />
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+
 </Project>

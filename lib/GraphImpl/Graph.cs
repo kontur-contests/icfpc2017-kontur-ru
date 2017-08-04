@@ -4,19 +4,45 @@ namespace lib.GraphImpl
 {
     public class Graph
     {
-        public readonly Dictionary<int, Vertex> vertexes = new Dictionary<int, Vertex>();
+        public readonly Dictionary<int, Vertex> Vertexes = new Dictionary<int, Vertex>();
+        public readonly Dictionary<int, Vertex> Mines = new Dictionary<int, Vertex>();
+
+        public Graph()
+        {
+            
+        }
 
         public Graph(Map map)
         {
             var mineIds = new HashSet<int>(map.Mines);
             foreach (var site in map.Sites)
-                vertexes.Add(site.Id, new Vertex(site.Id, mineIds.Contains(site.Id)));
+            {
+                var vertex = new Vertex(site.Id, mineIds.Contains(site.Id));
+                Vertexes.Add(vertex.Id, vertex);
+                if (vertex.IsMine)
+                    Mines.Add(vertex.Id, vertex);
+            }
             foreach (var river in map.Rivers)
             {
-                vertexes[river.Source].Edges.Add(new Edge(river.Target, river.Owner));
+                Vertexes[river.Source].Edges.Add(new Edge(river.Source, river.Target, river.Owner));
                 if (river.Source != river.Target)
-                    vertexes[river.Target].Edges.Add(new Edge(river.Source, river.Owner));
+                    Vertexes[river.Target].Edges.Add(new Edge(river.Target, river.Source, river.Owner));
             }
+        }
+
+        public void AddVertex(int v, bool isMine = false)
+        {
+            if (Vertexes.ContainsKey(v))
+                return;
+            Vertexes.Add(v, new Vertex(v, isMine));
+            if (isMine)
+                Mines.Add(v, new Vertex(v, true));
+        }
+
+        public void AddEdge(int v, int u, int owner = -1)
+        {
+            Vertexes[v].Edges.Add(new Edge(v, u, owner));
+            Vertexes[u].Edges.Add(new Edge(u, v, owner));
         }
     }
 }
