@@ -62,20 +62,25 @@ namespace worker
 
                         logger.Info($"Got message | Topic: {msg.Topic} Partition: {msg.Partition} Offset: {msg.Offset} {msg.Value}");
 
-
-
-                        var task = JsonConvert.DeserializeObject<Task>(msg.Value);
-                        var result = player.Play(task);
-                        var resultString = JsonConvert.SerializeObject(result);
-
-                        
-                        
-                        var deliveryReport = producer.ProduceAsync(outputTopicName, null, resultString);
-
-                        deliveryReport.ContinueWith(x =>
+                        try
                         {
-                            logger.Info($"Sent result | Partition: {x.Result.Partition}, Offset: {x.Result.Offset}");
-                        });
+                            var task = JsonConvert.DeserializeObject<Task>(msg.Value);
+                            var result = player.Play(task);
+                            var resultString = JsonConvert.SerializeObject(result);
+
+                            var deliveryReport = producer.ProduceAsync(outputTopicName, null, resultString);
+
+                            deliveryReport.ContinueWith(
+                                x =>
+                                {
+                                    logger.Info(
+                                        $"Sent result | Partition: {x.Result.Partition}, Offset: {x.Result.Offset}");
+                                });
+                        }
+                        catch (Exception e)
+                        {
+                            logger.Warn(e);
+                        }
                     }
 
                     producer.Flush(TimeSpan.FromSeconds(10));
