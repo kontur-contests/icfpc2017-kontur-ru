@@ -2,6 +2,6 @@ namespace lib.Scores
 {
     public interface IScoreCalculator
     {
-        int GetScore(int punter, Map map);
+        long GetScore(int punter, Map map);
     }
 }

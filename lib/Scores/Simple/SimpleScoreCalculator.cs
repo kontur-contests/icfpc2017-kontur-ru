@@ -6,7 +6,7 @@ namespace lib.Scores.Simple
 {
     public class SimpleScoreCalculator : IScoreCalculator
     {
-        public int GetScore(int punter, Map map)
+        public long GetScore(int punter, Map map)
         {
             var distances = FloydAlgorithm.Run(map);
 

@@ -10,12 +10,12 @@ namespace worker
 {
     public interface IPlayerStrategy
     {
-        IEnumerable<Tuple<PlayerWithParams, int>> Play(List<PlayerWithParams> players);
+        IEnumerable<Tuple<PlayerWithParams, long>> Play(List<PlayerWithParams> players);
     }
     
     public class DummySumPlayerStrategy : IPlayerStrategy
     {
-        public IEnumerable<Tuple<PlayerWithParams, int>> Play(List<PlayerWithParams> players)
+        public IEnumerable<Tuple<PlayerWithParams, long>> Play(List<PlayerWithParams> players)
         {
             var gamers = players
                 .Select(player => new DummyAi(player.Params["Param"]) { Name = player.Name })

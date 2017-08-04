@@ -42,14 +42,14 @@ namespace lib
 
     public class GameSimulationResult
     {
-        public GameSimulationResult(IAi gamer, int gamerScore)
+        public GameSimulationResult(IAi gamer, long gamerScore)
         {
             Gamer = gamer;
             Score = gamerScore;
         }
 
         public IAi Gamer { get; }
-        public int Score { get; }
+        public long Score { get; }
     }
     
 }

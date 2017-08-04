@@ -11,7 +11,7 @@ namespace lib.Scores
         private const int PUNTER_ID = 1;
 
         [TestCaseSource(nameof(GetTestCases))]
-        public int GetScore(Map map)
+        public long GetScore(Map map)
         {
             var calculator = new SimpleScoreCalculator();
 

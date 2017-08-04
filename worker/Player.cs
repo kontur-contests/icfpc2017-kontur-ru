@@ -9,7 +9,7 @@ namespace worker
     {
         public string Name { get; set; }
         public Dictionary<string, double> Params { get; set; }
-        public int Rank { get; set; } = 0;
+        public long Rank { get; set; } = 0;
     }
     
     public class Task

@@ -7,7 +7,7 @@ namespace lib.Scores.Simple
     public class FloydAlgorithm_Tests
     {
         [TestCaseSource(nameof(GetTestData))]
-        public int[][] Run(Map map)
+        public long[][] Run(Map map)
         {
             return FloydAlgorithm.Run(map);
         }
