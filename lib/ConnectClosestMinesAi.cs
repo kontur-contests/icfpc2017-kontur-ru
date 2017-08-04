@@ -42,7 +42,7 @@ namespace lib
             if (TryExtendAnything(graph, out move))
                 return move;
 
-            return new Pass();
+            return new Pass(punterId);
         }
 
         private bool TryExtendAnything(Graph graph, out IMove nextMove)

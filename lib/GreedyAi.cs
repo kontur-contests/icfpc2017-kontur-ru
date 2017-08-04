@@ -32,7 +32,7 @@ namespace lib.Strategies
             if (TryExtendAnything(graph, out IMove nextMove))
                 return nextMove;
 
-            return new Pass();
+            return new Pass(punterId);
         }
 
         private bool TryExtendAnything(Graph graph, out IMove nextMove)
@@ -100,7 +100,7 @@ namespace lib.Strategies
         {
             var form = new Form();
             var painter = new MapPainter();
-            var map = MapLoader.LoadMap(Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\..\maps\sample.json"));
+            var map = MapLoader.LoadMap(Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\..\maps\Sierpinski-triangle.json"));
 
             var ai = new GreedyAi();
             var simulator = new GameSimulator(map.Map);
@@ -127,7 +127,7 @@ namespace lib.Strategies
             var gameSimulator = new GameSimulatorRunner(new SimpleScoreCalculator());
 
             var results = gameSimulator.SimulateGame(
-                gamers, MapLoader.LoadMapByName("sample.json").Map);
+                gamers, MapLoader.LoadMapByName("Sierpinski-triangle.json").Map);
 
             foreach (var gameSimulationResult in results)
             {

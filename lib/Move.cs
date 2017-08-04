@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using Newtonsoft.Json;
 
 namespace lib
@@ -16,6 +15,14 @@ namespace lib
 
     public class Pass : AbstractMove
     {
+        public Pass()
+        {
+        }
+
+        public Pass(int punterId)
+        {
+            PunterId = punterId;
+        }
     }
 
     public class Move : AbstractMove, IEquatable<Move>
