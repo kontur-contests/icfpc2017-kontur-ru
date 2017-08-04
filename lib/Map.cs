@@ -20,6 +20,11 @@ namespace lib
             X = x;
             Y = y;
         }
+
+        public override string ToString()
+        {
+            return $"{nameof(Id)}: {Id}, {nameof(X)}: {X}, {nameof(Y)}: {Y}";
+        }
     }
 
     public class Map
@@ -59,6 +64,11 @@ namespace lib
             Source = source;
             Target = target;
             Owner = owner;
+        }
+
+        public override string ToString()
+        {
+            return $"{nameof(Source)}: {Source}, {nameof(Target)}: {Target}, {nameof(Owner)}: {Owner}";
         }
     }
 }
