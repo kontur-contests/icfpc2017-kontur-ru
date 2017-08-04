@@ -28,8 +28,9 @@ namespace lib
         {
         }
 
-        public Move(int source, int target)
+        public Move(int punterId, int source, int target)
         {
+            PunterId = punterId;
             Source = source;
             Target = target;
         }

@@ -60,7 +60,7 @@ namespace lib.Strategies
             }
             if (bestEdge != null)
             {
-                nextMove = new Move(bestEdge.From, bestEdge.To);
+                nextMove = new Move(punterId, bestEdge.From, bestEdge.To);
                 Console.WriteLine($"TAKE {bestEdge.From} {bestEdge.To}");
                 return true;
             }

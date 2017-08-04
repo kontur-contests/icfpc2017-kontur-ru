@@ -194,9 +194,9 @@ namespace lib
             return a.Edges.Count(x => x.Owner == -1) < b.Edges.Count(x => x.Owner == -1) ? a : b;
         }
 
-        private static IMove MakeMove(Edge edge)
+        private IMove MakeMove(Edge edge)
         {
-            return new Move(edge.From, edge.To);
+            return new Move(punterId, edge.From, edge.To);
         }
 
         public string SerializeGameState()

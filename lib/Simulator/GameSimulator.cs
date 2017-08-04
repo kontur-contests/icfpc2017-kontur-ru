@@ -36,6 +36,7 @@ namespace lib
                 return new GameState(map, currentPunter, moves.TakeLast(punters.Count).ToList(), true);
 
             var nextMove = punters[currentPunter].GetNextMove(moves.ToArray(), map);
+            
             ApplyMove(nextMove);
             moves.Add(nextMove);
             currentPunter = (currentPunter + 1) % punters.Count;
