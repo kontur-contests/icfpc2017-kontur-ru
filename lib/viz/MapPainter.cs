@@ -1,72 +1,69 @@
-using System;
 using System.Drawing;
-using System.IO;
 using System.Linq;
-using System.Windows.Forms;
-using lib;
-using NUnit.Framework;
+using lib.viz.Detalization;
 
-namespace CinemaLib
+namespace lib.viz
 {
     public class MapPainter : IScenePainter
     {
-        private Map map;
+        private static readonly Font font = new Font(FontFamily.GenericSansSerif, 6);
+        private IndexedMap map;
 
         public Map Map
         {
-            get => map;
-            set => map = value.NormalizeCoordinates(Size, Padding);
+            get => map.Map;
+            set => map = new IndexedMap(value.NormalizeCoordinates(Size, Padding));
         }
+
+        public IPainterAugmentor PainterAugmentor { get; set; } = new DefaultPainterAugmentor();
 
         private static SizeF Padding => new SizeF(30, 30);
         public SizeF Size => new SizeF(600, 600);
 
-        public void Paint(Graphics g)
+        public void Paint(Graphics g, PointF mouseLogicalPos, RectangleF clipRect)
         {
-            g.Clear(Color.White);
-
+            var visibleSites = map.Sites.Where(s => clipRect.Contains(s.Point())).Select(s => s.Id).ToHashSet();
             foreach (var river in map.Rivers)
-            {
-                var source = map.Sites.Single(x => x.Id == river.Source);
-                var target = map.Sites.Single(x => x.Id == river.Target);
-                g.DrawLine(Pens.Blue, source.Point(), target.Point());
-            }
-            foreach (var site in map.Sites)
+                if (visibleSites.Contains(river.Source) || visibleSites.Contains(river.Target))
+                    DrawRiver(g, river);
+            foreach (var site in visibleSites.Select(id => map.SiteById[id]))
                 DrawSite(g, site);
+            foreach (var site in map.Sites)
+                DrawSiteText(g, site, mouseLogicalPos);
+        }
+
+        private void DrawRiver(Graphics g, River river)
+        {
+            var data = PainterAugmentor.GetData(river);
+            var source = map.SiteById[river.Source];
+            var target = map.SiteById[river.Target];
+            using (var pen = new Pen(data.Color, data.PenWidth))
+            {
+                g.DrawLine(pen, source.Point(), target.Point());
+            }
         }
 
         private void DrawSite(Graphics g, Site site)
         {
-            var radius = 3;
-            g.FillEllipse(GetSiteColor(site), site.X - radius, site.Y - radius, 2 * radius, 2 * radius);
-            //g.DrawEllipse(Pens.Black, site.X - radius, site.Y - radius, 2 * radius, 2 * radius);
-        }
-
-        private Brush GetSiteColor(Site site)
-        {
-            return map.IsMine(site.Id) ? Brushes.Red : Brushes.LimeGreen;
-        }
-    }
-
-    [TestFixture]
-    public class MapPainter_Should
-    {
-        [Test]
-        [STAThread]
-        [Explicit]
-        public void Show()
-        {
-            var form = new Form();
-            var painter = new MapPainter();
-            painter.Map = MapLoader.LoadMap(
-                    Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\..\maps\tube.json"))
-                .Map;
-            var panel = new ScaledViewPanel(painter)
+            var data = PainterAugmentor.GetData(site);
+            var radius = data.Radius;
+            var rectangle = new RectangleF(site.X - radius, site.Y - radius, 2 * radius, 2 * radius);
+            using (var brush = new SolidBrush(data.Color))
             {
-                Dock = DockStyle.Fill
-            };
-            form.Controls.Add(panel);
-            form.ShowDialog();
+                if (map.MineIds.Contains(site.Id))
+                    g.FillRectangle(brush, rectangle);
+                else
+                    g.FillEllipse(brush, rectangle);
+            }
+        }
+
+        private void DrawSiteText(Graphics g, Site site, PointF mouseLogicalPos)
+        {
+            var data = PainterAugmentor.GetData(site);
+            var radius = data.Radius;
+            var rectangle = new RectangleF(site.X - radius, site.Y - radius, 2 * radius, 2 * radius);
+            if (rectangle.Contains(mouseLogicalPos))
+                g.DrawString(site.Id.ToString(), font, Brushes.Black, RectangleF.Inflate(rectangle, 7, 7).Location);
         }
     }
 }

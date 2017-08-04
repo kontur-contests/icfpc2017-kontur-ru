@@ -1,9 +1,8 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using lib;
 
-namespace CinemaLib
+namespace lib.viz
 {
     public static class MapDrawingExtensions
     {

@@ -54,7 +54,7 @@ namespace lib
 
             public IMove GetNextMove(IMove[] prevMoves, Map map)
             {
-                return new Move(0, 1);
+                return new Move(0, 0, 1);
             }
 
             public string SerializeGameState()

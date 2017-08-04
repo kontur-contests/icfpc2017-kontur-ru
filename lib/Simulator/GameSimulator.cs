@@ -36,6 +36,7 @@ namespace lib
                 return new GameState(map, currentPunter, moves.TakeLast(punters.Count).ToList(), true);
 
             var nextMove = punters[currentPunter].GetNextMove(moves.ToArray(), map);
+            
             ApplyMove(nextMove);
             moves.Add(nextMove);
             currentPunter = (currentPunter + 1) % punters.Count;
@@ -48,7 +49,8 @@ namespace lib
             if (!(nextMove is Move move)) return;
 
             foreach (var river in map.Rivers)
-                if (river.Source == move.Source && river.Target == move.Target)
+                if ((river.Source == move.Source && river.Target == move.Target
+                     || river.Target == move.Source && river.Source == move.Target) && river.Owner == -1)
                 {
                     river.Owner = move.PunterId;
                     return;

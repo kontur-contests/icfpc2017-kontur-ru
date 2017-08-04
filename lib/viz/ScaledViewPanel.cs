@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Drawing;
 using System.Windows.Forms;
-using NUnit.Framework;
 
-namespace CinemaLib
+namespace lib.viz
 {
 	public class ScaledViewPanel : Panel
 	{
@@ -97,6 +96,8 @@ namespace CinemaLib
 			else
 			{
 				Invalidate(new Rectangle(0, 0, 100, 50));
+                var loc = e.Location;
+                Invalidate(new Rectangle(loc.X - 100, loc.Y - 100, loc.X + 100, loc.Y + 100));
 			}
 		}
 
@@ -129,7 +130,7 @@ namespace CinemaLib
 		protected override void OnPaint(PaintEventArgs e)
 		{
 			base.OnPaint(e);
-			e.Graphics.Clear(Color.Black);
+			e.Graphics.Clear(Color.White);
 			if (painter == null) return;
 			var sceneSize = painter.Size;
 			if (FitToWindow)
@@ -147,7 +148,7 @@ namespace CinemaLib
 			e.Graphics.ResetTransform();
 			e.Graphics.TranslateTransform(shift.X, shift.Y);
 			e.Graphics.ScaleTransform(ZoomScale, ZoomScale);
-			painter.Paint(e.Graphics);
+            painter.Paint(e.Graphics, MouseLogicalPos, e.Graphics.VisibleClipBounds);
 		}
 	}
 }
