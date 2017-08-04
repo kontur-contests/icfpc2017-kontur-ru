@@ -23,12 +23,12 @@ namespace lib
             var state = gameSimulator.NextMove();
             while (!state.IsGameOver)
             {
-                var last = state.PreviousMoves.Last();
+                var lastMove = state.PreviousMoves.Last();
 
-                if (last is Move move && !silent)
-                    Console.WriteLine($"PunterId: {move.PunterId} move source: {move.Source} target: {move.Target}");
-                if (last is Pass pass && !silent)
-                    Console.WriteLine($"PunterId: { pass.PunterId} pass");
+                if (lastMove is ClaimMove claimMove && !silent)
+                    Console.WriteLine($"PunterId: {claimMove.PunterId} move source: {claimMove.Source} target: {claimMove.Target}");
+                if (lastMove is PassMove passMove && !silent)
+                    Console.WriteLine($"PunterId: {passMove.PunterId} pass");
 
                 state = gameSimulator.NextMove();
             }
@@ -36,7 +36,7 @@ namespace lib
             var results = new List<GameSimulationResult>();
             for (int i = 0; i < gamers.Count; i++)
             {
-                results.Add(new GameSimulationResult(gamers[i], scoreCalculator.GetScore(i, map))); 
+                results.Add(new GameSimulationResult(gamers[i], scoreCalculator.GetScore(i, map)));
             }
 
             return results;
@@ -54,5 +54,4 @@ namespace lib
         public IAi Gamer { get; }
         public long Score { get; }
     }
-    
 }

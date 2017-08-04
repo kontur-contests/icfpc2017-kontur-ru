@@ -1,50 +1,69 @@
 using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using FluentAssertions;
 using Newtonsoft.Json;
+using NUnit.Framework;
 
 namespace lib
 {
-    public interface IMove
+    public enum MoveType
     {
+        Claim,
+        Pass
     }
 
-    public class AbstractMove : IMove
+    [TestFixture]
+    public class Move_Should
     {
-        [JsonProperty("punter")]
-        public int PunterId;
-    }
-
-    public class Pass : AbstractMove
-    {
-        public Pass()
+        [Test]
+        public void BeClaim_WhenDeserializeFromClaim()
         {
+            var json = "{\"claim\" : {\"punter\" : 123, \"source\" : 2, \"target\" : 1}}";
+
+            JsonConvert.DeserializeObject<ClaimMove>(json);
         }
 
-        public Pass(int punterId)
+        [Test]
+        public void BePass_WhenDeserializeFromPass()
+        {
+            var json = "{\"pass\" : {\"punter\" : 123}}";
+
+            JsonConvert.DeserializeObject<PassMove>(json);
+        }
+    }
+
+    public abstract class Move
+    {
+    }
+
+    public class PassMove : Move
+    {
+        [JsonProperty("punter")] public int PunterId;
+
+        public PassMove(int punterId)
         {
             PunterId = punterId;
         }
     }
 
-    public class Move : AbstractMove, IEquatable<Move>
+
+    public class ClaimMove : Move, IEquatable<ClaimMove>
     {
-        [JsonProperty("source")]
-        public int Source;
+        [JsonProperty("punter")] public int PunterId;
 
-        [JsonProperty("target")]
-        public int Target;
+        [JsonProperty("source")] public int Source;
 
-        public Move()
-        {
-        }
+        [JsonProperty("target")] public int Target;
 
-        public Move(int punterId, int source, int target)
+        public ClaimMove(int punterId, int source, int target)
         {
             PunterId = punterId;
             Source = source;
             Target = target;
         }
 
-        public bool Equals(Move other)
+        public bool Equals(ClaimMove other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
@@ -56,7 +75,7 @@ namespace lib
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
-            return Equals((Move) obj);
+            return Equals((ClaimMove) obj);
         }
 
         public override int GetHashCode()
@@ -69,12 +88,12 @@ namespace lib
             }
         }
 
-        public static bool operator ==(Move left, Move right)
+        public static bool operator ==(ClaimMove left, ClaimMove right)
         {
             return Equals(left, right);
         }
 
-        public static bool operator !=(Move left, Move right)
+        public static bool operator !=(ClaimMove left, ClaimMove right)
         {
             return !Equals(left, right);
         }

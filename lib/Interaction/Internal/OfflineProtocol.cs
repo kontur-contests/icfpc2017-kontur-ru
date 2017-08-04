@@ -5,9 +5,9 @@ using Newtonsoft.Json;
 
 namespace lib.Interaction.Internal
 {
-    internal class OfflineHighTransport : HighTransport
+    internal class OfflineProtocol : ProtocolBase
     {
-        public OfflineHighTransport(ITransport transport)
+        public OfflineProtocol(ITransport transport)
         {
             this.transport = transport;
         }
@@ -23,15 +23,15 @@ namespace lib.Interaction.Internal
             transport.Write($"{{\"ready\":\"{ourId}\", \"state\":\"{stateData}\"}}");
         }
 
-        public Tuple<AbstractMove[], GameState> ReadMoves()
+        public Tuple<Move[], GameState> ReadMoves()
         {
             var data = JsonConvert.DeserializeObject<OfflineMoveServerData>(transport.Read());
-            var moves = data.Moves.Moves.Select(DeserializeMove).ToArray();
+            var moves = data.LastRound.Moves;
             var state = data.State;
             return Tuple.Create(moves, state);
         }
 
-        public void WriteMove(AbstractMove move, GameState newState)
+        public void WriteMove(Move move, GameState newState)
         {
             var moveData = SerializeMove(move);
             var stateData = JsonConvert.SerializeObject(newState);
@@ -39,13 +39,12 @@ namespace lib.Interaction.Internal
             transport.Write(moveData);
         }
 
-        public Tuple<AbstractMove[], Score[], GameState> ReadScore()
+        public Tuple<Move[], Score[], GameState> ReadScore()
         {
             var data = JsonConvert.DeserializeObject<Dictionary<string, string>>(transport.Read());
             var scoreData = JsonConvert.DeserializeObject<ScoreData>(data["stop"]);
             var state = JsonConvert.DeserializeObject<GameState>(data["state"]);
-            var moves = scoreData.Moves.Select(DeserializeMove).ToArray();
-            return Tuple.Create(moves, scoreData.Scores, state);
+            return Tuple.Create(scoreData.Moves, scoreData.Scores, state);
         }
 
         private class OfflineMoveServerData : MoveServerData

@@ -7,13 +7,13 @@ namespace lib.Interaction
     {
         public OffineInteraction(ITransport transport)
         {
-            this.transport = new OfflineHighTransport(transport);
+            this.transport = new OfflineProtocol(transport);
         }
 
         public void Start(string name, GameState state)
         {
             var setup = transport.ReadSetup();
-            transport.WriteInitialState(setup.OurId, state);
+            transport.WriteInitialState(setup.Id, state);
             SetupRecieved?.Invoke(setup);
 
             while (true)
@@ -30,9 +30,9 @@ namespace lib.Interaction
         }
 
         public event Action<Setup> SetupRecieved;
-        public Func<AbstractMove[], GameState, Tuple<AbstractMove, GameState>> HandleMove { private get; set; }
-        public event Action<AbstractMove[], Score[], GameState> GameEnded;
+        public Func<Move[], GameState, Tuple<Move, GameState>> HandleMove { private get; set; }
+        public event Action<Move[], Score[], GameState> GameEnded;
 
-        private readonly OfflineHighTransport transport;
+        private readonly OfflineProtocol transport;
     }
 }

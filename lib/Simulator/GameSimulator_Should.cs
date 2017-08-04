@@ -52,9 +52,9 @@ namespace lib
             {
             }
 
-            public IMove GetNextMove(IMove[] prevMoves, Map map)
+            public Move GetNextMove(Move[] prevMoves, Map map)
             {
-                return new Move(0, 0, 1);
+                return new ClaimMove(0, 0, 1);
             }
 
             public string SerializeGameState()

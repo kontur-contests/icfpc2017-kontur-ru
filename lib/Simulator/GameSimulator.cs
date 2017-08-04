@@ -9,14 +9,14 @@ namespace lib
         private readonly Map map;
         private List<IAi> punters;
         private int currentPunter = 0;
-        private readonly List<IMove> moves;
+        private readonly List<Move> moves;
         private int turnsAmount;
 
         public GameSimulator(Map map)
         {
             this.map = map;
             punters = new List<IAi>();
-            moves = new List<IMove>();
+            moves = new List<Move>();
         }
 
         public void StartGame(List<IAi> gamers)
@@ -36,7 +36,7 @@ namespace lib
                 return new GameState(map, currentPunter, moves.TakeLast(punters.Count).ToList(), true);
 
             var nextMove = punters[currentPunter].GetNextMove(moves.ToArray(), map);
-            
+
             ApplyMove(nextMove);
             moves.Add(nextMove);
             currentPunter = (currentPunter + 1) % punters.Count;
@@ -44,9 +44,9 @@ namespace lib
             return new GameState(map, currentPunter, moves.TakeLast(punters.Count).ToList(), false);
         }
 
-        private void ApplyMove(IMove nextMove)
+        private void ApplyMove(Move nextMove)
         {
-            if (!(nextMove is Move move)) return;
+            if (!(nextMove is ClaimMove move)) return;
 
             foreach (var river in map.Rivers)
                 if ((river.Source == move.Source && river.Target == move.Target

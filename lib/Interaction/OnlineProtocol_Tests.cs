@@ -1,4 +1,5 @@
-﻿using FakeItEasy;
+﻿using System;
+using FakeItEasy;
 using lib.Interaction.Internal;
 using Newtonsoft.Json;
 using NUnit.Framework;
@@ -6,13 +7,13 @@ using NUnit.Framework;
 namespace lib.Interaction
 {
     [TestFixture]
-    public class OnlineHighTransport_Tests
+    public class OnlineProtocol_Tests
     {
         [Test]
         public void TestHandShake()
         {
             var transport = A.Fake<ITransport>();
-            var gameTransport = new OnlineHighTransport(transport);
+            var gameTransport = new OnlineProtocol(transport);
             A.CallTo(() => transport.Read()).Returns("{\"you\":\"player\"}");
 
             gameTransport.HandShake("player");
@@ -22,13 +23,24 @@ namespace lib.Interaction
         }
 
         [Test]
+        public void TestHandShakeWithoutMock()
+        {
+            var transport = new TcpTransport(9011);
+            var gameTransport = new OnlineProtocol(transport);
+
+            gameTransport.HandShake("playёr");
+            var setup = gameTransport.ReadSetup();
+            Console.WriteLine(setup.Id);
+        }
+
+        [Test]
         public void TestReadSetup()
         {
             var transport = A.Fake<ITransport>();
-            var gameTransport = new OnlineHighTransport(transport);
+            var gameTransport = new OnlineProtocol(transport);
             var setup = new Setup
             {
-                OurId = "id"
+                Id = "id"
             };
             var data = JsonConvert.SerializeObject(setup);
 

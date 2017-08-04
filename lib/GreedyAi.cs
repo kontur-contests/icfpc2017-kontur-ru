@@ -25,17 +25,17 @@ namespace lib.Strategies
             this.mineDistCalulator = new MineDistCalculator(new Graph(map));
         }
 
-        public IMove GetNextMove(IMove[] prevMoves, Map map)
+        public Move GetNextMove(Move[] prevMoves, Map map)
         {
             var graph = new Graph(map);
 
-            if (TryExtendAnything(graph, out IMove nextMove))
+            if (TryExtendAnything(graph, out Move nextMove))
                 return nextMove;
 
-            return new Pass(punterId);
+            return new PassMove(punterId);
         }
 
-        private bool TryExtendAnything(Graph graph, out IMove nextMove)
+        private bool TryExtendAnything(Graph graph, out Move nextMove)
         {
             var calculator = new ConnectedCalculator(graph, punterId);
             var maxAddScore = long.MinValue;
@@ -58,7 +58,7 @@ namespace lib.Strategies
             }
             if (bestEdge != null)
             {
-                nextMove = new Move(punterId, bestEdge.From, bestEdge.To);
+                nextMove = new ClaimMove(punterId, bestEdge.From, bestEdge.To);
                 return true;
             }
             nextMove = null;
@@ -71,7 +71,7 @@ namespace lib.Strategies
                 mineId =>
                 {
                     var dist = mineDistCalulator.GetDist(mineId, vertexId);
-                    return (long)dist * dist;
+                    return (long) dist * dist;
                 });
         }
 
@@ -96,11 +96,12 @@ namespace lib.Strategies
         {
             var form = new Form();
             var painter = new MapPainter();
-            var map = MapLoader.LoadMap(Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\..\maps\Sierpinski-triangle.json"));
+            var map = MapLoader.LoadMap(
+                Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\..\maps\sample.json"));
 
             var ai = new GreedyAi();
             var simulator = new GameSimulator(map.Map);
-            simulator.StartGame(new List<IAi> { ai });
+            simulator.StartGame(new List<IAi> {ai});
 
             while (true)
             {
@@ -119,7 +120,7 @@ namespace lib.Strategies
         [Test]
         public void Test1()
         {
-            var gamers = new List<IAi> { new GreedyAi(), new ConnectClosestMinesAi() };
+            var gamers = new List<IAi> {new GreedyAi(), new GreedyAi()};
             var gameSimulator = new GameSimulatorRunner(new SimpleScoreCalculator());
 
             var results = gameSimulator.SimulateGame(
@@ -127,8 +128,8 @@ namespace lib.Strategies
 
             foreach (var gameSimulationResult in results)
             {
-                Console.Out.WriteLine("gameSimulationResult = {0}:{1}", gameSimulationResult.Gamer.Name, gameSimulationResult.Score);
-            }
+                Console.Out.WriteLine(
+                    "gameSimulationResult = {0}:{1}", gameSimulationResult.Gamer.Name, gameSimulationResult.Score);
         }
 
         [Test]

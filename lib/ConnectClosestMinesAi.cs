@@ -25,13 +25,13 @@ namespace lib
             this.mineDistCalulator = new MineDistCalculator(new Graph(map));
         }
 
-        public IMove GetNextMove(IMove[] prevMoves, Map map)
+        public Move GetNextMove(Move[] prevMoves, Map map)
         {
             mineDistCalulator = mineDistCalulator ?? new MineDistCalculator(new Graph(map));
 
             var graph = new Graph(map);
 
-            IMove move;
+            Move move;
 
             if (TryExtendComponent(graph, out move))
                 return move;
@@ -42,10 +42,10 @@ namespace lib
             if (TryExtendAnything(graph, out move))
                 return move;
 
-            return new Pass(punterId);
+            return new PassMove(punterId);
         }
 
-        private bool TryExtendAnything(Graph graph, out IMove nextMove)
+        private bool TryExtendAnything(Graph graph, out Move nextMove)
         {
             var calculator = new ConnectedCalculator(graph, punterId);
             var maxAddScore = long.MinValue;
@@ -86,7 +86,7 @@ namespace lib
             return false;
         }
 
-        private bool TryExtendComponent(Graph graph, out IMove move)
+        private bool TryExtendComponent(Graph graph, out Move move)
         {
             var queue = new Queue<ExtendQueueItem>();
             var used = new HashSet<int>();
@@ -133,7 +133,7 @@ namespace lib
             return false;
         }
 
-        private bool TryBuildNewComponent(Graph graph, out IMove move)
+        private bool TryBuildNewComponent(Graph graph, out Move move)
         {
             var queue = new Queue<BuildQueueItem>();
             var used = new Dictionary<int, BuildQueueItem>();
@@ -205,9 +205,9 @@ namespace lib
             return a.Edges.Count(x => x.Owner == -1) < b.Edges.Count(x => x.Owner == -1) ? a : b;
         }
 
-        private IMove MakeMove(Edge edge)
+        private Move MakeMove(Edge edge)
         {
-            return new Move(punterId, edge.From, edge.To);
+            return new ClaimMove(punterId, edge.From, edge.To);
         }
 
         public string SerializeGameState()
@@ -247,7 +247,7 @@ namespace lib
             var ai = new ConnectClosestMinesAi();
             ai.StartRound(0, 1, map);
             var move = ai.GetNextMove(null, map);
-            move.ShouldBe(new Move(0, 5, 7));
+            move.ShouldBe(new ClaimMove(0, 5, 7));
         }
 
         [Test]
@@ -259,7 +259,7 @@ namespace lib
             simulator.StartGame(new List<IAi> {ai});
             var gameState = simulator.NextMove();
             var move = ai.GetNextMove(null, gameState.CurrentMap);
-            move.ShouldBe(new Move(0, 1, 7));
+            move.ShouldBe(new ClaimMove(0, 1, 7));
         }
 
         [Test]
@@ -272,7 +272,7 @@ namespace lib
             simulator.NextMove();
             var gameState = simulator.NextMove();
             var move = ai.GetNextMove(null, gameState.CurrentMap);
-            move.ShouldBe(new Move(0, 0, 1));
+            move.ShouldBe(new ClaimMove(0, 0, 1));
         }
 
         [Test]

@@ -7,7 +7,7 @@ namespace lib.Interaction
     {
         public OnlineInteraction(ITransport transport)
         {
-            this.transport = new OnlineHighTransport(transport);
+            this.transport = new OnlineProtocol(transport);
         }
 
         public void Start(string name, GameState state)
@@ -32,9 +32,9 @@ namespace lib.Interaction
         }
 
         public event Action<Setup> SetupRecieved;
-        public Func<AbstractMove[], GameState, Tuple<AbstractMove, GameState>> HandleMove { private get; set; }
-        public event Action<AbstractMove[], Score[], GameState> GameEnded;
+        public Func<Move[], GameState, Tuple<Move, GameState>> HandleMove { private get; set; }
+        public event Action<Move[], Score[], GameState> GameEnded;
 
-        private readonly OnlineHighTransport transport;
+        private readonly OnlineProtocol transport;
     }
 }

@@ -128,7 +128,7 @@ namespace lib
                 throw new NotImplementedException();
             }
 
-            public IMove GetNextMove(IMove[] prevMoves, Map map)
+            public Move GetNextMove(Move[] prevMoves, Map map)
             {
                 throw new NotImplementedException();
             }

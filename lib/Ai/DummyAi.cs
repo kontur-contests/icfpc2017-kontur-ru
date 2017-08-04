@@ -20,7 +20,7 @@ namespace lib.Ai
             myPunterId = punterId;
         }
 
-        public IMove GetNextMove(IMove[] prevMoves, Map map)
+        public Move GetNextMove(Move[] prevMoves, Map map)
         {
             var random = new Random();
 
@@ -32,15 +32,10 @@ namespace lib.Ai
                     .FirstOrDefault();
 
                 if (river != null)
-                    return new Move
-                    {
-                        PunterId = myPunterId,
-                        Source = river.Source,
-                        Target = river.Target
-                    };
+                    return new ClaimMove(myPunterId, river.Source, river.Target);
             }
 
-            return new Pass(myPunterId);
+            return new PassMove(myPunterId);
         }
 
         public string SerializeGameState()

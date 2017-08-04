@@ -1,4 +1,6 @@
-﻿using FluentAssertions;
+﻿using System;
+using System.Threading;
+using FluentAssertions;
 using NUnit.Framework;
 
 namespace lib.Interaction
@@ -8,13 +10,12 @@ namespace lib.Interaction
     {
         [Test]
         [Explicit]
-        public void MakeHandshakeAndSetup()
+        public void DoHandshake()
         {
             var client = new TcpTransport(9019);
 
             client.Write("{\"me\":\"Ya\"}");
             client.Read().Should().BeEquivalentTo("{\"you\":\"Ya\"}");
-            client.Read().StartsWith("{\"punter\":").Should().BeTrue();
         }
     }
 }
