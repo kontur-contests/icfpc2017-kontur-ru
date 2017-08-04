@@ -65,9 +65,10 @@ namespace lib
                         {
                             if (!toMines.SetEquals(fromMines))
                                 throw new InvalidOperationException("Attempt to connect two not empty components! WTF???");
-                            continue;
+                            addScore = 0;
                         }
-                        addScore = Calc(fromMines, edge.To);
+                        else
+                            addScore = Calc(fromMines, edge.To);
                     }
                     if (addScore > maxAddScore)
                     {
