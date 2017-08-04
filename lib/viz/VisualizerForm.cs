@@ -50,7 +50,7 @@ namespace lib.viz
 
             makeStepButton.Click += (sender, args) =>
             {
-                painter.Map = simulator.NextMove().CurrentMap;
+                painter.GameState = simulator.NextMove();
                 panel.Refresh();
             };
 

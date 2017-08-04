@@ -6,6 +6,11 @@
     <RootNamespace>lib</RootNamespace>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DebugType>pdbonly</DebugType>
+    <DebugSymbols>True</DebugSymbols>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Confluent.Kafka" Version="0.11.0" />
     <PackageReference Include="FakeItEasy" Version="2.3.1" />

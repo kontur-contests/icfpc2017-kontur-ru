@@ -104,10 +104,11 @@ namespace lib
             while (queue.Count > 0)
             {
                 var current = queue.Dequeue();
-                if (current.CurrentVertex.Edges.Any(x => x.Owner == punterId))
+                if (current.CurrentVertex.Edges.Any(x => x.Owner == punterId) && current.Edge != null)
                 {
-                    if (graph.Mines.ContainsKey(current.Edge.From))
-                        myMines.Add(current.Edge.From);
+                    int edgeFrom = current.Edge.From;
+                    if (graph.Mines.ContainsKey(edgeFrom))
+                        myMines.Add(edgeFrom);
                     if (graph.Mines.ContainsKey(current.Edge.To))
                         myMines.Add(current.Edge.To);
                     move = MakeMove(current.Edge);
