@@ -21,7 +21,7 @@ namespace lib.Strategies
 
 		private Dictionary<int, Dictionary<int, MineNodeCharacteristic>> GetScores()
 		{
-			return Graph.vertexes
+			return Graph.Vertexes
 				.Where(vertex => vertex.Value.IsMine)
 				.ToDictionary(mine => mine.Key, mine => GetScoresFromMine(mine.Key));
 		}
@@ -35,7 +35,7 @@ namespace lib.Strategies
 			while (vertices.Count > 0)
 			{
 				var vertex = vertices.Dequeue();
-				var vertexNode = Graph.vertexes[vertex];
+				var vertexNode = Graph.Vertexes[vertex];
 				var vertexCharct = used[vertex];
 
 				foreach (var edge in vertexNode.Edges)
