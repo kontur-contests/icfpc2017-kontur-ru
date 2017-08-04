@@ -27,7 +27,7 @@ namespace CinemaLib
         }
 
         [TestCaseSource(nameof(TestCases))]
-        public void Test(PointF[] points, RectangleF bbox)
+        public void BoundingBox(PointF[] points, RectangleF bbox)
         {
             points.GetBoundingBox().ShouldBeEquivalentTo(bbox);
         }
