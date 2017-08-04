@@ -76,3 +76,6 @@ ansible/*.retry
 
 # official vm image dir
 /vm-debian-9
+
+/tools
+!/tools/packages.config

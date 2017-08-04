@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using NUnit.Framework;
 
-namespace lib.Score.Simple
+namespace lib.Scores.Simple
 {
     [TestFixture]
     public class FloydAlgorithm_Tests

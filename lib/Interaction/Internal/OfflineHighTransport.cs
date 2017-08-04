@@ -1,37 +1,59 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using Newtonsoft.Json;
 
-namespace lib
+namespace lib.Interaction.Internal
 {
-    public class OfflineHighTransport
+    internal class OfflineHighTransport : HighTransport
     {
-        public OfflineHighTransport(ITransport transport1)
+        public OfflineHighTransport(ITransport transport)
         {
-			
+            this.transport = transport;
         }
 
         public Setup ReadSetup()
         {
-            throw new NotImplementedException();
+            return JsonConvert.DeserializeObject<Setup>(transport.Read());
         }
 
-        public void WriteInitialState(string setupOurId, GameState state)
+        public void WriteInitialState(string ourId, GameState state)
         {
-            throw new NotImplementedException();
+            var stateData = JsonConvert.SerializeObject(state);
+            transport.Write($"{{\"ready\":\"{ourId}\", \"state\":\"{stateData}\"}}");
         }
 
         public Tuple<AbstractMove[], GameState> ReadMoves()
         {
-            throw new NotImplementedException();
+            var data = JsonConvert.DeserializeObject<OfflineMoveServerData>(transport.Read());
+            var moves = data.Moves.Moves.Select(DeserializeMove).ToArray();
+            var state = data.State;
+            return Tuple.Create(moves, state);
         }
 
-        public void SendMove(AbstractMove resultItem1, GameState resultItem2)
+        public void WriteMove(AbstractMove move, GameState newState)
         {
-            throw new NotImplementedException();
+            var moveData = SerializeMove(move);
+            var stateData = JsonConvert.SerializeObject(newState);
+            moveData = moveData.TrimEnd('}') + $"\"state\":\"{stateData}\"}}";
+            transport.Write(moveData);
         }
 
         public Tuple<AbstractMove[], Score[], GameState> ReadScore()
         {
-            throw new NotImplementedException();
+            var data = JsonConvert.DeserializeObject<Dictionary<string, string>>(transport.Read());
+            var scoreData = JsonConvert.DeserializeObject<ScoreData>(data["stop"]);
+            var state = JsonConvert.DeserializeObject<GameState>(data["state"]);
+            var moves = scoreData.Moves.Select(DeserializeMove).ToArray();
+            return Tuple.Create(moves, scoreData.Scores, state);
         }
+
+        private class OfflineMoveServerData : MoveServerData
+        {
+            [JsonProperty("state")]
+            public GameState State { get; set; }
+        }
+
+        private readonly ITransport transport;
     }
 }

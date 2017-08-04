@@ -15,24 +15,24 @@ namespace lib.GraphImpl
                 new[] {new River(1, 2), new River(2, 3, 1)},
                 new[] {2});
             var graph = new Graph(map);
-            graph.vertexes.ShouldBeEquivalentTo(new Dictionary<int, Vertex>
+            graph.Vertexes.ShouldBeEquivalentTo(new Dictionary<int, Vertex>
             {
                 {
                     1, new Vertex(1, false)
                     {
-                        Edges = { new Edge(2, -1) }
+                        Edges = { new Edge(1, 2, -1) }
                     }
                 },
                 {
                     2, new Vertex(2, true)
                     {
-                        Edges = { new Edge(1, -1), new Edge(3, 1) }
+                        Edges = { new Edge(2, 1, -1), new Edge(2, 3, 1) }
                     }
                 },
                 {
                     3, new Vertex(3, false)
                     {
-                        Edges = { new Edge(2, 1) }
+                        Edges = { new Edge(3, 2, 1) }
                     }
                 }
             });

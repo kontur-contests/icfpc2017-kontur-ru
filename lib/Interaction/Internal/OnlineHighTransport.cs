@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 
-namespace lib
+namespace lib.Interaction.Internal
 {
-    internal class OnlineHighTransport
+    internal class OnlineHighTransport : HighTransport
     {
         public OnlineHighTransport(ITransport transport)
         {
@@ -17,7 +17,7 @@ namespace lib
             transport.Write($"{{\"me\":\"{name}\"}}");
             var answer = transport.Read();
             if (!answer.Contains($"\"{name}\""))
-                throw new InvalidOperationException($"Incorrect server handsnake: {answer}");
+                throw new InvalidOperationException($"Incorrect server handshake: {answer}");
         }
 
         public Setup ReadSetup()
@@ -33,70 +33,19 @@ namespace lib
             return data.Moves.Moves.Select(DeserializeMove).ToArray();
         }
 
-        private AbstractMove DeserializeMove(string move)
+        public void WriteMove(AbstractMove abstractMove)
         {
-            var data = JsonConvert.DeserializeObject<Dictionary<string, string>>(move);
-            if (data.Count != 1)
-                throw new InvalidOperationException(move);
-            switch (data.Keys.First().ToLowerInvariant())
-            {
-                case "claim":
-                    return JsonConvert.DeserializeObject<ClaimSerializable>(move).Claim;
-                case "pass":
-                    return JsonConvert.DeserializeObject<PassSerializable>(move).Pass;
-                default:
-                    throw new InvalidOperationException(move);
-            }
+            transport.Write(SerializeMove(abstractMove));
         }
 
-        public void SendMove(AbstractMove abstractMove)
+        public Tuple<AbstractMove[], Score[]> ReadScore()
         {
-            switch (abstractMove)
-            {
-                case Move move:
-                    transport.Write(JsonConvert.SerializeObject(new ClaimSerializable(move)));
-                    break;
-                case Pass move:
-                    transport.Write(JsonConvert.SerializeObject(new PassSerializable(move)));
-                    break;
-                default:
-                    throw new InvalidOperationException();
-            }
-        }
-
-        private class MoveServerData
-        {
-            [JsonProperty("move")]
-            public MoveDataData Moves { get; set; }
-
-            public class MoveDataData
-            {
-                [JsonProperty("moves")]
-                public string[] Moves { get; set; }
-            }
-        }
-
-        private class ClaimSerializable
-        {
-            public ClaimSerializable(Move move) => Claim = move;
-
-            [JsonProperty("claim")]
-            public Move Claim { get; set; }
-        }
-
-        private class PassSerializable
-        {
-            public PassSerializable(Pass pass) => Pass = pass;
-
-            [JsonProperty("pass")]
-            public Pass Pass { get; set; }
+            var data = JsonConvert.DeserializeObject<Dictionary<string, string>>(transport.Read());
+            var scoreData = JsonConvert.DeserializeObject<ScoreData>(data["stop"]);
+            var moves = scoreData.Moves.Select(DeserializeMove).ToArray();
+            return Tuple.Create(moves, scoreData.Scores);
         }
 
         private readonly ITransport transport;
-
-        public Tuple<Move[], Score[]> ReadScore()
-        {
-            throw new NotImplementedException();
-        }
     }
 }

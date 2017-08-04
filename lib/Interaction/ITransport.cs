@@ -1,4 +1,4 @@
-namespace lib
+namespace lib.Interaction
 {
     public interface ITransport
     {
