@@ -10,13 +10,15 @@ namespace lib
         private HashSet<int> myMines = new HashSet<int>();
         
         private int punterId;
+        private MineDistCalculator mineDistCalulator;
 
         public string Name => nameof(ConnectClosestMinesAi);
 
+        // ReSharper disable once ParameterHidesMember
         public void StartRound(int punterId, int puntersCount, Map map)
         {
             this.punterId = punterId;
-            // precalc (site,mine) -> score
+            this.mineDistCalulator = new MineDistCalculator(new Graph(map));
         }
 
         public IMove GetNextMove(IMove[] prevMoves, Map map)
