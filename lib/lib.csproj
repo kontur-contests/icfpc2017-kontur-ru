@@ -108,6 +108,11 @@
     <Compile Include="Strategies\TurnResult.cs" />
     <Compile Include="V.cs" />
     <Compile Include="GraphImpl\Vertex.cs" />
+    <Compile Include="viz\IScenePainter.cs" />
+    <Compile Include="viz\MapPainter.cs" />
+    <Compile Include="viz\ScaledViewPanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
