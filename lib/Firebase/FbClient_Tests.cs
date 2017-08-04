@@ -1,3 +1,4 @@
+// pack: exclude
 using System;
 using System.Linq;
 using MoreLinq;

@@ -12,9 +12,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Confluent.Kafka" Version="0.11.0" />
     <PackageReference Include="FakeItEasy" Version="2.3.1" />
-    <PackageReference Include="librdkafka.redist" Version="0.11.0" />
     <PackageReference Include="FluentAssertions" Version="4.19.3" />
     <PackageReference Include="JetBrains.Annotations" Version="11.0.0" />
     <PackageReference Include="morelinq" Version="2.6.0" />

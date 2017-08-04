@@ -1,3 +1,4 @@
+// pack: exclude
 using System;
 using Firebase.Database.Query;
 using System.Collections.Generic;
