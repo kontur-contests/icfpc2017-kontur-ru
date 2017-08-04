@@ -7,6 +7,7 @@ namespace lib.GraphImpl
     public class Graph
     {
         public readonly Dictionary<int, Vertex> Vertexes = new Dictionary<int, Vertex>();
+        public readonly Dictionary<int, Vertex> Mines = new Dictionary<int, Vertex>();
 
         public Graph()
         {
@@ -17,12 +18,17 @@ namespace lib.GraphImpl
         {
             var mineIds = new HashSet<int>(map.Mines);
             foreach (var site in map.Sites)
-                Vertexes.Add(site.Id, new Vertex(site.Id, mineIds.Contains(site.Id)));
+            {
+                var vertex = new Vertex(site.Id, mineIds.Contains(site.Id));
+                Vertexes.Add(vertex.Id, vertex);
+                if (vertex.IsMine)
+                    Mines.Add(vertex.Id, vertex);
+            }
             foreach (var river in map.Rivers)
             {
-                Vertexes[river.Source].Edges.Add(new Edge(river.Target, river.Owner));
+                Vertexes[river.Source].Edges.Add(new Edge(river.Source, river.Target, river.Owner));
                 if (river.Source != river.Target)
-                    Vertexes[river.Target].Edges.Add(new Edge(river.Source, river.Owner));
+                    Vertexes[river.Target].Edges.Add(new Edge(river.Target, river.Source, river.Owner));
             }
         }
 
