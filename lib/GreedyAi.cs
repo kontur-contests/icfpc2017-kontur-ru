@@ -46,11 +46,9 @@ namespace lib.Strategies
                 {
                     var fromMines = calculator.GetConnectedMines(edge.From);
                     var toMines = calculator.GetConnectedMines(edge.To);
-                    long addScore = 0;
-                    if (fromMines.Count == 0)
-                        addScore = Calc(toMines, edge.From);
-                    if (toMines.Count == 0)
-                        addScore = Calc(fromMines, edge.To);
+                    long addScore = Math.Max(
+                        Calc(toMines, fromMines, edge.From),
+                        Calc(fromMines, toMines, edge.To));
                     if (addScore > maxAddScore)
                     {
                         maxAddScore = addScore;
@@ -69,9 +67,9 @@ namespace lib.Strategies
             return false;
         }
 
-        private long Calc(HashSet<int> mineIds, int vertexId)
+        private long Calc(HashSet<int> mineIds, HashSet<int> diff, int vertexId)
         {
-            return mineIds.Sum(
+            return mineIds.Where(x => !diff.Contains(x)).Sum(
                 mineId =>
                 {
                     var dist = mineDistCalulator.GetDist(mineId, vertexId);
