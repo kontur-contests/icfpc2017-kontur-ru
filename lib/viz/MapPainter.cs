@@ -1,6 +1,7 @@
 using System;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 using lib;
 using NUnit.Framework;
@@ -25,7 +26,11 @@ namespace CinemaLib
             g.Clear(Color.White);
 
             foreach (var river in map.Rivers)
-                g.DrawLine(Pens.Blue, map.Sites[river.Source].Point(), map.Sites[river.Target].Point());
+            {
+                var source = map.Sites.Single(x => x.Id == river.Source);
+                var target = map.Sites.Single(x => x.Id == river.Target);
+                g.DrawLine(Pens.Blue, source.Point(), target.Point());
+            }
             foreach (var site in map.Sites)
                 DrawSite(g, site);
         }
@@ -54,7 +59,7 @@ namespace CinemaLib
             var form = new Form();
             var painter = new MapPainter();
             painter.Map = MapLoader.LoadMap(
-                    Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\..\maps\oxford-sparse.json"))
+                    Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\..\maps\tube.json"))
                 .Map;
             var panel = new ScaledViewPanel(painter)
             {
