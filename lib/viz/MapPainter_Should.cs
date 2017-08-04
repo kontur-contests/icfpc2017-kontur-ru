@@ -19,10 +19,7 @@ namespace lib.viz
             var painter = new MapPainter
             {
                 Map = map,
-                PainterAugmentor = new DefaultPainterAugmentor
-                {
-                    Map = map
-                }
+                PainterAugmentor = new DefaultPainterAugmentor()
             };
             var panel = new ScaledViewPanel(painter)
             {

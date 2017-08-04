@@ -9,14 +9,28 @@ namespace lib.viz
     {
         private static readonly Font font = new Font(FontFamily.GenericSansSerif, 6);
         private IndexedMap map;
+        private IPainterAugmentor painterAugmentor = new DefaultPainterAugmentor();
 
         public Map Map
         {
             get => map.Map;
-            set => map = new IndexedMap(value.NormalizeCoordinates(Size, Padding));
+            set
+            {
+                map = new IndexedMap(value.NormalizeCoordinates(Size, Padding));
+                if (painterAugmentor != null)
+                    painterAugmentor.Map = map;
+            }
         }
 
-        public IPainterAugmentor PainterAugmentor { get; set; } = new DefaultPainterAugmentor();
+        public IPainterAugmentor PainterAugmentor
+        {
+            get => painterAugmentor;
+            set
+            {
+                painterAugmentor = value;
+                painterAugmentor.Map = map;
+            }
+        }
 
         private static SizeF Padding => new SizeF(30, 30);
         public SizeF Size => new SizeF(600, 600);

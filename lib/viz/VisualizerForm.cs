@@ -19,10 +19,7 @@ namespace lib.viz
             var painter = new MapPainter
             {
                 Map = startGameConfigPanel.SelectedMap.Map,
-                PainterAugmentor = new DefaultPainterAugmentor
-                {
-                    Map = startGameConfigPanel.SelectedMap.Map
-                }
+                PainterAugmentor = new DefaultPainterAugmentor()
             };
 
             var panel = new ScaledViewPanel(painter)
