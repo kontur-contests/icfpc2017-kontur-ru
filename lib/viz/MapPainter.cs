@@ -15,9 +15,10 @@ namespace CinemaLib
         public Map Map
         {
             get => map;
-            set => map = value.NormalizeCoordinates(Size);
+            set => map = value.NormalizeCoordinates(Size, Padding);
         }
 
+        private static SizeF Padding => new SizeF(30, 30);
         public SizeF Size => new SizeF(600, 600);
 
         public void Paint(Graphics g)
@@ -38,7 +39,7 @@ namespace CinemaLib
 
         private Brush GetSiteColor(Site site)
         {
-            return map.IsMine(site.Id) ? Brushes.Red : Brushes.Goldenrod;
+            return map.IsMine(site.Id) ? Brushes.Red : Brushes.LimeGreen;
         }
     }
 
