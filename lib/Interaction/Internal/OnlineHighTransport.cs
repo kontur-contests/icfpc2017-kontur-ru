@@ -86,10 +86,10 @@ namespace lib
 
         private class PassSerializable
         {
-            public PassSerializable(Pass move) => Pass = move;
+            public PassSerializable(Pass pass) => Pass = pass;
 
             [JsonProperty("pass")]
-            public Move Pass { get; set; }
+            public Pass Pass { get; set; }
         }
 
         private readonly ITransport transport;
