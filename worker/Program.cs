@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using NLog;
 using Topshelf;
 
 namespace worker
@@ -7,6 +8,7 @@ namespace worker
     {
         private static void Main(string[] args)
         {
+            LogManager.GetCurrentClassLogger().Info("Hi I am here!");
             HostFactory.Run(
                 x =>
                 {
