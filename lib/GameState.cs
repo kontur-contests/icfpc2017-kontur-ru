@@ -4,7 +4,7 @@ namespace lib
 {
     public class GameState
     {
-        public GameState(Map currentMap, int currentPunter, List<Move> previousMoves)
+        public GameState(Map currentMap, int currentPunter, List<IMove> previousMoves)
         {
             CurrentMap = currentMap;
             CurrentPunter = currentPunter;
@@ -13,6 +13,6 @@ namespace lib
 
         public Map CurrentMap { get; }
         public int CurrentPunter { get; }
-        public List<Move> PreviousMoves { get; }
+        public List<IMove> PreviousMoves { get; }
     }
 }

@@ -6,7 +6,7 @@ namespace lib
     {
         string Name { get; }
         void StartRound(int punterId, int puntersCount, Map map);
-        Move GetNextMove(Move[] prevMoves, Map map);
+        IMove GetNextMove(IMove[] prevMoves, Map map);
         string SerializeGameState();
         void DeserializeGameState(string gameState);
     }

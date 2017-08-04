@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Linq;
+using MoreLinq;
 
 namespace lib
 {
@@ -7,13 +9,13 @@ namespace lib
         private readonly Map map;
         private List<IAi> punters;
         private int currentPunter = 0;
-        private readonly List<Move> moves;
+        private readonly List<IMove> moves;
 
         public GameSimulator(Map map)
         {
             this.map = map;
             punters = new List<IAi>();
-            moves = new List<Move>();
+            moves = new List<IMove>();
         }
 
         public void StartGame(List<IAi> gamers)
@@ -33,17 +35,20 @@ namespace lib
 
             moves.Add(nextMove);
             currentPunter++;
-            return new GameState(map, currentPunter, moves);
+            return new GameState(map, currentPunter, moves.TakeLast(punters.Count).ToList());
         }
 
-        private void ApplyMove(Move nextMove)
+        private void ApplyMove(IMove nextMove)
         {
-            foreach (var river in map.Rivers)
-                if (river.Source == nextMove.Source && river.Target == nextMove.Target)
-                {
-                    river.Owner = nextMove.PunterId;
-                    return;
-                }
+            if (nextMove is Move move)
+            {
+                foreach (var river in map.Rivers)
+                    if (river.Source == move.Source && river.Target == move.Target)
+                    {
+                        river.Owner = move.PunterId;
+                        return;
+                    }
+            }
         }
     }
 }
