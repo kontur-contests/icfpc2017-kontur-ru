@@ -23,6 +23,7 @@ namespace lib
         {
             this.punterId = punterId;
             this.mineDistCalulator = new MineDistCalculator(new Graph(map));
+            myMines.Clear();
         }
 
         public Move GetNextMove(Move[] prevMoves, Map map)
