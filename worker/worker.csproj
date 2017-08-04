@@ -15,4 +15,10 @@
     <PackageReference Include="Topshelf.NLog" Version="4.0.3" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="NLog.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

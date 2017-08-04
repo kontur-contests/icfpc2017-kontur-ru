@@ -19,9 +19,11 @@ namespace lib
         {
             if (!File.Exists(path))
                 throw new Exception($"File {path} not exists");
+            Map map = JsonConvert.DeserializeObject<Map>(Encoding.UTF8.GetString(File.ReadAllBytes(path)));
+            
             return new NamedMap(
                 Path.GetFileNameWithoutExtension(path),
-                JsonConvert.DeserializeObject<Map>(Encoding.UTF8.GetString(File.ReadAllBytes(path))));
+                map);
         }
 
         [NotNull]

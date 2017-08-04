@@ -9,12 +9,12 @@ namespace CinemaLib
 {
     public class MapPainter : IScenePainter
     {
-        private Map map;
+        private IndexedMap map;
 
         public Map Map
         {
-            get => map;
-            set => map = value.NormalizeCoordinates(Size, Padding);
+            get => map.Map;
+            set => map = new IndexedMap(value.NormalizeCoordinates(Size, Padding));
         }
 
         private static SizeF Padding => new SizeF(30, 30);
@@ -25,7 +25,11 @@ namespace CinemaLib
             g.Clear(Color.White);
 
             foreach (var river in map.Rivers)
-                g.DrawLine(Pens.Blue, map.Sites[river.Source].Point(), map.Sites[river.Target].Point());
+            {
+                var source = map.SiteById[river.Source];
+                var target = map.SiteById[river.Target];
+                g.DrawLine(Pens.Blue, source.Point(), target.Point());
+            }
             foreach (var site in map.Sites)
                 DrawSite(g, site);
         }
@@ -39,7 +43,7 @@ namespace CinemaLib
 
         private Brush GetSiteColor(Site site)
         {
-            return map.IsMine(site.Id) ? Brushes.Red : Brushes.LimeGreen;
+            return map.MineIds.Contains(site.Id) ? Brushes.Red : Brushes.LimeGreen;
         }
     }
 
@@ -54,7 +58,7 @@ namespace CinemaLib
             var form = new Form();
             var painter = new MapPainter();
             painter.Map = MapLoader.LoadMap(
-                    Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\..\maps\oxford-sparse.json"))
+                    Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\..\maps\tube.json"))
                 .Map;
             var panel = new ScaledViewPanel(painter)
             {

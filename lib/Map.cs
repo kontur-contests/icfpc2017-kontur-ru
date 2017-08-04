@@ -1,7 +1,3 @@
-using System;
-using System.ComponentModel;
-using System.Drawing;
-using System.Linq;
 using Newtonsoft.Json;
 
 namespace lib
@@ -10,11 +6,9 @@ namespace lib
     {
         [JsonProperty("id")] public int Id;
 
-        [JsonProperty("x", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        public float X;
+        [JsonProperty("x", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)] public float X;
 
-        [JsonProperty("y", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        public float Y;
+        [JsonProperty("y", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)] public float Y;
 
         public Site()
         {
@@ -50,7 +44,7 @@ namespace lib
 
     public class River
     {
-        [JsonProperty("source", Order=1)] public readonly int Source;
+        [JsonProperty("source", Order = 1)] public readonly int Source;
 
         [JsonProperty("target", Order = 2)] public readonly int Target;
 
@@ -65,14 +59,6 @@ namespace lib
             Source = source;
             Target = target;
             Owner = owner;
-        }
-    }
-
-    public static class MapExtensions
-    {
-        public static bool IsMine(this Map map, int siteId)
-        {
-            return map.Mines.Contains(siteId);
         }
     }
 }

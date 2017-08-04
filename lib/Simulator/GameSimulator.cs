@@ -48,8 +48,8 @@ namespace lib
             if (!(nextMove is Move move)) return;
 
             foreach (var river in map.Rivers)
-                if (river.Source == move.Source && river.Target == move.Target ||
-                    river.Target == move.Source && river.Source == move.Target)
+                if (river.Source == move.Source && river.Target == move.Target
+                    || river.Target == move.Source && river.Source == move.Target)
                 {
                     river.Owner = move.PunterId;
                     return;

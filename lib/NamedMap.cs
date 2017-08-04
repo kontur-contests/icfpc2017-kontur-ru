@@ -18,5 +18,11 @@ namespace lib
 
         [NotNull]
         public Map Map { get; }
+
+        public override string ToString()
+        {
+            return Name;
+        }
     }
+
 }
