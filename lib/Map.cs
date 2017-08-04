@@ -54,7 +54,7 @@ namespace lib
 
         [JsonProperty("target", Order = 2)] public readonly int Target;
 
-        [JsonIgnore] public int Owner;
+        [JsonIgnore] public int Owner = -1;
 
         public River()
         {
