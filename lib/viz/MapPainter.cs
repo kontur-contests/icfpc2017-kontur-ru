@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Drawing;
+using System.Linq;
 using lib.viz.Detalization;
 using MoreLinq;
 
@@ -34,16 +35,43 @@ namespace lib.viz
 
         private static SizeF Padding => new SizeF(30, 30);
         public SizeF Size => new SizeF(600, 600);
+        private GameState gameState;
+
+        public GameState GameState
+        {
+            get { return gameState; }
+            set
+            {
+                gameState = value;
+                Map = gameState.CurrentMap;
+            }
+        }
 
         public void Paint(Graphics g, PointF mouseLogicalPos, RectangleF clipRect)
         {
             var sw = Stopwatch.StartNew();
+                HightlightLastMove(g, gameState?.PreviousMoves?.LastOrDefault());
             foreach (var river in map.Rivers)
                 DrawRiver(g, river);
             foreach (var site in map.Sites)
                 DrawSite(g, site);
             DrawRiverText(g, map.Rivers.MinBy(r => DistanceTo(mouseLogicalPos, r)));
             g.DrawString(sw.Elapsed.TotalMilliseconds.ToString("0ms"), SystemFonts.DefaultFont, Brushes.Black, PointF.Empty);
+        }
+
+        private void HightlightLastMove(Graphics g, IMove move)
+        {
+            if (move is Move m)
+            {
+                var start = map.SiteById[m.Source];
+                var end = map.SiteById[m.Target];
+                var radius = 7;
+                using (var pen = new Pen(Color.GreenYellow, radius))
+                {
+                    var center = 0.5f*(new VF(start.Point()) + new VF(end.Point())) - new VF(radius, radius);
+                    g.DrawEllipse(pen, (float) center.X, (float)center.Y, 2*radius, 2 * radius);
+                }
+            }
         }
 
         private void DrawRiver(Graphics g, River river)
