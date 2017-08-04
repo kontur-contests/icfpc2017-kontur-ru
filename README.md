@@ -27,4 +27,5 @@
 
 ## Автотесты
 
-TODO: Настроить автосборку и запуск тестов на TC. Тесты, которые не нужно запускать надо помечать атрибутом [Explicit].
+https://tc.skbkontur.ru/project.html?projectId=icfpc&branch_icfpc=all_branches
+Тесты, которые не нужно запускать надо помечать атрибутом [Explicit].
