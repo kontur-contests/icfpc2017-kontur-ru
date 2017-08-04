@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using lib.Ai;
 using lib.GraphImpl;
+using lib.Scores.Simple;
 using lib.viz;
 using NUnit.Framework;
 
@@ -115,6 +117,21 @@ namespace lib.Strategies
                 };
                 form.Controls.Add(panel);
                 form.ShowDialog();
+            }
+        }
+
+        [Test]
+        public void Test1()
+        {
+            var gamers = new List<IAi> { new GreedyAi(), new GreedyAi() };
+            var gameSimulator = new GameSimulatorRunner(new SimpleScoreCalculator());
+
+            var results = gameSimulator.SimulateGame(
+                gamers, MapLoader.LoadMap(Path.Combine(MapLoader.DefaultPath, "sample.json")).Map);
+
+            foreach (var gameSimulationResult in results)
+            {
+                Console.Out.WriteLine("gameSimulationResult = {0}:{1}", gameSimulationResult.Gamer.Name, gameSimulationResult.Score);
             }
         }
     }
