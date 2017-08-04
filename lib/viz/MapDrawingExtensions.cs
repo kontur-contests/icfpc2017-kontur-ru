@@ -40,7 +40,13 @@ namespace CinemaLib
             float maxX = points.Max(s => s.X);
             float minY = points.Min(s => s.Y);
             float maxY = points.Max(s => s.Y);
-            return new RectangleF(minX, minY, Math.Max(1, maxX - minX), Math.Max(1, maxY - minY));
+            var width = maxX - minX;
+            if (width < 1e-7)
+                width = 1;
+            var height = maxY - minY;
+            if (height < 1e-7)
+                height = 1;
+            return new RectangleF(minX, minY, width, height);
         }
 
         public static PointF Point(this Site site)
