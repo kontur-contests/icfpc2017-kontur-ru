@@ -33,14 +33,17 @@ namespace lib.Interaction.Internal
             return data.Moves.Moves.Select(DeserializeMove).ToArray();
         }
 
-        public void SendMove(AbstractMove abstractMove)
+        public void WriteMove(AbstractMove abstractMove)
         {
             transport.Write(SerializeMove(abstractMove));
         }
 
-        public Tuple<Move[], Score[]> ReadScore()
+        public Tuple<AbstractMove[], Score[]> ReadScore()
         {
-            throw new NotImplementedException();
+            var data = JsonConvert.DeserializeObject<Dictionary<string, string>>(transport.Read());
+            var scoreData = JsonConvert.DeserializeObject<ScoreData>(data["stop"]);
+            var moves = scoreData.Moves.Select(DeserializeMove).ToArray();
+            return Tuple.Create(moves, scoreData.Scores);
         }
 
         private readonly ITransport transport;

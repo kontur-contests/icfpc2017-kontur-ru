@@ -48,6 +48,15 @@ namespace lib.Interaction.Internal
             }
         }
 
+        protected class ScoreData
+        {
+            [JsonProperty("moves")]
+            public string[] Moves { get; set; }
+
+            [JsonProperty("score")]
+            public Score[] Scores { get; set; }
+        }
+
         private class ClaimSerializable
         {
             public ClaimSerializable(Move move) => Claim = move;

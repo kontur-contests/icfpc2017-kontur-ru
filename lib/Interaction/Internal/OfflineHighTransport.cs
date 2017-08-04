@@ -25,39 +25,35 @@ namespace lib.Interaction.Internal
 
         public Tuple<AbstractMove[], GameState> ReadMoves()
         {
-            var data = JsonConvert.DeserializeObject<MoveServerData>(transport.Read());
+            var data = JsonConvert.DeserializeObject<OfflineMoveServerData>(transport.Read());
             var moves = data.Moves.Moves.Select(DeserializeMove).ToArray();
             var state = data.State;
             return Tuple.Create(moves, state);
         }
 
-        public void SendMove(AbstractMove resultItem1, GameState resultItem2)
+        public void WriteMove(AbstractMove move, GameState newState)
         {
-            throw new NotImplementedException();
+            var moveData = SerializeMove(move);
+            var stateData = JsonConvert.SerializeObject(newState);
+            moveData = moveData.TrimEnd('}') + $"\"state\":\"{stateData}\"}}";
+            transport.Write(moveData);
         }
 
         public Tuple<AbstractMove[], Score[], GameState> ReadScore()
         {
-            throw new NotImplementedException();
+            var data = JsonConvert.DeserializeObject<Dictionary<string, string>>(transport.Read());
+            var scoreData = JsonConvert.DeserializeObject<ScoreData>(data["stop"]);
+            var state = JsonConvert.DeserializeObject<GameState>(data["state"]);
+            var moves = scoreData.Moves.Select(DeserializeMove).ToArray();
+            return Tuple.Create(moves, scoreData.Scores, state);
         }
 
-
-
-        private readonly ITransport transport;
-
-        private class MoveServerData
+        private class OfflineMoveServerData : MoveServerData
         {
-            [JsonProperty("move")]
-            public MoveDataData Moves { get; set; }
-
             [JsonProperty("state")]
             public GameState State { get; set; }
-
-            public class MoveDataData
-            {
-                [JsonProperty("moves")]
-                public string[] Moves { get; set; }
-            }
         }
+
+        private readonly ITransport transport;
     }
 }
