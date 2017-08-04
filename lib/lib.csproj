@@ -91,7 +91,13 @@
     <Compile Include="Map_Should.cs" />
     <Compile Include="MoreExtensions.cs" />
     <Compile Include="Map.cs" />
-    <Compile Include="ScoreCalculator.cs" />
+    <Compile Include="Score\Simple\DisjointSetUnion.cs" />
+    <Compile Include="Score\Simple\DisjointSetUnion_Tests.cs" />
+    <Compile Include="Score\Simple\FloydAlgorithm.cs" />
+    <Compile Include="Score\Simple\FloydAlgorithm_Tests.cs" />
+    <Compile Include="Score\IScoreCalculator.cs" />
+    <Compile Include="Score\ScoreCalculator_Tests.cs" />
+    <Compile Include="Score\Simple\SimpleScoreCalculator.cs" />
     <Compile Include="V.cs" />
   </ItemGroup>
   <ItemGroup>
