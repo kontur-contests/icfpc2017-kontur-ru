@@ -11,8 +11,8 @@ namespace lib
 {
     public static class MapLoader
     {
-        private static readonly string DefaultPath =
-            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\..\maps");
+        public static readonly string DefaultPath =
+            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\..\..\maps");
 
         [NotNull]
         public static NamedMap LoadMap([NotNull] string path)
@@ -49,7 +49,7 @@ namespace lib
             Assert.That(
                 MapLoader.LoadDefaultMaps().Select(x => x.Name),
                 Is.EquivalentTo(
-                    new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\..\maps"))
+                    new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\..\..\maps"))
                         .EnumerateFiles().Select(x => Path.GetFileNameWithoutExtension(x.FullName))));
         }
     }

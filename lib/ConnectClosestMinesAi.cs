@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace lib
 {
@@ -17,9 +16,9 @@ namespace lib
             // precalc (site,mine) -> score
         }
 
-        public Move GetNextMove(Move[] prevMoves, Map map)
+        public IMove GetNextMove(IMove[] prevMoves, Map map)
         {
-            throw new InvalidOperationException();
+            throw new NotImplementedException();
             //if (myMines.Any())
             //{
             //    // bfs от myMines до ближайшей шахты
