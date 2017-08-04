@@ -7,8 +7,7 @@ namespace lib
 {
     public class ConnectClosestMinesAi : IAi
     {
-        private HashSet<int> myMines = new HashSet<int>();
-        
+        private readonly HashSet<int> myMines = new HashSet<int>();
         private int punterId;
         private MineDistCalculator mineDistCalulator;
 
@@ -23,6 +22,8 @@ namespace lib
 
         public IMove GetNextMove(IMove[] prevMoves, Map map)
         {
+            mineDistCalulator = mineDistCalulator ?? new MineDistCalculator(new Graph(map));
+
             var graph = new Graph(map);
 
             IMove move;
@@ -33,6 +34,14 @@ namespace lib
             if (TryBuildNewComponent(graph, out move))
                 return move;
 
+            if (TryExtendAnything(graph, out move))
+                return move;
+
+            return new Pass();
+        }
+
+        private bool TryExtendAnything(Graph graph, out IMove nextMove)
+        {
             var calculator = new ConnectedCalculator(graph, punterId);
             var maxAddScore = long.MinValue;
             Edge bestEdge = null;
@@ -45,7 +54,7 @@ namespace lib
                     long addScore;
                     if (fromMines.Count == 0)
                         addScore = Calc(toMines, edge.From);
-                    else 
+                    else
                     {
                         if (toMines.Count != 0)
                             throw new InvalidOperationException("Attempt to connect two not empty components! WTF???");
@@ -59,19 +68,12 @@ namespace lib
                 }
             }
             if (bestEdge != null)
-                return MakeMove(bestEdge);
-            
-            return new Pass();
-        }
-
-        private long Calc(List<int> mineIds, int vertexId)
-        {
-            return mineIds.Sum(
-                mineId =>
-                {
-                    var dist = mineDistCalulator.GetDist(mineId, vertexId);
-                    return (long) dist * dist;
-                });
+            {
+                nextMove = MakeMove(bestEdge);
+                return true;
+            }
+            nextMove = null;
+            return false;
         }
 
         private bool TryExtendComponent(Graph graph, out IMove move)
@@ -173,6 +175,16 @@ namespace lib
             return false;
         }
 
+        private long Calc(List<int> mineIds, int vertexId)
+        {
+            return mineIds.Sum(
+                mineId =>
+                {
+                    var dist = mineDistCalulator.GetDist(mineId, vertexId);
+                    return (long) dist * dist;
+                });
+        }
+
         private static Vertex SelectBestMine(Vertex a, Vertex b)
         {
             return a.Edges.Count(x => x.Owner == -1) < b.Edges.Count(x => x.Owner == -1) ? a : b;
@@ -185,12 +197,15 @@ namespace lib
 
         public string SerializeGameState()
         {
-            throw new NotImplementedException();
-        }
+            return $"{punterId};{string.Join(";", myMines)}";
+    }
 
         public void DeserializeGameState(string gameState)
         {
-            throw new NotImplementedException();
+            var split = gameState.Split(';');
+            punterId = int.Parse(split[0]);
+            myMines.Clear();
+            myMines.UnionWith(split.Skip(1).Select(int.Parse));
         }
 
         private class BuildQueueItem
