@@ -6,9 +6,19 @@ namespace lib.viz.Detalization
 {
     public class DefaultPainterAugmentor : IPainterAugmentor
     {
+        private const float defaultRadius = 30f;
+
+        private static Color[] Colors =
+        {
+            Color.Navy,
+            Color.Red,
+            Color.Orange,
+            Color.Fuchsia,
+            Color.Green
+        };
+
         private IndexedMap map;
         private float radius;
-        private const float defaultRadius = 30f;
 
         public IndexedMap Map
         {
@@ -25,7 +35,7 @@ namespace lib.viz.Detalization
             return new SitePainterData
             {
                 Color = GetSiteColor(site),
-                Radius = radius,
+                Radius = map.MineIds.Contains(site.Id) ? Math.Min(radius * 5, defaultRadius) : radius,
                 HoverText = site.Id.ToString(),
             };
         }
@@ -34,7 +44,6 @@ namespace lib.viz.Detalization
         {
             return new RiverPainterData
             {
-
                 Color = river.Owner == -1 ? Color.LightGray : Colors[river.Owner],
                 PenWidth = river.Owner == -1 ? 1 : 3,
                 HoverText = "It's a river!"
@@ -54,14 +63,6 @@ namespace lib.viz.Detalization
                     return dist < 1e-5 ? defaultRadius : dist;
                 });
         }
-
-        private static Color[] Colors = {
-            Color.Navy,
-            Color.Red,
-            Color.Orange,
-            Color.Fuchsia,
-            Color.Green
-        };
 
         private Color GetSiteColor(Site site)
         {
