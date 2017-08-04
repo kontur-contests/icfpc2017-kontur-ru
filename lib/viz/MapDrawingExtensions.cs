@@ -7,11 +7,13 @@ namespace CinemaLib
 {
     public static class MapDrawingExtensions
     {
-        public static Map NormalizeCoordinates(this Map map, SizeF targetSize)
+        public static Map NormalizeCoordinates(this Map map, SizeF targetSize, SizeF padding)
         {
             var box = map.GetBoundingBox();
+            padding = new SizeF(padding.Width * box.Width / targetSize.Width, padding.Height * box.Height / targetSize.Height);
+            var paddedBox = new RectangleF(box.X - padding.Width, box.Y - padding.Height, box.Width + 2 * padding.Width, box.Height + 2 * padding.Height);
             return new Map(
-                map.Sites.Select(s => NormalizeCoordinates(s, box, targetSize)).ToArray(), map.Rivers, map.Mines);
+                map.Sites.Select(s => NormalizeCoordinates(s, paddedBox, targetSize)).ToArray(), map.Rivers, map.Mines);
         }
 
         private static Site NormalizeCoordinates(Site site, RectangleF bbox, SizeF targetSize)
