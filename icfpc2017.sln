@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "lib", "lib\lib.csproj", "{1
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "worker", "worker\worker.csproj", "{282B1902-191B-40F0-9A76-C8E4ED1EC474}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VizApp", "VizApp\VizApp.csproj", "{2452A47E-D56C-4D48-8D19-01461B1B0526}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{282B1902-191B-40F0-9A76-C8E4ED1EC474}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{282B1902-191B-40F0-9A76-C8E4ED1EC474}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{282B1902-191B-40F0-9A76-C8E4ED1EC474}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2452A47E-D56C-4D48-8D19-01461B1B0526}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2452A47E-D56C-4D48-8D19-01461B1B0526}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2452A47E-D56C-4D48-8D19-01461B1B0526}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2452A47E-D56C-4D48-8D19-01461B1B0526}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -62,7 +62,11 @@ namespace lib
                     else
                     {
                         if (toMines.Count != 0)
-                            throw new InvalidOperationException("Attempt to connect two not empty components! WTF???");
+                        {
+                            if (!toMines.SetEquals(fromMines))
+                                throw new InvalidOperationException("Attempt to connect two not empty components! WTF???");
+                            continue;
+                        }
                         addScore = Calc(fromMines, edge.To);
                     }
                     if (addScore > maxAddScore)
@@ -184,7 +188,7 @@ namespace lib
             return false;
         }
 
-        private long Calc(List<int> mineIds, int vertexId)
+        private long Calc(HashSet<int> mineIds, int vertexId)
         {
             return mineIds.Sum(
                 mineId =>
