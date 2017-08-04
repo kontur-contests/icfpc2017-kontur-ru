@@ -20,7 +20,7 @@ namespace lib.Interaction
             {
                 var answer = transport.ReadMoves();
                 var result = HandleMove.Invoke(answer.Item1, answer.Item2);
-                transport.SendMove(result.Item1, result.Item2);
+                transport.WriteMove(result.Item1, result.Item2);
                 if (answer.Item1.Length + 1 == setup.Map.Rivers.Length)
                     break;
             }
