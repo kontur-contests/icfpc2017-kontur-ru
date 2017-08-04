@@ -78,7 +78,7 @@ namespace lib.viz
             var radius = data.Radius;
             var rectangle = new RectangleF(site.X - radius, site.Y - radius, 2 * radius, 2 * radius);
             if (rectangle.Contains(mouseLogicalPos))
-                g.DrawString(site.Id.ToString(), font, Brushes.Black, RectangleF.Inflate(rectangle, 7, 7).Location);
+                g.DrawString(data.HoverText, font, Brushes.Black, RectangleF.Inflate(rectangle, 7, 7).Location);
         }
     }
 }

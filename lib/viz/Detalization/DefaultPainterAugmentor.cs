@@ -25,7 +25,8 @@ namespace lib.viz.Detalization
             return new SitePainterData
             {
                 Color = GetSiteColor(site),
-                Radius = radius
+                Radius = radius,
+                HoverText = site.Id.ToString(),
             };
         }
 
@@ -36,6 +37,7 @@ namespace lib.viz.Detalization
 
                 Color = river.Owner == -1 ? Color.Blue : Color.FromKnownColor((KnownColor) river.Owner) ,
                 PenWidth = 1,
+                HoverText = "It's a river!"
             };
         }
 
