@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 
 namespace lib.Interaction.Internal
 {
-    internal abstract class HightTransport
+    internal abstract class HighTransport
     {
         protected AbstractMove DeserializeMove(string move)
         {

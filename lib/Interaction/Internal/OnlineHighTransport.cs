@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 
 namespace lib.Interaction.Internal
 {
-    internal class OnlineHighTransport : HightTransport
+    internal class OnlineHighTransport : HighTransport
     {
         public OnlineHighTransport(ITransport transport)
         {
@@ -17,7 +17,7 @@ namespace lib.Interaction.Internal
             transport.Write($"{{\"me\":\"{name}\"}}");
             var answer = transport.Read();
             if (!answer.Contains($"\"{name}\""))
-                throw new InvalidOperationException($"Incorrect server handsnake: {answer}");
+                throw new InvalidOperationException($"Incorrect server handshake: {answer}");
         }
 
         public Setup ReadSetup()

@@ -8,6 +8,6 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
   </metadata>
   <files>
-    <file src="bin\Debug\net461\**"/>
+    <file src="bin\Release\net461\**"/>
   </files>
 </package>

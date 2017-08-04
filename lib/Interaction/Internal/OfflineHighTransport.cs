@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 
 namespace lib.Interaction.Internal
 {
-    internal class OfflineHighTransport : HightTransport
+    internal class OfflineHighTransport : HighTransport
     {
         public OfflineHighTransport(ITransport transport)
         {
