@@ -13,7 +13,7 @@ namespace lib.Ai
             this.moveProbability = moveProbability;
         }
 
-        public string Name { get; } = "Dummy";
+        public string Name { get; set; } = "Dummy";
 
         public void StartRound(int punterId, int puntersCount, Map map)
         {

@@ -21,6 +21,9 @@
     <PackageReference Include="Topshelf" Version="4.0.3" />
     <PackageReference Include="Topshelf.NLog" Version="4.0.3" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\lib\lib.csproj" />
+  </ItemGroup>
 
   <ItemGroup>
     <None Update="NLog.config">

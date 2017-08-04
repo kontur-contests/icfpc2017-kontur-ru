@@ -1,5 +1,9 @@
-﻿using System;
+﻿using lib;
+using lib.Ai;
+using lib.Scores.Simple;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace worker
@@ -13,9 +17,21 @@ namespace worker
     {
         public IEnumerable<Tuple<PlayerWithParams, int>> Play(List<PlayerWithParams> players)
         {
-            return players
-                .OrderBy(player => player.Params.Values.Sum())
-                .Select((player, i) => Tuple.Create(player, i));
+            var gamers = players
+                .Select(player => new DummyAi(player.Params["Param"]) { Name = player.Name })
+                .Cast<IAi>()
+                .ToList();
+
+            var gameSimulator = new GameSimulatorRunner(new SimpleScoreCalculator());
+
+            var results = gameSimulator.SimulateGame(
+                gamers, MapLoader.LoadMap(Path.Combine(MapLoader.DefaultPath, "sample.json")).Map);
+
+            var report = results.Select(result => Tuple.Create(
+                players.Where(player => player.Name == result.Gamer.Name).Single(),
+                result.Score))
+                .ToList();
+            return report;
         }
     }
 }
