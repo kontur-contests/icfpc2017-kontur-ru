@@ -45,7 +45,11 @@ namespace lib.viz
             var radius = data.Radius;
             using (var brush = new SolidBrush(data.Color))
             {
-                g.FillEllipse(brush, site.X - radius, site.Y - radius, 2 * radius, 2 * radius);
+                var rectangle = new RectangleF(site.X - radius, site.Y - radius, 2 * radius, 2 * radius);
+                if(map.MineIds.Contains(site.Id))
+                    g.FillRectangle(brush, rectangle);
+                else
+                    g.FillEllipse(brush, rectangle);
             }
 
             //g.DrawEllipse(Pens.Black, site.X - radius, site.Y - radius, 2 * radius, 2 * radius);

@@ -15,7 +15,7 @@ namespace lib.viz
         public void Show()
         {
             var form = new Form();
-            var map = MapLoader.LoadMap(Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\..\maps\oxford-sparse.json")).Map;
+            var map = MapLoader.LoadMap(Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\..\maps\circle.json")).Map;
             var painter = new MapPainter
             {
                 Map = map,
