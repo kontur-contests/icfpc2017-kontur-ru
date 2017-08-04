@@ -1,6 +1,6 @@
 using System.Drawing;
 
-namespace CinemaLib
+namespace lib.viz
 {
 	public interface IScenePainter
 	{
