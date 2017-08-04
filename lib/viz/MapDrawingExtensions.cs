@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -36,10 +35,10 @@ namespace CinemaLib
         public static RectangleF GetBoundingBox(this IEnumerable<PointF> pointsSequence)
         {
             var points = pointsSequence.DefaultIfEmpty(new PointF(0, 0)).ToArray();
-            float minX = points.Min(s => s.X);
-            float maxX = points.Max(s => s.X);
-            float minY = points.Min(s => s.Y);
-            float maxY = points.Max(s => s.Y);
+            var minX = points.Min(s => s.X);
+            var maxX = points.Max(s => s.X);
+            var minY = points.Min(s => s.Y);
+            var maxY = points.Max(s => s.Y);
             var width = maxX - minX;
             if (width < 1e-7)
                 width = 1;

@@ -1,9 +1,8 @@
 using System;
 using System.Drawing;
 using System.IO;
-using lib;
-using System.Linq;
 using System.Windows.Forms;
+using lib;
 using NUnit.Framework;
 
 namespace CinemaLib
@@ -55,7 +54,8 @@ namespace CinemaLib
             var form = new Form();
             var painter = new MapPainter();
             painter.Map = MapLoader.LoadMap(
-                Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\..\maps\oxford-sparse.json")).Map;
+                    Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\..\maps\oxford-sparse.json"))
+                .Map;
             var panel = new ScaledViewPanel(painter)
             {
                 Dock = DockStyle.Fill
