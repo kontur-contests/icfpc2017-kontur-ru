@@ -11,7 +11,9 @@ namespace ConsoleApp
     {
         static void Main(string[] args)
         {
-            var maps = MapLoader.LoadDefaultMaps().OrderBy(m => m.Map.Rivers.Length).ToList();
+            var maps = MapLoader.LoadDefaultMaps()
+                .Where(m => m.Map.Mines.Length > 1)
+                .OrderBy(m => m.Map.Rivers.Length).ToList();
 
             foreach (var map in maps)
             {
@@ -28,6 +30,7 @@ namespace ConsoleApp
                 Console.WriteLine();
                 foreach (var gameSimulationResult in results)
                     Console.Write($"{gameSimulationResult.Score} ");
+                Console.WriteLine();
                 Console.WriteLine();
             }
         }

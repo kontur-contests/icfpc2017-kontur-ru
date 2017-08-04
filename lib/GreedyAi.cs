@@ -123,7 +123,7 @@ namespace lib.Strategies
             var gameSimulator = new GameSimulatorRunner(new SimpleScoreCalculator());
 
             var results = gameSimulator.SimulateGame(
-                gamers, MapLoader.LoadMapByName("sample.json").Map);
+                gamers, MapLoader.LoadMapByName("gen1.json").Map);
 
             foreach (var gameSimulationResult in results)
             {
