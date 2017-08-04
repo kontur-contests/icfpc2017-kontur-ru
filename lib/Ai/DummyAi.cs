@@ -40,10 +40,7 @@ namespace lib.Ai
                     };
             }
 
-            return new Pass
-            {
-                PunterId = myPunterId
-            };
+            return new Pass(myPunterId);
         }
 
         public string SerializeGameState()

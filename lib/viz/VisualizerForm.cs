@@ -62,10 +62,14 @@ namespace lib.viz
 
     public class AiFactoryRegistry
     {
-        public static AiFactory[] Factories => new[]
+        public static readonly AiFactory[] Factories;
+
+        static AiFactoryRegistry()
         {
-            new AiFactory("GreedyAi", () => new GreedyAi()),
-        };
+            var types = typeof(AiFactoryRegistry).Assembly.GetTypes()
+                .Where(x => typeof(IAi).IsAssignableFrom(x) && x.GetConstructor(Type.EmptyTypes) != null);
+            Factories = types.Select(type => new AiFactory(type.Name, () => (IAi)Activator.CreateInstance(type))).ToArray();
+        }
     }
 
     [TestFixture]
