@@ -82,8 +82,10 @@ namespace lib.viz
         private void DrawRiverText(Graphics g, River river)
         {
             var data = PainterAugmentor.GetData(river);
-            var start = new VF(map.SiteById[river.Source].Point());
-            var end = new VF(map.SiteById[river.Target].Point());
+            var sourceSite = map.SiteById[river.Source];
+            var targetSite = map.SiteById[river.Target];
+            var start = new VF(sourceSite.Point());
+            var end = new VF(targetSite.Point());
             var drawPoint = ((start + end) * 0.5).Translate(-5, 0).ToPointF;
             var stringBoxSize = g.MeasureString(data.HoverText, font, drawPoint, StringFormat.GenericDefault);
             using (var pen = new Pen(data.Color, 3 * data.PenWidth))
@@ -94,9 +96,11 @@ namespace lib.viz
             {
                 g.FillRectangle(textBckgPen, new RectangleF(drawPoint, stringBoxSize));
             }
+            DrawSite(g, sourceSite);
+            DrawSite(g, targetSite);
+            DrawSiteText(g, sourceSite);
+            DrawSiteText(g, targetSite);
             g.DrawString(data.HoverText, font, Brushes.Black, drawPoint);
-            DrawSiteText(g, map.SiteById[river.Source]);
-            DrawSiteText(g, map.SiteById[river.Target]);
         }
 
         private double DistanceTo(PointF cursor, River river)
