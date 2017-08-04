@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using lib.Scores;
 
 namespace lib
@@ -19,6 +21,8 @@ namespace lib
             while (!state.IsGameOver)
             {
                 state = gameSimulator.NextMove();
+
+                Console.WriteLine(string.Format("{0}", state.PreviousMoves.Last()));
             }
 
             var results = new List<GameSimulationResult>();
