@@ -69,7 +69,7 @@ namespace lib.Strategies
             return false;
         }
 
-        private long Calc(List<int> mineIds, int vertexId)
+        private long Calc(HashSet<int> mineIds, int vertexId)
         {
             return mineIds.Sum(
                 mineId =>

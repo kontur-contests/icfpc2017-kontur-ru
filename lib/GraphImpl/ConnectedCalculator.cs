@@ -8,24 +8,24 @@ namespace lib.GraphImpl
     public class ConnectedCalculator
     {
         private readonly Graph graph;
-        private readonly Dictionary<int, List<int>> minesConnected;
+        private readonly Dictionary<int, HashSet<int>> minesConnected;
 
         public ConnectedCalculator(Graph graph, int ownerId)
         {
             this.graph = graph;
 
-            minesConnected = new Dictionary<int, List<int>>();
+            minesConnected = new Dictionary<int, HashSet<int>>();
             foreach (var vertex in graph.Mines.Values)
             {
                 Bfs(vertex.Id, ownerId);
             }
         }
 
-        public List<int> GetConnectedMines(int v)
+        public HashSet<int> GetConnectedMines(int v)
         {
             return minesConnected.ContainsKey(v)
                 ? minesConnected[v]
-                : new List<int>();
+                : new HashSet<int>();
         }
 
         private void Bfs(int start, int owner)
@@ -55,7 +55,7 @@ namespace lib.GraphImpl
             foreach (var v in dist.Keys)
             {
                 if (!minesConnected.ContainsKey(v))
-                    minesConnected.Add(v, new List<int>());
+                    minesConnected.Add(v, new HashSet<int>());
                 minesConnected[v].Add(start);
             }
         }
