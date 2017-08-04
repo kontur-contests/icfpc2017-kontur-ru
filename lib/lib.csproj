@@ -88,6 +88,7 @@
     <Compile Include="FileSystemExtensions.cs" />
     <Compile Include="Firebase\FbClient.cs" />
     <Compile Include="Firebase\FbClient_Tests.cs" />
+    <Compile Include="GameState.cs" />
     <Compile Include="IAi.cs" />
     <Compile Include="IGameTransport.cs" />
     <Compile Include="ISimulator.cs" />
