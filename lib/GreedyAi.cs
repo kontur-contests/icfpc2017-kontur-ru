@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using CinemaLib;
 using lib.GraphImpl;
-using lib.viz;
 using NUnit.Framework;
 
 namespace lib.Strategies
