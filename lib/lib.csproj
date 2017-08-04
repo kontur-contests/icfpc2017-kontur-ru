@@ -91,6 +91,7 @@
     <Compile Include="Map_Should.cs" />
     <Compile Include="MoreExtensions.cs" />
     <Compile Include="Map.cs" />
+    <Compile Include="ScoreCalculator.cs" />
     <Compile Include="V.cs" />
   </ItemGroup>
   <ItemGroup>
