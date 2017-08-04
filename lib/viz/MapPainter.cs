@@ -5,6 +5,7 @@ namespace lib.viz
 {
     public class MapPainter : IScenePainter
     {
+        private static readonly Font font = new Font(FontFamily.GenericSansSerif, 6);
         private IndexedMap map;
 
         public Map Map
@@ -18,7 +19,7 @@ namespace lib.viz
         private static SizeF Padding => new SizeF(30, 30);
         public SizeF Size => new SizeF(600, 600);
 
-        public void Paint(Graphics g)
+        public void Paint(Graphics g, PointF mouseLogicalPos)
         {
             g.Clear(Color.White);
 
@@ -26,6 +27,8 @@ namespace lib.viz
                 DrawRiver(g, river);
             foreach (var site in map.Sites)
                 DrawSite(g, site);
+            foreach (var site in map.Sites)
+                DrawSiteText(g, site, mouseLogicalPos);
         }
 
         private void DrawRiver(Graphics g, River river)
@@ -43,16 +46,23 @@ namespace lib.viz
         {
             var data = PainterAugmentor.GetData(site);
             var radius = data.Radius;
+            var rectangle = new RectangleF(site.X - radius, site.Y - radius, 2 * radius, 2 * radius);
             using (var brush = new SolidBrush(data.Color))
             {
-                var rectangle = new RectangleF(site.X - radius, site.Y - radius, 2 * radius, 2 * radius);
-                if(map.MineIds.Contains(site.Id))
+                if (map.MineIds.Contains(site.Id))
                     g.FillRectangle(brush, rectangle);
                 else
                     g.FillEllipse(brush, rectangle);
             }
+        }
 
-            //g.DrawEllipse(Pens.Black, site.X - radius, site.Y - radius, 2 * radius, 2 * radius);
+        private void DrawSiteText(Graphics g, Site site, PointF mouseLogicalPos)
+        {
+            var data = PainterAugmentor.GetData(site);
+            var radius = data.Radius;
+            var rectangle = new RectangleF(site.X - radius, site.Y - radius, 2 * radius, 2 * radius);
+            if (rectangle.Contains(mouseLogicalPos))
+                g.DrawString(site.Id.ToString(), font, Brushes.Black, RectangleF.Inflate(rectangle, 7, 7).Location);
         }
     }
 }
