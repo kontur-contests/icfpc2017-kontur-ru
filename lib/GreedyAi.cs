@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
-using CinemaLib;
 using lib.GraphImpl;
+using lib.viz;
 using NUnit.Framework;
 
 namespace lib.Strategies
@@ -44,15 +44,11 @@ namespace lib.Strategies
                 {
                     var fromMines = calculator.GetConnectedMines(edge.From);
                     var toMines = calculator.GetConnectedMines(edge.To);
-                    long addScore;
+                    long addScore = 0;
                     if (fromMines.Count == 0)
                         addScore = Calc(toMines, edge.From);
-                    else
-                    {
-                        if (toMines.Count != 0)
-                            throw new InvalidOperationException("Attempt to connect two not empty components! WTF???");
+                    if (toMines.Count == 0)
                         addScore = Calc(fromMines, edge.To);
-                    }
                     if (addScore > maxAddScore)
                     {
                         maxAddScore = addScore;
@@ -107,15 +103,19 @@ namespace lib.Strategies
             var ai = new GreedyAi();
             var simulator = new GameSimulator(map.Map);
             simulator.StartGame(new List<IAi> { ai });
-            var gameState = simulator.NextMove();
-            painter.Map = gameState.CurrentMap;
 
-            var panel = new ScaledViewPanel(painter)
+            while (true)
             {
-                Dock = DockStyle.Fill
-            };
-            form.Controls.Add(panel);
-            form.ShowDialog();
+                var gameState = simulator.NextMove();
+                painter.Map = gameState.CurrentMap;
+
+                var panel = new ScaledViewPanel(painter)
+                {
+                    Dock = DockStyle.Fill
+                };
+                form.Controls.Add(panel);
+                form.ShowDialog();
+            }
         }
     }
 }
