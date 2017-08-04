@@ -25,7 +25,7 @@ namespace lib
                 Path.GetFileNameWithoutExtension(path),
                 map);
         }
-                                                                                                                          p
+
         [NotNull]
         public static IEnumerable<NamedMap> LoadMaps([NotNull] string path)
         {
