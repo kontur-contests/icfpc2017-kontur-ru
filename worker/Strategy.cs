@@ -14,7 +14,7 @@ namespace worker
         public IEnumerable<Tuple<PlayerWithParams, int>> Play(List<PlayerWithParams> players)
         {
             return players
-                .OrderByDescending(player => player.Params.Values.Sum())
+                .OrderBy(player => player.Params.Values.Sum())
                 .Select((player, i) => Tuple.Create(player, i));
         }
     }
