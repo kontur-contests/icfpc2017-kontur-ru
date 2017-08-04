@@ -85,6 +85,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConnectClosestMinesAi.cs" />
+    <Compile Include="GameSimulator_Should.cs" />
     <Compile Include="GraphImpl\Edge.cs" />
     <Compile Include="EnumExtensions.cs" />
     <Compile Include="FileSystemExtensions.cs" />

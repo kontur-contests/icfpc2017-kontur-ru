@@ -11,7 +11,7 @@ namespace lib
 {
     public static class MapLoader
     {
-        private static readonly string DefaultPath =
+        public static readonly string DefaultPath =
             Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\..\maps");
 
         [NotNull]
