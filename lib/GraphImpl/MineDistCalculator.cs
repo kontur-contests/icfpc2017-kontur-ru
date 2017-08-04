@@ -28,7 +28,7 @@ namespace lib.GraphImpl
             if (!distFromMines.ContainsKey(mineId))
                 throw new InvalidOperationException();
             if (!distFromMines[mineId].ContainsKey(vertexId))
-                return int.MaxValue;
+                return -1;
             return distFromMines[mineId][vertexId];
         }
 
@@ -61,6 +61,18 @@ namespace lib.GraphImpl
     [TestFixture]
     public class MineDistCalculator_Tests
     {
+        [Test]
+        public void TestDisjoint()
+        {
+            var graph = new Graph();
+
+            graph.AddVertex(1, true);
+            graph.AddVertex(2);
+
+            var calculator = new MineDistCalculator(graph);
+            Assert.AreEqual(-1, calculator.GetDist(1, 2));
+        }
+
         [Test]
         public void TestGraphWithTwoMines()
         {

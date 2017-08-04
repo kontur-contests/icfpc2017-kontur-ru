@@ -41,8 +41,8 @@ namespace lib.GraphImpl
 
         public void AddEdge(int v, int u)
         {
-            Vertexes[v].Edges.Add(new Edge(u, -1));
-            Vertexes[u].Edges.Add(new Edge(v, -1));
+            Vertexes[v].Edges.Add(new Edge(v, u, -1));
+            Vertexes[u].Edges.Add(new Edge(u, v, -1));
         }
     }
 }
