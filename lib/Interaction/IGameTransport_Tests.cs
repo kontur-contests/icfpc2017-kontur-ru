@@ -1,5 +1,6 @@
 ﻿using System;
 using FakeItEasy;
+using lib.Interaction.Internal;
 using NUnit.Framework;
 
 namespace lib.Interaction
@@ -10,10 +11,8 @@ namespace lib.Interaction
         [Test]
         public void TestHandShake()
         {
-            var x = "a";
-            Console.WriteLine($"{{\"me\":\"{x}\"}}");
-            var transport = A.Fake<OfflineHighTransport>();
-            var gameTransport = new OnlineInteraction(transport);
+            var transport = A.Fake<ITransport>();
+            var gameTransport = new OnlineHighTransport(transport);
             A.CallTo(() => transport.Read()).Returns("{\"you\":\"player\"}");
 
             gameTransport.HandShake("player");
