@@ -4,11 +4,9 @@ using System.Linq;
 
 namespace lib.viz.Detalization
 {
-    public class DefaultPainterAugmentor : IPainterAugmentor
+    public class ColorsPalette
     {
-        private const float defaultRadius = 30f;
-
-        private static Color[] Colors =
+        public static Color[] Colors =
         {
             Color.Navy,
             Color.Red,
@@ -16,6 +14,13 @@ namespace lib.viz.Detalization
             Color.Fuchsia,
             Color.Green
         };
+
+    }
+    public class DefaultPainterAugmentor : IPainterAugmentor
+    {
+        private const float defaultRadius = 30f;
+
+        private static Color[] Colors = ColorsPalette.Colors;
 
         private IndexedMap map;
         private float radius;
