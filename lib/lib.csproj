@@ -40,5 +40,11 @@
     <Compile Update="viz\ScaledViewPanel.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Update="viz\StartGameConfigPanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Update="viz\VisualizerForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
   </ItemGroup>
 </Project>

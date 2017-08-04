@@ -1,10 +1,10 @@
 using System.Drawing;
 
-namespace CinemaLib
+namespace lib.viz
 {
 	public interface IScenePainter
 	{
 		SizeF Size { get; }
-		void Paint(Graphics g);
+		void Paint(Graphics g, PointF mouseLogicalPos);
 	}
 }

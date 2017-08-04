@@ -1,7 +1,3 @@
-using System;
-using System.ComponentModel;
-using System.Drawing;
-using System.Linq;
 using Newtonsoft.Json;
 
 namespace lib
@@ -10,11 +6,9 @@ namespace lib
     {
         [JsonProperty("id")] public int Id;
 
-        [JsonProperty("x", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        public float X;
+        [JsonProperty("x", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)] public float X;
 
-        [JsonProperty("y", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
-        public float Y;
+        [JsonProperty("y", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)] public float Y;
 
         public Site()
         {
@@ -25,6 +19,11 @@ namespace lib
             Id = id;
             X = x;
             Y = y;
+        }
+
+        public override string ToString()
+        {
+            return $"{nameof(Id)}: {Id}, {nameof(X)}: {X}, {nameof(Y)}: {Y}";
         }
     }
 
@@ -50,11 +49,11 @@ namespace lib
 
     public class River
     {
-        [JsonProperty("source", Order=1)] public readonly int Source;
+        [JsonProperty("source", Order = 1)] public readonly int Source;
 
         [JsonProperty("target", Order = 2)] public readonly int Target;
 
-        [JsonIgnore] public int Owner;
+        [JsonIgnore] public int Owner = -1;
 
         public River()
         {
@@ -66,13 +65,10 @@ namespace lib
             Target = target;
             Owner = owner;
         }
-    }
 
-    public static class MapExtensions
-    {
-        public static bool IsMine(this Map map, int siteId)
+        public override string ToString()
         {
-            return map.Mines.Contains(siteId);
+            return $"{nameof(Source)}: {Source}, {nameof(Target)}: {Target}, {nameof(Owner)}: {Owner}";
         }
     }
 }

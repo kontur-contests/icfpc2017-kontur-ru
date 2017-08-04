@@ -20,13 +20,7 @@ namespace lib
             if (!File.Exists(path))
                 throw new Exception($"File {path} not exists");
             Map map = JsonConvert.DeserializeObject<Map>(Encoding.UTF8.GetString(File.ReadAllBytes(path)));
-
-            // TODO после десериализации проставляется нолик в овнера, а по спеке надо -1. Поправьте потом кто нить или забейте
-            foreach (River river in map.Rivers)
-            {
-                river.Owner = -1;
-            }
-
+            
             return new NamedMap(
                 Path.GetFileNameWithoutExtension(path),
                 map);
