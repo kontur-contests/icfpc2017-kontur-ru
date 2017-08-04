@@ -35,7 +35,7 @@ namespace lib.viz.Detalization
             return new RiverPainterData
             {
 
-                Color = river.Owner == -1 ? Color.Blue : Color.FromKnownColor((KnownColor) river.Owner) ,
+                Color = river.Owner == -1 ? Color.Blue : Colors[river.Owner],
                 PenWidth = 1,
                 HoverText = "It's a river!"
             };
@@ -54,6 +54,14 @@ namespace lib.viz.Detalization
                     return dist < 1e-5 ? defaultRadius : dist;
                 });
         }
+
+        private static Color[] Colors = {
+            Color.Red,
+            Color.Green,
+            Color.Orange,
+            Color.Fuchsia,
+            Color.Navy
+        };
 
         private Color GetSiteColor(Site site)
         {
