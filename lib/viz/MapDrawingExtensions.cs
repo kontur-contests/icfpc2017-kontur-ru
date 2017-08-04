@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -36,11 +35,17 @@ namespace CinemaLib
         public static RectangleF GetBoundingBox(this IEnumerable<PointF> pointsSequence)
         {
             var points = pointsSequence.DefaultIfEmpty(new PointF(0, 0)).ToArray();
-            float minX = points.Min(s => s.X);
-            float maxX = points.Max(s => s.X);
-            float minY = points.Min(s => s.Y);
-            float maxY = points.Max(s => s.Y);
-            return new RectangleF(minX, minY, Math.Max(1, maxX - minX), Math.Max(1, maxY - minY));
+            var minX = points.Min(s => s.X);
+            var maxX = points.Max(s => s.X);
+            var minY = points.Min(s => s.Y);
+            var maxY = points.Max(s => s.Y);
+            var width = maxX - minX;
+            if (width < 1e-7)
+                width = 1;
+            var height = maxY - minY;
+            if (height < 1e-7)
+                height = 1;
+            return new RectangleF(minX, minY, width, height);
         }
 
         public static PointF Point(this Site site)
