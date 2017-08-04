@@ -1,6 +1,6 @@
-﻿using System;
-using FakeItEasy;
+﻿using FakeItEasy;
 using lib.Interaction.Internal;
+using Newtonsoft.Json;
 using NUnit.Framework;
 
 namespace lib.Interaction
@@ -26,11 +26,17 @@ namespace lib.Interaction
         {
             var transport = A.Fake<ITransport>();
             var gameTransport = new OnlineHighTransport(transport);
-            A.CallTo(() => transport.Read()).Returns("{\"you\":\"player\"}");
+            var setup = new Setup
+            {
+                OurId = "id"
+            };
+            var data = JsonConvert.SerializeObject(setup);
 
-            gameTransport.HandShake("player");
+            A.CallTo(() => transport.Read()).Returns(data);
 
-            var expectedToWrite = "{\"me\":\"player\"}";
+            gameTransport.ReadSetup();
+
+            var expectedToWrite = "{\"ready\":\"id\"}";
             A.CallTo(() => transport.Write(expectedToWrite)).MustHaveHappened();
         }
     }
