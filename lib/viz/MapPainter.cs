@@ -77,7 +77,7 @@ namespace lib.viz
             var data = PainterAugmentor.GetData(site);
             var radius = data.Radius;
             var rectangle = new RectangleF(site.X - radius, site.Y - radius, 2 * radius, 2 * radius);
-            if (rectangle.Contains(mouseLogicalPos))
+            //if (rectangle.Contains(mouseLogicalPos))
                 g.DrawString(data.HoverText, font, Brushes.Black, RectangleF.Inflate(rectangle, 7, 7).Location);
         }
     }

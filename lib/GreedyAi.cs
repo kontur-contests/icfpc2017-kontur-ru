@@ -61,7 +61,7 @@ namespace lib.Strategies
             if (bestEdge != null)
             {
                 nextMove = new Move(punterId, bestEdge.From, bestEdge.To);
-                Console.WriteLine($"TAKE {bestEdge.From} {bestEdge.To}");
+                Console.WriteLine($"TAKE {bestEdge.From} {bestEdge.To} with score {maxAddScore}");
                 return true;
             }
             Console.WriteLine("PASS");
@@ -127,7 +127,7 @@ namespace lib.Strategies
             var gameSimulator = new GameSimulatorRunner(new SimpleScoreCalculator());
 
             var results = gameSimulator.SimulateGame(
-                gamers, MapLoader.LoadMapByName("sample.json").Map);
+                gamers, MapLoader.LoadMapByName("Sierpinski-triangle.json").Map);
 
             foreach (var gameSimulationResult in results)
             {
