@@ -34,7 +34,7 @@ namespace lib
             ApplyMove(nextMove);
 
             moves.Add(nextMove);
-            currentPunter++;
+            currentPunter = (currentPunter + 1) % punters.Count;
             return new GameState(map, currentPunter, moves.TakeLast(punters.Count).ToList());
         }
 

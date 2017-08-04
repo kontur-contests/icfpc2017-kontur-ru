@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using FluentAssertions;
 using NUnit.Framework;
 
 namespace lib
@@ -28,6 +30,18 @@ namespace lib
             simulator.NextMove();
 
             Assert.AreEqual(0, map.Map.Rivers.First(x => x.Source == 0 && x.Target == 1).Owner);
+        }
+
+        [Test]
+        public void MakeTwoMoves()
+        {
+            var gamer1 = new Ai();
+            simulator.StartGame(new List<IAi> {gamer1});
+
+            Action a = () => simulator.NextMove();
+
+            a();
+            a.ShouldNotThrow();
         }
 
         private class Ai : IAi
