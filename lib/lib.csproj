@@ -84,6 +84,8 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConnectClosestMinesAi.cs" />
+    <Compile Include="GraphImpl\Edge.cs" />
     <Compile Include="EnumExtensions.cs" />
     <Compile Include="FileSystemExtensions.cs" />
     <Compile Include="Firebase\FbClient.cs" />
@@ -91,6 +93,8 @@
     <Compile Include="MapLoader.cs" />
     <Compile Include="GameSimulator.cs" />
     <Compile Include="GameState.cs" />
+    <Compile Include="GraphImpl\Graph.cs" />
+    <Compile Include="GraphImpl\Graph_Test.cs" />
     <Compile Include="IAi.cs" />
     <Compile Include="IGameTransport.cs" />
     <Compile Include="ISimulator.cs" />
@@ -102,6 +106,7 @@
     <Compile Include="Strategies\IStrategy.cs" />
     <Compile Include="Strategies\TurnResult.cs" />
     <Compile Include="V.cs" />
+    <Compile Include="GraphImpl\Vertex.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
