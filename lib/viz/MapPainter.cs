@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using System.Drawing;
-using System.Linq;
 using lib.viz.Detalization;
+using MoreLinq;
 
 namespace lib.viz
 {
@@ -39,11 +39,10 @@ namespace lib.viz
         {
             var sw = Stopwatch.StartNew();
             foreach (var river in map.Rivers)
-                    DrawRiver(g, river);
+                DrawRiver(g, river);
             foreach (var site in map.Sites)
                 DrawSite(g, site);
-            foreach (var site in map.Sites)
-                DrawSiteText(g, site, mouseLogicalPos);
+            DrawRiverText(g, map.Rivers.MinBy(r => DistanceTo(mouseLogicalPos, r)));
             g.DrawString(sw.Elapsed.TotalMilliseconds.ToString("0ms"), SystemFonts.DefaultFont, Brushes.Black, PointF.Empty);
         }
 
@@ -72,13 +71,50 @@ namespace lib.viz
             }
         }
 
-        private void DrawSiteText(Graphics g, Site site, PointF mouseLogicalPos)
+        private void DrawSiteText(Graphics g, Site site)
         {
             var data = PainterAugmentor.GetData(site);
             var radius = data.Radius;
-            var rectangle = new RectangleF(site.X - radius, site.Y - radius, 2 * radius, 2 * radius);
-            //if (rectangle.Contains(mouseLogicalPos))
-                g.DrawString(data.HoverText, font, Brushes.Black, RectangleF.Inflate(rectangle, 7, 7).Location);
+            var drawPoint = new PointF(site.X - radius - 7, site.Y - radius - 7);
+            g.DrawString(data.HoverText, font, Brushes.Black, drawPoint);
+        }
+
+        private void DrawRiverText(Graphics g, River river)
+        {
+            var data = PainterAugmentor.GetData(river);
+            var start = new VF(map.SiteById[river.Source].Point());
+            var end = new VF(map.SiteById[river.Target].Point());
+            var drawPoint = ((start + end) * 0.5).Translate(-5, 0).ToPointF;
+            var stringBoxSize = g.MeasureString(data.HoverText, font, drawPoint, StringFormat.GenericDefault);
+            using (var pen = new Pen(data.Color, 3 * data.PenWidth))
+            {
+                g.DrawLine(pen, start.ToPointF, end.ToPointF);
+            }
+            using (var textBckgPen = new SolidBrush(Color.FromArgb(192, Color.White)))
+            {
+                g.FillRectangle(textBckgPen, new RectangleF(drawPoint, stringBoxSize));
+            }
+            g.DrawString(data.HoverText, font, Brushes.Black, drawPoint);
+            DrawSiteText(g, map.SiteById[river.Source]);
+            DrawSiteText(g, map.SiteById[river.Target]);
+        }
+
+        private double DistanceTo(PointF cursor, River river)
+        {
+            var point = new VF(cursor);
+            var start = new VF(map.SiteById[river.Source].Point());
+            var end = new VF(map.SiteById[river.Target].Point());
+            var v = end - start;
+            var w = point - start;
+            var c1 = w.ScalarProd(v);
+            var c2 = v.ScalarProd(v);
+            if (c1 <= 0)
+                return (start - point).LengthSquared();
+            if (c2 <= c1)
+                return (end - point).LengthSquared();
+            var b = c1 / c2;
+            var pb = start + b * v;
+            return (point - pb).LengthSquared();
         }
     }
 }
