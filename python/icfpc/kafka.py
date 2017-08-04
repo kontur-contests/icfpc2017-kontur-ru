@@ -6,7 +6,7 @@ def send_and_receive(data, output_queue = 'test', input_queue = 'test'):
 
     broker = 'icfpc-broker.dev.kontur.ru'
 
-    consumer = KafkaConsumer('qwerty', group_id=None, bootstrap_servers=broker)
+    consumer = KafkaConsumer('qwerty', group_id=None, bootstrap_servers=broker, )
 
     producer = KafkaProducer(
         bootstrap_servers=broker,
