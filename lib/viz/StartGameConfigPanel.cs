@@ -7,28 +7,6 @@ using NUnit.Framework;
 
 namespace lib
 {
-    internal class AiFactory
-    {
-        private readonly Func<IAi> create;
-        public string Name;
-
-        public AiFactory(string name, Func<IAi> create)
-        {
-            Name = name;
-            this.create = create;
-        }
-
-        public IAi Create()
-        {
-            return create();
-        }
-
-        public override string ToString()
-        {
-            return Name;
-        }
-    }
-
     internal class StartGameConfigPanel : Panel
     {
         private readonly ListBox allAisList;
@@ -104,6 +82,7 @@ namespace lib
         public void SetMaps(NamedMap[] maps)
         {
             mapsList.Items.AddRange(maps.Cast<object>().ToArray());
+            mapsList.SelectedIndex = 0;
         }
 
         public void SetAis(params AiFactory[] ais)
