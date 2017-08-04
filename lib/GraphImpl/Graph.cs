@@ -1,10 +1,17 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace lib.GraphImpl
 {
     public class Graph
     {
         public readonly Dictionary<int, Vertex> Vertexes = new Dictionary<int, Vertex>();
+
+        public Graph()
+        {
+            
+        }
 
         public Graph(Map map)
         {
@@ -17,6 +24,19 @@ namespace lib.GraphImpl
                 if (river.Source != river.Target)
                     Vertexes[river.Target].Edges.Add(new Edge(river.Source, river.Owner));
             }
+        }
+
+        public void AddVertex(int v, bool isMine = false)
+        {
+            if (Vertexes.ContainsKey(v))
+                return;
+            Vertexes.Add(v, new Vertex(v, isMine));
+        }
+
+        public void AddEdge(int v, int u)
+        {
+            Vertexes[v].Edges.Add(new Edge(u, -1));
+            Vertexes[u].Edges.Add(new Edge(v, -1));
         }
     }
 }
