@@ -35,12 +35,14 @@ namespace lib.GraphImpl
             if (Vertexes.ContainsKey(v))
                 return;
             Vertexes.Add(v, new Vertex(v, isMine));
+            if (isMine)
+                Mines.Add(v, new Vertex(v, true));
         }
 
-        public void AddEdge(int v, int u)
+        public void AddEdge(int v, int u, int owner = -1)
         {
-            Vertexes[v].Edges.Add(new Edge(v, u, -1));
-            Vertexes[u].Edges.Add(new Edge(u, v, -1));
+            Vertexes[v].Edges.Add(new Edge(v, u, owner));
+            Vertexes[u].Edges.Add(new Edge(u, v, owner));
         }
     }
 }
