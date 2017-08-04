@@ -1,4 +1,5 @@
 using System.Drawing;
+using System.Linq;
 using lib.viz.Detalization;
 
 namespace lib.viz
@@ -19,13 +20,13 @@ namespace lib.viz
         private static SizeF Padding => new SizeF(30, 30);
         public SizeF Size => new SizeF(600, 600);
 
-        public void Paint(Graphics g, PointF mouseLogicalPos)
+        public void Paint(Graphics g, PointF mouseLogicalPos, RectangleF clipRect)
         {
-            g.Clear(Color.White);
-
+            var visibleSites = map.Sites.Where(s => clipRect.Contains(s.Point())).Select(s => s.Id).ToHashSet();
             foreach (var river in map.Rivers)
-                DrawRiver(g, river);
-            foreach (var site in map.Sites)
+                if (visibleSites.Contains(river.Source) || visibleSites.Contains(river.Target))
+                    DrawRiver(g, river);
+            foreach (var site in visibleSites.Select(id => map.SiteById[id]))
                 DrawSite(g, site);
             foreach (var site in map.Sites)
                 DrawSiteText(g, site, mouseLogicalPos);
