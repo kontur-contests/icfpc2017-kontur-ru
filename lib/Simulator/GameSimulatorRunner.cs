@@ -20,9 +20,14 @@ namespace lib
             var state = gameSimulator.NextMove();
             while (!state.IsGameOver)
             {
-                state = gameSimulator.NextMove();
+                var last = state.PreviousMoves.Last();
 
-                Console.WriteLine(string.Format("{0}", state.PreviousMoves.Last()));
+                if (last is Move move)
+                    Console.WriteLine($"PunterId: {move.PunterId} move source: {move.Source} target: {move.Target}");
+                if (last is Pass pass)
+                    Console.WriteLine($"PunterId: { pass.PunterId} pass");
+
+                state = gameSimulator.NextMove();
             }
 
             var results = new List<GameSimulationResult>();
