@@ -25,7 +25,8 @@ namespace lib.viz.Detalization
         {
             return new RiverPainterData
             {
-                Color = Color.Blue,
+
+                Color = river.Owner == -1 ? Color.Blue : Color.FromKnownColor((KnownColor) river.Owner) ,
                 PenWidth = 1,
             };
         }
