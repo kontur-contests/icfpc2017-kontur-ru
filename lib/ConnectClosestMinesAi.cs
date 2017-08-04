@@ -23,17 +23,24 @@ namespace lib
 
         public IMove GetNextMove(IMove[] prevMoves, Map map)
         {
-            throw new NotImplementedException();
             var graph = new Graph(map);
-            if (myMines.Any())
-            {
 
-                throw new NotImplementedException();
-            }
+            IMove move;
+            //if (TryExtendComponent(graph, out move))
+            //    return move;
+            if (TryBuildNewComponent(graph, out move))
+                return move;
 
+            // foreach myMines.adjastentRivers take best
+
+            return new Pass();
+        }
+
+        private bool TryBuildNewComponent(Graph graph, out IMove move)
+        {
             var queue = new Queue<QueueItem>();
             var used = new Dictionary<int, QueueItem>();
-            foreach (var mineId in map.Mines.Where(id => !myMines.Contains(id)))
+            foreach (var mineId in graph.Mines.Keys.Where(id => !myMines.Contains(id)))
             {
                 var queueItem = new QueueItem
                 {
@@ -48,13 +55,26 @@ namespace lib
             while (queue.Count > 0)
             {
                 var current = queue.Dequeue();
-                foreach (var edge in current.CurrentVertex.Edges)
+                foreach (var edge in current.CurrentVertex.Edges.Where(x => x.Owner == -1))
                 {
                     var next = graph.Vertexes[edge.To];
                     QueueItem prev;
                     if (used.TryGetValue(next.Id, out prev))
                     {
-
+                        if (prev.SourceMine != current.SourceMine)
+                        {
+                            var bestMine = SelectBestMine(prev.SourceMine, current.SourceMine);
+                            myMines.Add(bestMine.Id);
+                            if (bestMine == prev.SourceMine)
+                            {
+                                move = MakeMove(prev.FirstEdge ?? edge);
+                                return true;
+                            }
+                            {
+                                move = MakeMove(current.FirstEdge ?? edge);
+                                return true;
+                            }
+                        }
                     }
                     else
                     {
@@ -69,15 +89,18 @@ namespace lib
                     }
                 }
             }
+            move = null;
+            return false;
+        }
 
+        private static Vertex SelectBestMine(Vertex a, Vertex b)
+        {
+            return a.Edges.Count(x => x.Owner == -1) < b.Edges.Count(x => x.Owner == -1) ? a : b;
+        }
 
-            // bfs от всех, кроме myMines
-            // if (has path)
-            //     return first path item
-
-            // foreach myMines.adjastentRivers take best
-
-            // pass
+        private static IMove MakeMove(Edge edge)
+        {
+            return new Move(edge.From, edge.To);
         }
 
         public string SerializeGameState()
