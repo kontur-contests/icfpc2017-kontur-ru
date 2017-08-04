@@ -17,6 +17,11 @@ namespace lib
             // precalc (site,mine) -> score
         }
 
+        public IMove GetNextMove(IMove[] prevMoves, Map map)
+        {
+            throw new NotImplementedException();
+        }
+
         public Move GetNextMove(Move[] prevMoves, Map map)
         {
             throw new InvalidOperationException();
