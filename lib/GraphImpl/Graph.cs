@@ -28,15 +28,15 @@ namespace lib.GraphImpl
 
         public void AddVertex(int v, bool isMine = false)
         {
-            if (vertexes.ContainsKey(v))
+            if (Vertexes.ContainsKey(v))
                 return;
-            vertexes.Add(v, new Vertex(v, isMine));
+            Vertexes.Add(v, new Vertex(v, isMine));
         }
 
         public void AddEdge(int v, int u)
         {
-            vertexes[v].Edges.Add(new Edge(u, -1));
-            vertexes[u].Edges.Add(new Edge(v, -1));
+            Vertexes[v].Edges.Add(new Edge(u, -1));
+            Vertexes[u].Edges.Add(new Edge(v, -1));
         }
     }
 }
