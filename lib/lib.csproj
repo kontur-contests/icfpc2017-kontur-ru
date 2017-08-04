@@ -32,5 +32,6 @@
     <Reference Include="Firebase.Auth">
       <HintPath>..\externals\Firebase.Auth.dll</HintPath>
     </Reference>
+    <Reference Include="System.Windows.Forms" />
   </ItemGroup>
 </Project>
