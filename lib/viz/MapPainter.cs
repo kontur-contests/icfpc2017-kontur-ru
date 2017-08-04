@@ -59,9 +59,9 @@ namespace lib.viz
             g.DrawString(sw.Elapsed.TotalMilliseconds.ToString("0ms"), SystemFonts.DefaultFont, Brushes.Black, PointF.Empty);
         }
 
-        private void HightlightLastMove(Graphics g, IMove move)
+        private void HightlightLastMove(Graphics g, Move move)
         {
-            if (move is Move m)
+            if (move is ClaimMove m)
             {
                 var start = map.SiteById[m.Source];
                 var end = map.SiteById[m.Target];

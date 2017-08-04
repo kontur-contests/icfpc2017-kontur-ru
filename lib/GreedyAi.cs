@@ -130,6 +130,7 @@ namespace lib.Strategies
             {
                 Console.Out.WriteLine(
                     "gameSimulationResult = {0}:{1}", gameSimulationResult.Gamer.Name, gameSimulationResult.Score);
+            }
         }
 
         [Test]

@@ -10,6 +10,7 @@ namespace lib.Interaction
     public class OnlineProtocol_Tests
     {
         [Test]
+        [Explicit]
         public void TestHandShake()
         {
             var transport = A.Fake<ITransport>();
@@ -23,6 +24,7 @@ namespace lib.Interaction
         }
 
         [Test]
+        [Explicit]
         public void TestHandShakeWithoutMock()
         {
             var transport = new TcpTransport(9011);
@@ -34,6 +36,7 @@ namespace lib.Interaction
         }
 
         [Test]
+        [Explicit]
         public void TestReadSetup()
         {
             var transport = A.Fake<ITransport>();

@@ -1,0 +1,69 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using lib.Scores;
+
+namespace lib
+{
+    public class GameSimulatorRunner
+    {
+        private readonly IScoreCalculator scoreCalculator;
+<<<<<<< 508fd06a9c5dc5faee598be64a3688511a5088fa
+        private readonly bool silent;
+
+        public GameSimulatorRunner(IScoreCalculator scoreCalculator, bool silent = false)
+=======
+
+        public GameSimulatorRunner(IScoreCalculator scoreCalculator)
+>>>>>>> Transport + Move
+        {
+            this.scoreCalculator = scoreCalculator;
+            this.silent = silent;
+        }
+
+        public List<GameSimulationResult> SimulateGame(List<IAi> gamers, Map map)
+        {
+            var gameSimulator = new GameSimulator(map);
+            gameSimulator.StartGame(gamers);
+            var state = gameSimulator.NextMove();
+            while (!state.IsGameOver)
+            {
+                var lastMove = state.PreviousMoves.Last();
+
+<<<<<<< 508fd06a9c5dc5faee598be64a3688511a5088fa
+                if (last is Move move && !silent)
+                    Console.WriteLine($"PunterId: {move.PunterId} move source: {move.Source} target: {move.Target}");
+                if (last is Pass pass && !silent)
+                    Console.WriteLine($"PunterId: { pass.PunterId} pass");
+=======
+                if (lastMove is ClaimMove claimMove)
+                    Console.WriteLine($"PunterId: {claimMove.PunterId} move source: {claimMove.Source} target: {claimMove.Target}");
+                if (lastMove is PassMove passMove)
+                    Console.WriteLine($"PunterId: {passMove.PunterId} pass");
+>>>>>>> Transport + Move
+
+                state = gameSimulator.NextMove();
+            }
+
+            var results = new List<GameSimulationResult>();
+            for (int i = 0; i < gamers.Count; i++)
+            {
+                results.Add(new GameSimulationResult(gamers[i], scoreCalculator.GetScore(i, map)));
+            }
+
+            return results;
+        }
+    }
+
+    public class GameSimulationResult
+    {
+        public GameSimulationResult(IAi gamer, long gamerScore)
+        {
+            Gamer = gamer;
+            Score = gamerScore;
+        }
+
+        public IAi Gamer { get; }
+        public long Score { get; }
+    }
+}
