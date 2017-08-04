@@ -25,7 +25,7 @@ namespace worker
             var gameSimulator = new GameSimulatorRunner(new SimpleScoreCalculator());
 
             var results = gameSimulator.SimulateGame(
-                gamers, MapLoader.LoadMap(Path.Combine(MapLoader.DefaultPath, "sample.json")).Map);
+                gamers, MapLoader.LoadMapByName("sample.json").Map);
 
             var report = results.Select(result => Tuple.Create(
                 players.Where(player => player.Name == result.Gamer.Name).Single(),
