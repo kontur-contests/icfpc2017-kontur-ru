@@ -1,7 +1,6 @@
 using System;
 using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Windows.Forms;
 using lib;
 using NUnit.Framework;
@@ -10,12 +9,12 @@ namespace CinemaLib
 {
     public class MapPainter : IScenePainter
     {
-        private Map map;
+        private IndexedMap map;
 
         public Map Map
         {
-            get => map;
-            set => map = value.NormalizeCoordinates(Size, Padding);
+            get => map.Map;
+            set => map = new IndexedMap(value.NormalizeCoordinates(Size, Padding));
         }
 
         private static SizeF Padding => new SizeF(30, 30);
@@ -27,8 +26,8 @@ namespace CinemaLib
 
             foreach (var river in map.Rivers)
             {
-                var source = map.Sites.Single(x => x.Id == river.Source);
-                var target = map.Sites.Single(x => x.Id == river.Target);
+                var source = map.SiteById[river.Source];
+                var target = map.SiteById[river.Target];
                 g.DrawLine(Pens.Blue, source.Point(), target.Point());
             }
             foreach (var site in map.Sites)
@@ -44,7 +43,7 @@ namespace CinemaLib
 
         private Brush GetSiteColor(Site site)
         {
-            return map.IsMine(site.Id) ? Brushes.Red : Brushes.LimeGreen;
+            return map.MineIds.Contains(site.Id) ? Brushes.Red : Brushes.LimeGreen;
         }
     }
 
