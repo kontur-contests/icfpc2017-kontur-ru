@@ -123,11 +123,11 @@ namespace lib.Strategies
         [Test]
         public void Test1()
         {
-            var gamers = new List<IAi> { new GreedyAi(), new GreedyAi() };
+            var gamers = new List<IAi> { new GreedyAi(), new ConnectClosestMinesAi() };
             var gameSimulator = new GameSimulatorRunner(new SimpleScoreCalculator());
 
             var results = gameSimulator.SimulateGame(
-                gamers, MapLoader.LoadMap(Path.Combine(MapLoader.DefaultPath, "sample.json")).Map);
+                gamers, MapLoader.LoadMap(Path.Combine(MapLoader.DefaultPath, "Sierpinski-triangle.json")).Map);
 
             foreach (var gameSimulationResult in results)
             {
