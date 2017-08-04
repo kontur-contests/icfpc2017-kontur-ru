@@ -1,8 +1,5 @@
-using System;
 using System.Drawing;
-using System.IO;
-using System.Windows.Forms;
-using NUnit.Framework;
+using lib.viz.Detalization;
 
 namespace lib.viz
 {
@@ -16,6 +13,8 @@ namespace lib.viz
             set => map = new IndexedMap(value.NormalizeCoordinates(Size, Padding));
         }
 
+        public IPainterAugmentor PainterAugmentor { get; set; } = new DefaultPainterAugmentor();
+
         private static SizeF Padding => new SizeF(30, 30);
         public SizeF Size => new SizeF(600, 600);
 
@@ -24,47 +23,32 @@ namespace lib.viz
             g.Clear(Color.White);
 
             foreach (var river in map.Rivers)
-            {
-                var source = map.SiteById[river.Source];
-                var target = map.SiteById[river.Target];
-                g.DrawLine(Pens.Blue, source.Point(), target.Point());
-            }
+                DrawRiver(g, river);
             foreach (var site in map.Sites)
                 DrawSite(g, site);
         }
 
+        private void DrawRiver(Graphics g, River river)
+        {
+            var data = PainterAugmentor.GetData(river);
+            var source = map.SiteById[river.Source];
+            var target = map.SiteById[river.Target];
+            using (var pen = new Pen(data.Color, data.PenWidth))
+            {
+                g.DrawLine(pen, source.Point(), target.Point());
+            }
+        }
+
         private void DrawSite(Graphics g, Site site)
         {
-            var radius = 3;
-            g.FillEllipse(GetSiteColor(site), site.X - radius, site.Y - radius, 2 * radius, 2 * radius);
-            //g.DrawEllipse(Pens.Black, site.X - radius, site.Y - radius, 2 * radius, 2 * radius);
-        }
-
-        private Brush GetSiteColor(Site site)
-        {
-            return map.MineIds.Contains(site.Id) ? Brushes.Red : Brushes.LimeGreen;
-        }
-    }
-
-    [TestFixture]
-    public class MapPainter_Should
-    {
-        [Test]
-        [STAThread]
-        [Explicit]
-        public void Show()
-        {
-            var form = new Form();
-            var painter = new MapPainter();
-            painter.Map = MapLoader.LoadMap(
-                    Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\..\maps\oxford-sparse.json"))
-                .Map;
-            var panel = new ScaledViewPanel(painter)
+            var data = PainterAugmentor.GetData(site);
+            var radius = data.Radius;
+            using (var brush = new SolidBrush(data.Color))
             {
-                Dock = DockStyle.Fill
-            };
-            form.Controls.Add(panel);
-            form.ShowDialog();
+                g.FillEllipse(brush, site.X - radius, site.Y - radius, 2 * radius, 2 * radius);
+            }
+
+            //g.DrawEllipse(Pens.Black, site.X - radius, site.Y - radius, 2 * radius, 2 * radius);
         }
     }
 }
