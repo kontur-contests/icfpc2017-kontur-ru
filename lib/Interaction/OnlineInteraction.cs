@@ -1,6 +1,7 @@
 ﻿using System;
+using lib.Interaction.Internal;
 
-namespace lib
+namespace lib.Interaction
 {
     public class OnlineInteraction : IServerInteraction
     {

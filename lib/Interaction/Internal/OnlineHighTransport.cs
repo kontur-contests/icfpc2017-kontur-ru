@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 
-namespace lib
+namespace lib.Interaction.Internal
 {
-    internal class OnlineHighTransport
+    internal class OnlineHighTransport : HightTransport
     {
         public OnlineHighTransport(ITransport transport)
         {
@@ -33,70 +33,16 @@ namespace lib
             return data.Moves.Moves.Select(DeserializeMove).ToArray();
         }
 
-        private AbstractMove DeserializeMove(string move)
-        {
-            var data = JsonConvert.DeserializeObject<Dictionary<string, string>>(move);
-            if (data.Count != 1)
-                throw new InvalidOperationException(move);
-            switch (data.Keys.First().ToLowerInvariant())
-            {
-                case "claim":
-                    return JsonConvert.DeserializeObject<ClaimSerializable>(move).Claim;
-                case "pass":
-                    return JsonConvert.DeserializeObject<PassSerializable>(move).Pass;
-                default:
-                    throw new InvalidOperationException(move);
-            }
-        }
-
         public void SendMove(AbstractMove abstractMove)
         {
-            switch (abstractMove)
-            {
-                case Move move:
-                    transport.Write(JsonConvert.SerializeObject(new ClaimSerializable(move)));
-                    break;
-                case Pass move:
-                    transport.Write(JsonConvert.SerializeObject(new PassSerializable(move)));
-                    break;
-                default:
-                    throw new InvalidOperationException();
-            }
+            transport.Write(SerializeMove(abstractMove));
         }
-
-        private class MoveServerData
-        {
-            [JsonProperty("move")]
-            public MoveDataData Moves { get; set; }
-
-            public class MoveDataData
-            {
-                [JsonProperty("moves")]
-                public string[] Moves { get; set; }
-            }
-        }
-
-        private class ClaimSerializable
-        {
-            public ClaimSerializable(Move move) => Claim = move;
-
-            [JsonProperty("claim")]
-            public Move Claim { get; set; }
-        }
-
-        private class PassSerializable
-        {
-            public PassSerializable(Pass pass) => Pass = pass;
-
-            [JsonProperty("pass")]
-            public Pass Pass { get; set; }
-        }
-
-        private readonly ITransport transport;
 
         public Tuple<Move[], Score[]> ReadScore()
         {
             throw new NotImplementedException();
         }
+
+        private readonly ITransport transport;
     }
 }
