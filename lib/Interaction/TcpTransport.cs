@@ -9,9 +9,10 @@ using System.Threading.Tasks;
 
 namespace lib.Interaction
 {
-    class TcpTransport : ITransport
+    public class TcpTransport : ITransport
     {
-        private TcpClient client;
+        private readonly TcpClient client;
+        private NetworkStream networkStream;
 
         public TcpTransport(int port)
         {
@@ -20,29 +21,25 @@ namespace lib.Interaction
             var ipAddress = ipHostInfo.AddressList[0];
 
             client.Connect(ipAddress.ToString(), port);
+            networkStream = client.GetStream();
         }
 
         public void Write(string data)
         {
-            var message = System.Text.Encoding.ASCII.GetBytes("Testing");
-            using (var stream = client.GetStream())
-            {
-                stream.Write(message, 0, message.Length);
-                stream.Close();
-            }
+            var strToSend = data.Length + ":" + data;
+            Console.WriteLine(client.Connected);
+            var buffer = Encoding.ASCII.GetBytes(strToSend);
+                networkStream.Write(buffer, 0, buffer.Length);
+            Console.WriteLine(client.Connected);
         }
 
         public string Read()
         {
-            string answer;
-            using (var stream = client.GetStream())
-            {
-                using (StreamReader sr = new StreamReader(stream))
-                {
-                    answer = sr.ReadLine();
-                }
-            }
-            return answer;
+            var  answer = new byte[1024];
+            Console.WriteLine(client.Connected);
+            networkStream.Read(answer, 0, 1024);
+
+            return Encoding.ASCII.GetString(answer).Split(':')[1];
         }
     }
 }
