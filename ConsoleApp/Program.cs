@@ -12,7 +12,6 @@ namespace ConsoleApp
         static void Main(string[] args)
         {
             var maps = MapLoader.LoadDefaultMaps()
-                .Where(m => m.Map.Mines.Length > 1)
                 .OrderBy(m => m.Map.Rivers.Length).ToList();
 
             foreach (var map in maps)
