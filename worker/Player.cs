@@ -21,8 +21,9 @@ namespace worker
 
     public class Result
     {
-        public IEnumerable<PlayerWithParams> Players { get; set; }
+        public List<PlayerWithParams> Players { get; set; }
         public string Error { get; set; }
+        public string Map { get; set; }
     }
 
     public interface IPlayer
@@ -52,7 +53,7 @@ namespace worker
 
             return new Result
             {
-                Players = players
+                Players = players.ToList()
             };
         }
     }

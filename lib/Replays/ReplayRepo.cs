@@ -85,6 +85,7 @@ namespace lib.Replays
     }
 
     [TestFixture]
+    [Explicit]
     public class ReplayRepoTests
     {
         [Test]

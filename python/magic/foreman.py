@@ -1,14 +1,14 @@
 from pykafka import KafkaClient
 import json
 
-def execute_tasks(tasks):
+def execute_tasks(tasks_to_do):
     client = KafkaClient(hosts="icfpc-broker.dev.kontur.ru:9092")
     tasks = client.topics[b'tasks']
     results = client.topics[b'results']
-    num_tasks = len(tasks)
+    num_tasks = len(tasks_to_do)
 
     with tasks.get_sync_producer() as producer:
-        for task in range(tasks):
+        for task in tasks_to_do:
             producer.produce(json.dumps(task).encode('utf-8'))
 
     consumer = results.get_balanced_consumer(
@@ -23,7 +23,8 @@ def execute_tasks(tasks):
     for message in consumer:
         remaining_answers -= 1
         if message is not None:
-            results.append()
-            print (message.value)
+            results.append(json.loads(message.value.decode('utf-8')))
         if not remaining_answers:
             break
+
+    return results

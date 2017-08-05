@@ -110,7 +110,8 @@ namespace lib.Ai
             while (queue.Count > 0)
             {
                 var current = queue.Dequeue();
-                if (current.CurrentVertex.Edges.Any(x => x.Owner == punterId))
+                //Is it correct expression?
+                if (current.Edge != null && current.CurrentVertex.Edges.Any(x => x.Owner == punterId))
                 {
                     TryAddMine(graph, current.Edge);
                     move = MakeMove(current.Edge);

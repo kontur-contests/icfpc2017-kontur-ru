@@ -10,25 +10,40 @@ using NUnit.Framework;
 
 namespace lib.Ai
 {
-    public class GreedyAi : IAi
+    public class CrazyAi : IAi
     {
-        public string Name { get; set; } = nameof(GreedyAi);
+        public string Name => nameof(CrazyAi);
         private int punterId;
-        private GreedyAiHelper GreedyAiHelper;
-
+        public static Random Random = new Random(314);
         private MineDistCalculator mineDistCalulator;
+        public GreedyAiHelper GreedyAiHelper { get; set; }
 
         // ReSharper disable once ParameterHidesMember
         public void StartRound(int punterId, int puntersCount, Map map)
         {
             this.punterId = punterId;
             this.mineDistCalulator = new MineDistCalculator(new Graph(map));
-            GreedyAiHelper = new GreedyAiHelper(punterId, mineDistCalulator);
+            this.GreedyAiHelper = new GreedyAiHelper(punterId, mineDistCalulator);
         }
 
         public Move GetNextMove(Move[] prevMoves, Map map)
         {
             var graph = new Graph(map);
+
+            var mines = map.Mines.Shuffle(Random).ToList();
+            for (int i = 0; i < mines.Count(); i++)
+            {
+                for (int j = i + 1; j < mines.Count(); j++)
+                {
+                    var denic = new Dinic(graph, punterId, mines[i], mines[j], out int flow);
+                    if (flow != 0 && flow != Dinic.INF)
+                    {
+                        var cut = denic.GetMinCut();
+                        var edge = cut[Random.Next(cut.Count)];
+                        return new ClaimMove(punterId, edge.From, edge.To);
+                    }
+                }
+            }
 
             GreedyAiHelper.TryExtendAnything(graph, out Move nextMove);
             return nextMove;
@@ -46,7 +61,7 @@ namespace lib.Ai
     }
 
     [TestFixture]
-    public class GreedyAi_Run
+    public class CrazyAi_Run
     {
         [Test]
         [STAThread]
@@ -60,7 +75,7 @@ namespace lib.Ai
 
             var ai = new GreedyAi();
             var simulator = new GameSimulator(map.Map);
-            simulator.StartGame(new List<IAi> {ai});
+            simulator.StartGame(new List<IAi> { ai });
 
             while (true)
             {
@@ -79,42 +94,16 @@ namespace lib.Ai
         [Test]
         public void Test1()
         {
-            var gamers = new List<IAi> {new GreedyAi(), new GreedyAi()};
+            var gamers = new List<IAi> { new CrazyAi(), new ConnectClosestMinesAi() };
             var gameSimulator = new GameSimulatorRunner(new SimpleScoreCalculator());
 
             var results = gameSimulator.SimulateGame(
-                gamers, MapLoader.LoadMapByName("gen1.json").Map);
+                gamers, MapLoader.LoadMapByName("edge.json").Map);
 
             foreach (var gameSimulationResult in results)
             {
                 Console.Out.WriteLine(
                     "gameSimulationResult = {0}:{1}", gameSimulationResult.Gamer.Name, gameSimulationResult.Score);
-            }
-        }
-
-        [Test]
-        [Explicit]
-        public void TestAllMaps()
-        {
-            var maps = MapLoader.LoadDefaultMaps().OrderBy(m => m.Map.Rivers.Length).ToList();
-
-            foreach (var map in maps)
-            {
-                var gamers = new List<IAi> { new GreedyAi(),  };
-                var gameSimulator = new GameSimulatorRunner(new SimpleScoreCalculator());
-                
-
-                Console.WriteLine($"MAP: {map.Name}");
-                var results = gameSimulator.SimulateGame(
-                    gamers, map.Map);
-
-                foreach (var gameSimulationResult in results)
-                    Console.Write($"{gameSimulationResult.Gamer.Name} ");
-                Console.WriteLine();
-                foreach (var gameSimulationResult in results)
-                    Console.Write($"{gameSimulationResult.Score} ");
-                Console.WriteLine();
-                Console.Out.Flush();
             }
         }
     }
