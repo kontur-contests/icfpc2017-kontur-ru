@@ -81,7 +81,8 @@ namespace worker
                         {
                             timesSleeped = 0;
                             idleThresholdSecs = rnd.Next(60, 120);
-                            ArenaRunner.TryCompeteOnArena("TCWorker", commitHash);
+                            //TODO this interferes with queue operation
+                            //ArenaRunner.TryCompeteOnArena("TCWorker", commitHash);
                         } 
                         
                         if (!consumer.Consume(out msg, TimeSpan.FromSeconds(1)))
