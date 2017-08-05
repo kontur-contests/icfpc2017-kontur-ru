@@ -1,21 +1,24 @@
 from pykafka import KafkaClient
+from pykafka.balancedconsumer import OffsetType
+from uuid import uuid4
 import json
 
-def execute_tasks(tasks_to_do, consumer_group):
+def execute_tasks(tasks_to_do):
     client = KafkaClient(hosts="icfpc-broker.dev.kontur.ru:9092")
     tasks = client.topics[b'tasks']
     results = client.topics[b'results']
     num_tasks = len(tasks_to_do)
 
+    consumer = results.get_balanced_consumer(
+        consumer_group="icfpc2017-foreman-%s" % uuid4().hex,
+        auto_commit_enable=True,
+        auto_offset_reset=OffsetType.LATEST,
+        zookeeper_connect='icfpc-broker.dev.kontur.ru:2181'
+    )
+
     with tasks.get_sync_producer() as producer:
         for task in tasks_to_do:
             producer.produce(json.dumps(task).encode('utf-8'))
-
-    consumer = results.get_balanced_consumer(
-        consumer_group=consumer_group,
-        auto_commit_enable=True,
-        zookeeper_connect='icfpc-broker.dev.kontur.ru:2181'
-    )
 
     results = []
 
