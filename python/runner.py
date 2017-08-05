@@ -40,12 +40,25 @@ class Fluent:
 
     def on_maps(self, *args):
         self.battles_on_maps = [(battle,map) for battle in self.battles for map in args]
+        return self
+
+    def experiment(self, experiment_name):
+        self.tasks = [{'Experiment': experiment_name, 'Map': map, 'Players': battle} for battle, map in
+                      self.battles_on_maps]
+        return self
+
+    def preview(self):
+        print(json.dumps(self.tasks,indent=2))
+        return self
 
     def run_experiment(self, experiment_name):
-        self.tasks = [ {'Experiment' : experiment_name, 'Map' : map,  'Players' : battle } for battle, map in self.battles_on_maps]
         self.results = execute_tasks(self.tasks)
         return self
 
+    def dump(self,dump_file):
+        with open(dump_file,'w') as file:
+            file.write(json.dumps(self.results))
+        return self
 
     def store_pointwise(self, filename):
         keys = list(self.params)
@@ -59,7 +72,17 @@ class Fluent:
                     file.write(',')
                     file.write(','.join([str(player['Params'][key]) for key in keys]))
                     file.write('\n')
+        return self
 
 
-#k = Fluent().from_params().create_players_randomly(1).one_player_various_groupsize(1,2,4,8)
-print (k.results)
+
+def test_greedy_algorithms():
+    (Fluent()
+    .from_params()
+    .create_random_players(1)
+    .first_against_himself(1,2,4,8,16)
+    .on_maps('sample.json')
+    .experiment('Greedy')
+    .preview())
+
+test_greedy_algorithms()
