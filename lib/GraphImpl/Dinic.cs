@@ -31,7 +31,7 @@ namespace lib.GraphImpl
                 foreach (var ee in g[v])
                 {
                     int u = e[ee].b;
-                    if (d[u] == -1)
+                    if (d[u] == -1 && e[ee].flow > 0)
                         result.Add(new Edge(rinds[v], rinds[u], -1));
                 }
             }

@@ -19,7 +19,7 @@ namespace VizApp
             {
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
-                var visualizerForm = new VisualizerForm(){WindowState = FormWindowState.Maximized};
+                var visualizerForm = new VisualizerForm{WindowState = FormWindowState.Maximized};
                 Application.Run(visualizerForm);
             }
             catch (Exception e)

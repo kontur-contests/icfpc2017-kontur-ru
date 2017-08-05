@@ -14,9 +14,9 @@ namespace lib.Ai
     {
         public string Name => nameof(CrazyAi);
         private int punterId;
-        public static Random Random = new Random(314);
+        private readonly Random random = new Random(314);
         private MineDistCalculator mineDistCalulator;
-        public GreedyAiHelper GreedyAiHelper { get; set; }
+        private GreedyAiHelper GreedyAiHelper { get; set; }
 
         // ReSharper disable once ParameterHidesMember
         public Future[] StartRound(int punterId, int puntersCount, Map map, Settings settings)
@@ -32,7 +32,7 @@ namespace lib.Ai
         {
             var graph = new Graph(map);
 
-            var mines = map.Mines.Shuffle(Random).ToList();
+            var mines = map.Mines.ToList();
             for (int i = 0; i < mines.Count(); i++)
             {
                 for (int j = i + 1; j < mines.Count(); j++)
@@ -41,7 +41,7 @@ namespace lib.Ai
                     if (flow != 0 && flow != Dinic.INF)
                     {
                         var cut = denic.GetMinCut();
-                        var edge = cut[Random.Next(cut.Count)];
+                        var edge = cut[random.Next(cut.Count)];
                         return new ClaimMove(punterId, edge.From, edge.To);
                     }
                 }

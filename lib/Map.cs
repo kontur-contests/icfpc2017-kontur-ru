@@ -49,6 +49,11 @@ namespace lib
         {
         }
 
+        public string Md5Hash()
+        {
+            return JsonConvert.SerializeObject(this, Formatting.None).CalculateMd5();
+        }
+
         public Map(Site[] sites, River[] rivers, int[] mines)
             :this(sites, rivers.ToImmutableHashSet(), mines)
         {
