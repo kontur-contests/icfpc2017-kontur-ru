@@ -9,11 +9,13 @@ namespace lib.Strategies.EdgeWeighting
 {
     public class MaxVertextWeighterWithConnectedComponents : IEdgeWeighter
     {
-        public MaxVertextWeighterWithConnectedComponents(Map map, MineDistCalculator mineDistCalculator)
+        public MaxVertextWeighterWithConnectedComponents(Graph graph, double mineMultiplier)
         {
-            MineDistCalculator = mineDistCalculator;
+            MineDistCalculator = new MineDistCalculator(graph);
+            MineMultiplier = mineMultiplier;
         }
 
+        private double MineMultiplier { get; }
         private Graph Graph { get; set; }
         private MineDistCalculator MineDistCalculator { get; }
         private ShortestPathGraph SpGraph { get; set; }
@@ -38,6 +40,7 @@ namespace lib.Strategies.EdgeWeighting
             ClaimedMineIds = maxComponent.Mines;
             foreach (var vertex in maxComponent.Vertices)
                 SubGraphWeight[vertex] = CalcSubGraphWeight(vertex);
+
         }
 
         public double EstimateWeight(Edge edge)
@@ -51,7 +54,8 @@ namespace lib.Strategies.EdgeWeighting
                 return weight;
             weight = CalcVertexScore(vertexId);
             foreach (var edge in SpGraph.Vertexes[vertexId].Edges)
-                weight = Math.Max((double) weight, CalcSubGraphWeight(edge.To));
+//                weight = weight + CalcSubGraphWeight(edge.To);
+                weight = Math.Max(weight, CalcSubGraphWeight(edge.To));
             SubGraphWeight[vertexId] = weight;
             return weight;
         }
@@ -66,11 +70,10 @@ namespace lib.Strategies.EdgeWeighting
                     weight = CalcMutualComponentWeight(component, CurrentComponent);
                 return weight;
             }
-            var multiplier = 1;
+            var vertexWeight = CalcProperVertexScore(vertexId, ClaimedMineIds);
             if (Graph.Mines.ContainsKey(vertexId))
-                multiplier = 100;
-
-            return multiplier * CalcProperVertexScore(vertexId, ClaimedMineIds);
+                return (long)(MineMultiplier*vertexWeight) + CurrentComponent.Vertices.Sum(v => CalcProperVertexScore(v, new [] {vertexId}));
+            return vertexWeight;
         }
 
         private int CalcProperVertexScore(int vertexId, ICollection<int> claimedMineIds)

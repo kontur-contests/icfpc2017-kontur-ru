@@ -1,14 +1,21 @@
-using lib.GraphImpl;
-using lib.StateImpl;
+using JetBrains.Annotations;
 using lib.Strategies.EdgeWeighting;
 
 namespace lib.Ai.StrategicFizzBuzz
 {
+    [UsedImplicitly]
     public class MaxReachableVertexWeightAi : EdgeWeightingStrategicAi
     {
-        protected override IEdgeWeighter CreateEdgeWeighter(State state, IServices services)
+        public MaxReachableVertexWeightAi() : this(100)
         {
-            return new MaxVertextWeighterWithConnectedComponents(state.map, services.Get<MineDistCalculator>(state));
         }
+
+        public MaxReachableVertexWeightAi(double mineWeight)
+            : base(s => new MaxVertextWeighter(s.Map, mineWeight))
+        {
+        }
+
+        public override string Name => nameof(MaxReachableVertexWeightAi);
+        public override string Version => "1.0";
     }
 }

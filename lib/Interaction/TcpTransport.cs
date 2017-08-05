@@ -40,7 +40,7 @@ namespace lib.Interaction
             networkStream.Flush();
         }
 
-        public T Read<T>(int? timeout = 15000) where T : InBase
+        public T Read<T>(int? timeout = null) where T : InBase
         {
             var n = ReadN(timeout);
             var sb = new StringBuilder();
@@ -77,7 +77,7 @@ namespace lib.Interaction
                 {
                     Thread.Sleep(20);
                     if (timeout != null && sw.ElapsedMilliseconds > timeout)
-                        throw new TimeoutException($"Wait too long {client.Client.RemoteEndPoint}");
+                        throw new TimeoutException($"Wait too long {client.Client.RemoteEndPoint} {timeout}");
                 }
                 networkStream.Read(buffer, 0, 1);
                 nStr.AppendFormat("{0}", Encoding.ASCII.GetString(buffer, 0, 1));

@@ -35,7 +35,8 @@ namespace worker.Strategies
                 Task = task,
                 Results = playerResults,
                 RiversCount = map.Rivers.Length,
-                SitesCount = map.Sites.Length
+                SitesCount = map.Sites.Length,
+                MinesCount = map.Mines.Length
             };
             return result;
 

@@ -8,11 +8,13 @@ namespace lib.Strategies.EdgeWeighting
 {
     public class MaxVertextWeighter : IEdgeWeighter
     {
-        public MaxVertextWeighter(MineDistCalculator mineDistCalculator)
+        public MaxVertextWeighter(MineDistCalculator mineDistCalculator, double mineWeight)
         {
+            MineWeight = mineWeight;
             MineDistCalculator = mineDistCalculator;
         }
 
+        private double MineWeight { get; }
         private Graph Graph { get; set; }
         private MineDistCalculator MineDistCalculator { get; }
         private ShortestPathGraph SpGraph { get; set; }
@@ -47,9 +49,9 @@ namespace lib.Strategies.EdgeWeighting
             return weight;
         }
 
-        private long CalcVertexScore(int vertexId)
+        private double CalcVertexScore(int vertexId)
         {
-            return (Graph.Mines.ContainsKey(vertexId) ? 100 : 1) *
+            return (Graph.Mines.ContainsKey(vertexId) ? MineWeight : 1) *
                    ClaimedMineIds.Select(mineId => MineDistCalculator.GetDist(mineId, vertexId))
                        .Sum(x => x * x);
         }

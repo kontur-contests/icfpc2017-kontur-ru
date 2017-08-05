@@ -15,39 +15,27 @@ def execute_tasks(tasks_to_do, token):
         auto_offset_reset=OffsetType.LATEST,
         zookeeper_connect='icfpc-broker.dev.kontur.ru:2181'
     )
+    print(str(len(tasks_to_do))+' to go')
 
     with tasks.get_sync_producer() as producer:
-        for task in tasks_to_do:
+        for index, task in enumerate(tasks_to_do):
+            print('\rsending '+str(index), end='')
             producer.produce(json.dumps(task).encode('utf-8'))
 
     results = []
 
     remaining_answers = num_tasks
+    print('\nremaining', end='')
     for message in consumer:
         if message is not None:
             data = json.loads(message.value.decode('utf-8'))
-            if 'Task' in data and 'Token' in data['Task'] and data['Task']['Token'] == token:
+            #print(json.dumps(data))
+            if ('Token' in data) and (data['Token'] == token):
                 remaining_answers -= 1
                 results.append(data)
         if not remaining_answers:
             break
-        print(str(remaining_answers)+"             \r",end='')
+        print('\rremaining ' + str(remaining_answers), end='')
 
     return results
 
-
-def empty_queue():
-    client = KafkaClient(hosts="icfpc-broker.dev.kontur.ru:9092")
-    results = client.topics[b'results']
-
-    consumer = results.get_balanced_consumer(
-        consumer_group=b'icfpc2017-foreman',
-        auto_commit_enable=True,
-        zookeeper_connect='icfpc-broker.dev.kontur.ru:2181'
-    )
-
-    for message in consumer:
-        if message is not None:
-            print(message.value)
-
-    return results

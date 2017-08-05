@@ -119,7 +119,7 @@ namespace lib.GraphImpl
             {
                 foreach (var edge in vertex.Value.Edges)
                 {
-                    if (edge.Owner != -1 && edge.Owner != punterId)
+                    if (edge.Owner != -1)// && edge.Owner != punterId)
                         continue;
 
                     int cap = edge.Owner == punterId

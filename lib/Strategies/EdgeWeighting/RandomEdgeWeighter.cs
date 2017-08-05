@@ -11,7 +11,6 @@ namespace lib.Strategies.EdgeWeighting
 
         public void Init(Graph graph, List<ConnectedComponent> connectedComponents)
         {
-            throw new NotImplementedException();
         }
 
         public double EstimateWeight(Edge edge)

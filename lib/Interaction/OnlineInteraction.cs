@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using lib.Ai;
 using lib.Interaction.Internal;
 using lib.Replays;
@@ -14,21 +15,18 @@ namespace lib.Interaction
 {
     public class OnlineInteraction : IServerInteraction
     {
+        private readonly string botName;
         private readonly OnlineProtocol connection;
-
-        public OnlineInteraction(int port)
+        private string BotName => botName ?? "kontur.ru";
+        public OnlineInteraction(int port, string botName=null)
         {
+            this.botName = botName;
             connection = new OnlineProtocol(new TcpTransport(port));
         }
 
         public bool Start()
         {
-            return connection.HandShake(CreateBotName());
-        }
-
-        public string CreateBotName()
-        {
-            return "kontur.ru"; // Sneaky fucker...
+            return connection.HandShake(BotName);
         }
 
         public Tuple<ReplayMeta, ReplayData> RunGame(IAi ai)
@@ -52,7 +50,7 @@ namespace lib.Interaction
             }
             catch
             {
-                var handshake = JsonConvert.SerializeObject(new HandshakeIn { you = CreateBotName() });
+                var handshake = JsonConvert.SerializeObject(new HandshakeIn { you = botName });
                 var input = JsonConvert.SerializeObject(setup, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
                 File.WriteAllText($@"error-setup-{DateTime.UtcNow.ToString("O").Replace(":", "_")}.json", $@"{handshake.Length}:{handshake}{input.Length}:{input}");
                 throw;
@@ -98,7 +96,7 @@ namespace lib.Interaction
                 }
                 catch
                 {
-                    var handshake = JsonConvert.SerializeObject(new { you = CreateBotName() });
+                    var handshake = JsonConvert.SerializeObject(new { you = "kontur.ru" });
                     File.WriteAllText($@"error-turn-{DateTime.UtcNow.ToString("O").Replace(":", "_")}.json", $@"{handshake.Length}:{handshake}{gameplay.Length}:{gameplay}");
                     throw;
                 }

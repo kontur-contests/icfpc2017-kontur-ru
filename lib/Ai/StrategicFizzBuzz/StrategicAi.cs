@@ -1,34 +1,48 @@
+using System;
 using System.Linq;
 using lib.GraphImpl;
-using lib.StateImpl;
 using lib.Strategies;
+using lib.Structures;
 using MoreLinq;
 
 namespace lib.Ai.StrategicFizzBuzz
 {
     public abstract class StrategicAi : IAi
     {
-        protected abstract IStrategy CreateStrategy(State state, IServices services);
-
-        public string Name => GetType().Name;
-        public string Version => "0.1";
-
-        public AiSetupDecision Setup(State state, IServices services)
+        protected StrategicAi(Func<SuperSettings, IStrategy> strategyProvider)
         {
-            services.Setup<GraphService>(state);
-            CreateStrategy(state, services);
-            return AiSetupDecision.Empty();
+            StrategyProvider = strategyProvider;
         }
 
-        public AiMoveDecision GetNextMove(State state, IServices services)
+        private int PunterId { get; set; }
+        private IStrategy Strategy { get; set; }
+        public abstract string Name { get; }
+        public abstract string Version { get; }
+        private Func<SuperSettings, IStrategy> StrategyProvider { get; }
+
+        public virtual Future[] StartRound(int punterId, int puntersCount, Map map, Settings settings)
         {
-            var strategy = CreateStrategy(state, services);
-            var graph = services.Get<GraphService>(state).Graph;
-            var turns = strategy.Turn(graph);
+            Strategy = StrategyProvider(new SuperSettings(punterId, puntersCount, map, settings));
+            PunterId = punterId;
+            return new Future[0];
+        }
+
+        public Move GetNextMove(Move[] prevMoves, Map map)
+        {
+            var turns = Strategy.Turn(new Graph(map));
             if (!turns.Any())
-                return AiMoveDecision.Pass(state.punter);
+                return Move.Pass(PunterId);
             var bestTurn = turns.MaxBy(x => x.Estimation);
-            return AiMoveDecision.Claim(state.punter, bestTurn.River.Source, bestTurn.River.Target);
-        }       
+            return Move.Claim(PunterId, bestTurn.River.Source, bestTurn.River.Target);
+        }
+
+        public string SerializeGameState()
+        {
+            return "";
+        }
+
+        public void DeserializeGameState(string gameState)
+        {
+        }
     }
 }

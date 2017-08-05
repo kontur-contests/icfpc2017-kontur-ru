@@ -15,6 +15,7 @@ namespace worker.Strategies
                 case "DummyAI": return new DummyAIExperiment().Play(task);
                 case "Greedy": return new GreedyExperiment().Play(task);
                 case "Historical":return new HistoricalExperiment().Play(task);
+                case "MRVW": return new MaxReachableVertexWeightAIExperiment().Play(task);
                 default: throw new Exception("Experiment type '" + task.Experiment + "' is not recognized");
             }
         }
