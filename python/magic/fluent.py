@@ -40,7 +40,8 @@ class Fluent:
     def battling_in_pairs(self):
         self.battles = [[self.players[first], self.players[second]]
                         for second in range(len(self.players))
-                        for first in range(second)]
+                        for first in range(len(self.players))
+                        if first != second]
         return self
 
     def first_against_himself(self, *args):
@@ -49,6 +50,10 @@ class Fluent:
 
     def on_maps(self, *args):
         self.battles_on_maps = [(battle,map) for battle in self.battles for map in args]
+        return self
+
+    def repeating(self, count):
+        self.battles_on_maps = [x for x in self.battles_on_maps for _ in range(count)]
         return self
 
     def experiment(self, experiment_name):
@@ -80,7 +85,7 @@ class Fluent:
     def store_pointwise(self, filename):
         keys = self.param_names
         with open(filename,'w') as file:
-            file.write('game_number,server_name,scores,num_players,name,')
+            file.write('game_number,server_name,scores,num_players,map,name,')
             file.write(",".join(keys))
             file.write('\n')
             for game_number, game in enumerate(self.results):
