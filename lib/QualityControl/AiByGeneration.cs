@@ -15,6 +15,7 @@ namespace lib.QualityControl
             {
                 yield return () => new DummyAi(0.8);
                 yield return () => new GreedyAi();
+                yield return () => new ConnectClosestMinesAi();
             }
         }
     }
