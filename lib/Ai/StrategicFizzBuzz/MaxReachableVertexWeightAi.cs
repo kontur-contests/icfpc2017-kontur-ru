@@ -10,7 +10,7 @@ namespace lib.Ai.StrategicFizzBuzz
 
         protected override IEdgeWeighter CreateEdgeWeighter(int punterId, int puntersCount, Map map, Settings settings)
         {
-            return new SubGraphEdgeWeighter(map);
+            return new MaxVertextWeighter(map);
         }
     }
 }
