@@ -8,15 +8,13 @@ using System.Linq;
 
 namespace worker
 {
-    public interface IPlayerStrategy
-    {
-        IEnumerable<Tuple<PlayerWithParams, long>> Play(List<PlayerWithParams> players);
-    }
     
-    public class DummySumPlayerStrategy : IPlayerStrategy
+
+    public class DummyAIExperiment : IExperiment
     {
-        public IEnumerable<Tuple<PlayerWithParams, long>> Play(List<PlayerWithParams> players)
+        public IEnumerable<Tuple<PlayerWithParams, long>> Play(Task task)
         {
+            var players = task.Players;
             var gamers = players
                 .Select(player => new DummyAi(player.Params["Param"]) { Name = player.Name })
                 .Cast<IAi>()

@@ -20,7 +20,7 @@
 
         public bool IsSuitableForReplayCollection()
         {
-            return TotalSeats - TakenSeats == 1;
+            return TotalSeats - TakenSeats == 1 && MapName.IsOneOf("sample.json", "circle.json", "lambda.json", "Sierpinski-triangle.json");
         }
     }
 }

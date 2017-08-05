@@ -17,9 +17,11 @@ namespace lib.GraphImpl
             distFromMines = new Dictionary<int, Dictionary<int, int>>();
             foreach (var vertex in graph.Vertexes.Values)
             {
-                var dists = CalcDist(vertex.Id);
                 if (vertex.IsMine)
+                {
+                    Dictionary<int, int> dists = CalcDist(vertex.Id);
                     distFromMines.Add(vertex.Id, dists);
+                }
             }
         }
 

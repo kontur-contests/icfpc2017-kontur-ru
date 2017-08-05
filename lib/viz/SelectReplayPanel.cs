@@ -64,7 +64,7 @@ namespace lib.viz
             set
             {
                 repo = value;
-                var metas = repo.GetRecentMetas();
+                var metas = repo.GetRecentMetas(50);
                 UpdateList(metas);
             }
         }
@@ -77,10 +77,13 @@ namespace lib.viz
                 lvItem.Tag = meta;
                 lvItem.SubItems.Add(meta.AiName);
                 var ourScore = meta.Scores.First(s => s.Punter == meta.OurPunter).Score;
-                var count = meta.Scores.Count(s => s.Score < ourScore);
+                var count = meta.Scores.Count(s => s.Score < ourScore) + 1;
                 lvItem.SubItems.Add(count.ToString());
                 lvItem.SubItems.Add(meta.Scores.Length.ToString());
+                lvItem.BackColor = (count == meta.Scores.Length) ? Color.GreenYellow : Color.White;
             }
+            listView.Columns[0].AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
+            listView.Columns[1].AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
         }
 
         public ReplayFullData SelectedReplay { get; private set; }
