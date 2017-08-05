@@ -26,7 +26,7 @@ namespace lib.GraphImpl
             {
                 Vertexes[river.Source].Edges.Add(Edge.Forward(river));
                 if (river.Source != river.Target)
-                    Vertexes[river.Target].Edges.Add(Edge.Forward(river));
+                    Vertexes[river.Target].Edges.Add(Edge.Backward(river));
             }
         }
 
