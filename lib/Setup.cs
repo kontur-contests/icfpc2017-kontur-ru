@@ -5,7 +5,7 @@ namespace lib
     public class Setup
     {
         [JsonProperty("punter")]
-        public string Id { get; set; }
+        public int Id { get; set; }
         [JsonProperty("punters")]
         public int PunterCount { get; set; }
         [JsonProperty("map")]

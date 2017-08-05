@@ -1,10 +1,15 @@
 using System;
+using System.Linq;
+using System.Security.Cryptography;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace lib.Interaction.Internal
 {
     internal class OnlineProtocol : ProtocolBase
     {
+        public bool IsGameOver { get; private set; }
+
         public OnlineProtocol(ITransport transport)
         {
             this.transport = transport;
@@ -19,14 +24,8 @@ namespace lib.Interaction.Internal
         public Setup ReadSetup()
         {
             var setup = JsonConvert.DeserializeObject<Setup>(transport.Read());
-            transport.Write($"{{\"ready\":\"{setup.Id}\"}}");
+            transport.Write($"{{\"ready\":{setup.Id}}}");
             return setup;
-        }
-
-        public Move[] ReadMoves()
-        {
-            var moves = JsonConvert.DeserializeObject<MoveServerData>(transport.Read());
-            return moves.LastRound.Moves;
         }
 
         public void WriteMove(Move move)
@@ -34,10 +33,35 @@ namespace lib.Interaction.Internal
             transport.Write(SerializeMove(move));
         }
 
-        public Tuple<Move[], Score[]> ReadScore()
+        public JToken ReadGameState()
+        {
+            var state = JObject.Parse(transport.Read());
+            if (state["stop"] != null)
+            {
+                IsGameOver = true;
+                return state["stop"];
+            }
+            if (state["move"] != null)
+            {
+                return state["move"];
+            }
+            throw new TimeoutException("azaza");
+        }
+
+        public Move[] GetMoves(JToken moves)
+        {
+            return moves.ToObject<LastRoundModel>().MoveModels.Select(MoveModel.GetMove).ToArray();
+        }
+
+        public ScoreData GetScore(JToken score)
+        {
+            return score.ToObject<ScoreData>();
+        }
+
+        public Tuple<Move[], ScoreModel[]> ReadScore()
         {
             var scoreJsonResponse = JsonConvert.DeserializeObject<ScoreJsonResponse>(transport.Read());
-            return Tuple.Create(scoreJsonResponse.ScoreData.Moves, scoreJsonResponse.ScoreData.Scores);
+            return Tuple.Create(scoreJsonResponse.ScoreData.MoveModels.Select(MoveModel.GetMove).ToArray(), scoreJsonResponse.ScoreData.Scores);
         }
 
         private readonly ITransport transport;

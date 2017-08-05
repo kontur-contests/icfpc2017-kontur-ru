@@ -26,7 +26,7 @@ namespace lib.Interaction.Internal
         public Tuple<Move[], GameState> ReadMoves()
         {
             var data = JsonConvert.DeserializeObject<OfflineMoveServerData>(transport.Read());
-            var moves = data.LastRound.Moves;
+            var moves = data.LastRound.MoveModels.Select(MoveModel.GetMove).ToArray();
             var state = data.State;
             return Tuple.Create(moves, state);
         }
@@ -39,12 +39,12 @@ namespace lib.Interaction.Internal
             transport.Write(moveData);
         }
 
-        public Tuple<Move[], Score[], GameState> ReadScore()
+        public Tuple<Move[], ScoreModel[], GameState> ReadScore()
         {
             var data = JsonConvert.DeserializeObject<Dictionary<string, string>>(transport.Read());
             var scoreData = JsonConvert.DeserializeObject<ScoreData>(data["stop"]);
             var state = JsonConvert.DeserializeObject<GameState>(data["state"]);
-            return Tuple.Create(scoreData.Moves, scoreData.Scores, state);
+            return Tuple.Create(scoreData.MoveModels.Select(MoveModel.GetMove).ToArray(), scoreData.Scores, state);
         }
 
         private class OfflineMoveServerData : MoveServerData
