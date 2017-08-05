@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using FluentAssertions;
 using lib.Ai;
+using lib.viz;
 using NUnit.Framework;
 
 namespace lib
@@ -45,6 +46,7 @@ namespace lib
             a.ShouldNotThrow();
         }
 
+        [ShoulNotRunOnline]
         private class Ai : IAi
         {
             public string Name { get; }

@@ -18,7 +18,7 @@ namespace lib.Arena
                 .Where(x => x.IsSuitableForReplayCollection())
                 .ToArray();
             
-            Console.WriteLine(matches.Length + " matches available");
+//            Console.WriteLine(matches.Length + " matches available");
 
             return matches
                 .OrderBy(x => Guid.NewGuid())
