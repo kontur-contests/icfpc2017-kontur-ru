@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using lib;
+using lib.Ai;
 using lib.Scores.Simple;
 using lib.Strategies;
 

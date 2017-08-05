@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using lib.Ai;
 using lib.Scores;
 
 namespace lib

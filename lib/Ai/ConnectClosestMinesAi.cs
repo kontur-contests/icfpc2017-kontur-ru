@@ -8,7 +8,7 @@ using lib.viz;
 using NUnit.Framework;
 using Shouldly;
 
-namespace lib
+namespace lib.Ai
 {
     public class ConnectClosestMinesAi : IAi
     {
@@ -23,6 +23,7 @@ namespace lib
         {
             this.punterId = punterId;
             this.mineDistCalulator = new MineDistCalculator(new Graph(map));
+            myMines.Clear();
         }
 
         public Move GetNextMove(Move[] prevMoves, Map map)
@@ -42,11 +43,7 @@ namespace lib
             if (TryExtendAnything(graph, out move))
                 return move;
 
-<<<<<<< 508fd06a9c5dc5faee598be64a3688511a5088fa
-            return new Pass(punterId);
-=======
             return new PassMove(punterId);
->>>>>>> Transport + Move
         }
 
         private bool TryExtendAnything(Graph graph, out Move nextMove)
@@ -92,6 +89,11 @@ namespace lib
 
         private bool TryExtendComponent(Graph graph, out Move move)
         {
+            if (myMines.Count == 0)
+            {
+                move = null;
+                return false;
+            }
             var queue = new Queue<ExtendQueueItem>();
             var used = new HashSet<int>();
             foreach (var mineId in graph.Mines.Keys.Where(id => !myMines.Contains(id)))
@@ -108,7 +110,7 @@ namespace lib
             while (queue.Count > 0)
             {
                 var current = queue.Dequeue();
-                if (current.CurrentVertex.Edges.Any(x => x.Owner == punterId) && current.Edge != null)
+                if (current.CurrentVertex.Edges.Any(x => x.Owner == punterId))
                 {
                     int edgeFrom = current.Edge.From;
                     if (graph.Mines.ContainsKey(edgeFrom))
@@ -221,7 +223,7 @@ namespace lib
 
         public void DeserializeGameState(string gameState)
         {
-            var split = gameState.Split(';');
+            var split = gameState.Split(new[]{';'}, StringSplitOptions.RemoveEmptyEntries);
             punterId = int.Parse(split[0]);
             myMines.Clear();
             myMines.UnionWith(split.Skip(1).Select(int.Parse));
@@ -251,7 +253,7 @@ namespace lib
             var ai = new ConnectClosestMinesAi();
             ai.StartRound(0, 1, map);
             var move = ai.GetNextMove(null, map);
-            move.ShouldBe(new ClaimMove(0, 5, 7));
+            Assert.That(move, Is.EqualTo(new ClaimMove(0, 5, 7)).Or.EqualTo(new ClaimMove(0, 5, 3)));
         }
 
         [Test]
@@ -263,7 +265,7 @@ namespace lib
             simulator.StartGame(new List<IAi> {ai});
             var gameState = simulator.NextMove();
             var move = ai.GetNextMove(null, gameState.CurrentMap);
-            move.ShouldBe(new ClaimMove(0, 1, 7));
+            move.ShouldBe(new ClaimMove(0, 1, 3));
         }
 
         [Test]

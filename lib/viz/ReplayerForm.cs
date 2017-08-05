@@ -15,13 +15,14 @@ namespace lib.viz
             Size = new Size(800, 600);
             selectReplayPanel = new SelectReplayPanel
             {
-                Dock = DockStyle.Left,
+                Dock = DockStyle.Fill,
                 Repo = repo
             };
 
             var rightPanel = new ReplayerPanel()
             {
-                Dock = DockStyle.Fill
+                Dock = DockStyle.Fill,
+                ShowScore = false
             };
             //UpdateMap(rightPanel);
             selectReplayPanel.ReplayChanged += () =>
@@ -29,8 +30,14 @@ namespace lib.viz
                 UpdateMap(rightPanel);
             };
 
-            Controls.Add(rightPanel);
-            Controls.Add(selectReplayPanel);
+            var split = new SplitContainer()
+            {
+                Dock=DockStyle.Fill,
+                Orientation = Orientation.Vertical
+            };
+            split.Panel1.Controls.Add(selectReplayPanel);
+            split.Panel2.Controls.Add(rightPanel);
+            Controls.Add(split);
         }
 
         private void UpdateMap(ReplayerPanel rightPanel)

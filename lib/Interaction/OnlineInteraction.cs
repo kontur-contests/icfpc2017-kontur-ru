@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using lib.Ai;
 using lib.Interaction.Internal;
 using lib.Replays;
 using NUnit.Framework;
@@ -42,11 +43,11 @@ namespace lib.Interaction
                 var moves = connection.GetMoves(serverResponse);
                 
                 allMoves.AddRange(moves);
-                
                 foreach (var move in moves)
                     map = move.Execute(map);
 
                 var nextMove = ai.GetNextMove(moves, map);
+                allMoves.Add(nextMove);
                 connection.WriteMove(nextMove);
 
                 serverResponse = connection.ReadGameState();

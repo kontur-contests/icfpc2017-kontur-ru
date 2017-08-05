@@ -46,6 +46,19 @@ namespace lib.viz
             timer.Start();
         }
 
+        private bool showScore;
+
+        public bool ShowScore
+        {
+            get { return showScore; }
+            set
+            {
+                showScore = value;
+                if (showScore) timer.Start();
+                else timer.Stop();
+            }
+        }
+
         public void SetAugmentor(IPainterAugmentor augmentor)
         {
             mapPainter.PainterAugmentor = augmentor;

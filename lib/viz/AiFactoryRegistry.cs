@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using lib.Ai;
 
 namespace lib.viz
 {

@@ -6,23 +6,33 @@ namespace lib.viz.Detalization
 {
     public class ColorsPalette
     {
-        public static Color ForPunter(int punterId)
+        public static Color[] Colors =
         {
-            return Color.FromArgb(GetComponent(), GetComponent(), GetComponent());
-        }
+            Color.Navy,
+            Color.Red,
+            Color.Orange,
+            Color.Fuchsia,
+            Color.Green,
+            Color.Brown,
+            Color.CornflowerBlue,
+            Color.CadetBlue,
+            Color.DimGray,
+            Color.Chocolate,
+            Color.BlueViolet,
+            Color.LightSeaGreen,
+            Color.DeepPink,
+            Color.MediumOrchid,
+            Color.MidnightBlue,
+            Color.Teal,
+            Color.Sienna,
+            Color.SlateBlue,
+        };
 
-        private static int GetComponent()
-        {
-            return new Random(Guid.NewGuid().GetHashCode()).Next(50, 200);
-        }
-        
-        public static Color[] Colors = Enumerable.Repeat(0, 16).Select(ForPunter).ToArray();
     }
-    
     public class DefaultPainterAugmentor : IPainterAugmentor
     {
         private const float defaultRadius = 30f;
-        
+
         private static Color[] Colors = ColorsPalette.Colors;
 
         private IndexedMap map;
