@@ -116,7 +116,7 @@ namespace punter
         private static void Write<T>(T obj)
         {
             Console.Error.WriteLine($"Writing {typeof(T)}");
-            var line = JsonConvert.SerializeObject(obj);
+            var line = JsonConvert.SerializeObject(obj, new JsonSerializerSettings{NullValueHandling = NullValueHandling.Ignore});
             Console.Error.WriteLine($"Writing {typeof(T)} line: {line}");
             Console.Out.Write($"{line.Length}:{line}");
         }
