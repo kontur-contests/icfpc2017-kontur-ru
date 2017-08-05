@@ -31,7 +31,7 @@ namespace worker
             this.experiment = experiment;
             try
             {
-                commitHash = File.ReadAllLines("commit_hash.txt").FirstOrDefault();
+                commitHash = File.ReadAllLines(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "commit_hash.txt")).FirstOrDefault();
             }
             catch (Exception e)
             {
