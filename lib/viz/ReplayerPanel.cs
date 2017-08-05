@@ -7,31 +7,6 @@ using lib.viz.Detalization;
 
 namespace lib.viz
 {
-    public interface IReplayDataProvider
-    {
-        string[] PunterNames { get; }
-        GameState NextMove();
-    }
-
-    public class SimulatorReplayDataProvider : IReplayDataProvider
-    {
-        private readonly List<IAi> ais;
-        private readonly GameSimulator simulator;
-
-        public SimulatorReplayDataProvider(List<IAi> ais, Map map)
-        {
-            this.ais = ais;
-            simulator = new GameSimulator(map);
-            simulator.StartGame(ais);
-        }
-
-        public string[] PunterNames => ais.Select(ai => ai.Name).ToArray();
-        public GameState NextMove()
-        {
-            return simulator.NextMove();
-        }
-    }
-
     public class ReplayerPanel : Panel
     {
         private readonly Timer timer;
@@ -43,7 +18,6 @@ namespace lib.viz
         {
             mapPainter = new MapPainter
             {
-                // Map = startGameConfigPanel.SelectedMap.Map,
                 PainterAugmentor = new DefaultPainterAugmentor()
             };
             var mapPanel = new ScaledViewPanel(mapPainter)
@@ -70,6 +44,11 @@ namespace lib.viz
             timer = new Timer { Interval = 500 };
             timer.Tick += OnTick;
             timer.Start();
+        }
+
+        public void SetAugmentor(IPainterAugmentor augmentor)
+        {
+            mapPainter.PainterAugmentor = augmentor;
         }
 
         public void SetDataProvider(Map map, IReplayDataProvider newProvider)

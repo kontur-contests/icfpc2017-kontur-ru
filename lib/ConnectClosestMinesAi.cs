@@ -253,7 +253,7 @@ namespace lib
             var ai = new ConnectClosestMinesAi();
             ai.StartRound(0, 1, map);
             var move = ai.GetNextMove(null, map);
-            move.ShouldBe(new ClaimMove(0, 5, 7));
+            Assert.That(move, Is.EqualTo(new ClaimMove(0, 5, 7)).Or.EqualTo(new ClaimMove(0, 5, 3)));
         }
 
         [Test]
@@ -265,7 +265,7 @@ namespace lib
             simulator.StartGame(new List<IAi> {ai});
             var gameState = simulator.NextMove();
             var move = ai.GetNextMove(null, gameState.CurrentMap);
-            move.ShouldBe(new ClaimMove(0, 1, 7));
+            move.ShouldBe(new ClaimMove(0, 1, 3));
         }
 
         [Test]

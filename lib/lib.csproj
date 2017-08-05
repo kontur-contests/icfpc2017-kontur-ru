@@ -40,6 +40,9 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Update="viz\ReplayerPanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Update="viz\ScaledViewPanel.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -48,6 +51,9 @@
     </Compile>
     <Compile Update="viz\StartGameConfigPanel.cs">
       <SubType>Component</SubType>
+    </Compile>
+    <Compile Update="viz\ReplayerForm.cs">
+      <SubType>Form</SubType>
     </Compile>
     <Compile Update="viz\VisualizerForm.cs">
       <SubType>Form</SubType>
