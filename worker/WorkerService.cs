@@ -21,6 +21,7 @@ namespace worker
         private readonly IExperiment experiment;
         private bool cancelled;
         private Thread workerThread;
+        private Thread arenaThread;
         private string commitHash;
 
         public WorkerService(Dictionary<string, object> conf, string input, string output, IExperiment experiment)
@@ -31,7 +32,8 @@ namespace worker
             this.experiment = experiment;
             try
             {
-                commitHash = File.ReadAllLines(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "commit_hash.txt")).FirstOrDefault();
+                commitHash = File.ReadAllLines(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "commit_hash.txt"))
+                    .FirstOrDefault();
             }
             catch (Exception e)
             {
@@ -43,90 +45,91 @@ namespace worker
 
         public void Start()
         {
-            workerThread = new Thread(() =>
-            {
-                var timesSleeped = 0;
-                var rnd = new Random();
-                var idleThresholdSecs = rnd.Next(60, 120);
-                
-                using (var consumer = new Consumer<Null, string>(config, null, new StringDeserializer(Encoding.UTF8)))
-                using (var producer = new Producer<Null, string>(config, null, new StringSerializer(Encoding.UTF8)))
+            arenaThread = new Thread(
+                () =>
                 {
-                    consumer.OnPartitionEOF += (_, end) => logger.Info(
-                        $"Reached end of topic {end.Topic} partition {end.Partition}, next message will be at offset {end.Offset}");
-
-                    consumer.OnError += (_, error) => logger.Error($"Error: {error}");
-
-                    consumer.OnPartitionsAssigned += (_, partitions) =>
-                    {
-                        logger.Info($"Assigned partitions: [{string.Join(", ", partitions)}], member id: {consumer.MemberId}");
-                        consumer.Assign(partitions);
-                    };
-
-                    consumer.OnPartitionsRevoked += (_, partitions) =>
-                    {
-                        logger.Info($"Revoked partitions: [{string.Join(", ", partitions)}]");
-                        consumer.Unassign();
-                    };
-
-                    consumer.OnStatistics += (_, json) => logger.Info($"Statistics: {json}");
-
-                    consumer.Subscribe(inputTopicName);
-
                     while (!cancelled)
                     {
-                        Message<Null, string> msg;
-                
-                        if (timesSleeped >= idleThresholdSecs)
-                        {
-                            timesSleeped = 0;
-                            idleThresholdSecs = rnd.Next(60, 120);
-                            //TODO this interferes with queue operation
-                            //ArenaRunner.TryCompeteOnArena("TCWorker", commitHash);
-                        } 
-                        
-                        if (!consumer.Consume(out msg, TimeSpan.FromSeconds(1)))
-                        {
-                            timesSleeped++;
-                            continue;
-                        }
+                        ArenaRunner.TryCompeteOnArena("TCWorker", commitHash);
+                    }
+                });
+            arenaThread.Start();
 
-                        logger.Info($"Got message | Topic: {msg.Topic} Partition: {msg.Partition} Offset: {msg.Offset} {msg.Value}");
+            workerThread = new Thread(
+                () =>
+                {
+                    using (var consumer = new Consumer<Null, string>(
+                        config, null, new StringDeserializer(Encoding.UTF8)))
+                    using (var producer = new Producer<Null, string>(config, null, new StringSerializer(Encoding.UTF8)))
+                    {
+                        consumer.OnPartitionEOF += (_, end) => logger.Info(
+                            $"Reached end of topic {end.Topic} partition {end.Partition}, next message will be at offset {end.Offset}");
 
-                        try
+                        consumer.OnError += (_, error) => logger.Error($"Error: {error}");
+
+                        consumer.OnPartitionsAssigned += (_, partitions) =>
                         {
-                            var task = JsonConvert.DeserializeObject<Task>(msg.Value);
-                            Result result = null;
+                            logger.Info(
+                                $"Assigned partitions: [{string.Join(", ", partitions)}], member id: {consumer.MemberId}");
+                            consumer.Assign(partitions);
+                        };
+
+                        consumer.OnPartitionsRevoked += (_, partitions) =>
+                        {
+                            logger.Info($"Revoked partitions: [{string.Join(", ", partitions)}]");
+                            consumer.Unassign();
+                        };
+
+                        consumer.OnStatistics += (_, json) => logger.Info($"Statistics: {json}");
+
+                        consumer.Subscribe(inputTopicName);
+
+                        while (!cancelled)
+                        {
+                            Message<Null, string> msg;
+
+                            if (!consumer.Consume(out msg, TimeSpan.FromSeconds(1)))
+                            {
+                                continue;
+                            }
+
+                            logger.Info(
+                                $"Got message | Topic: {msg.Topic} Partition: {msg.Partition} Offset: {msg.Offset} {msg.Value}");
+
                             try
                             {
-                                result = experiment.Play(task);
-                            }
-                            catch(Exception exception)
-                            {
-                                result = new Result { Error = exception.Message };
-                            }
-                            result.Task = task;
-                            result.Token = task.Token;
-                            var resultString = JsonConvert.SerializeObject(result);
-
-                            var deliveryReport = producer.ProduceAsync(outputTopicName, null, resultString);
-
-                            deliveryReport.ContinueWith(
-                                x =>
+                                var task = JsonConvert.DeserializeObject<Task>(msg.Value);
+                                Result result = null;
+                                try
                                 {
-                                    logger.Info(
-                                        $"Sent result | Partition: {x.Result.Partition}, Offset: {x.Result.Offset}");
-                                });
-                        }
-                        catch (Exception e)
-                        {
-                            logger.Warn(e);
-                        }
-                    }
+                                    result = experiment.Play(task);
+                                }
+                                catch (Exception exception)
+                                {
+                                    result = new Result {Error = exception.Message};
+                                }
+                                result.Task = task;
+                                result.Token = task.Token;
+                                var resultString = JsonConvert.SerializeObject(result);
 
-                    producer.Flush(TimeSpan.FromSeconds(10));
-                }
-            });
+                                var deliveryReport = producer.ProduceAsync(outputTopicName, null, resultString);
+
+                                deliveryReport.ContinueWith(
+                                    x =>
+                                    {
+                                        logger.Info(
+                                            $"Sent result | Partition: {x.Result.Partition}, Offset: {x.Result.Offset}");
+                                    });
+                            }
+                            catch (Exception e)
+                            {
+                                logger.Warn(e);
+                            }
+                        }
+
+                        producer.Flush(TimeSpan.FromSeconds(10));
+                    }
+                });
             workerThread.Start();
         }
 
@@ -134,6 +137,7 @@ namespace worker
         {
             cancelled = true;
             workerThread.Join();
+            arenaThread.Join();
         }
     }
 }
