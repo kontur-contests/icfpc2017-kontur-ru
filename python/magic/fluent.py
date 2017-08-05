@@ -66,8 +66,8 @@ class Fluent:
         print(json.dumps(self.tasks,indent=2))
         return self
 
-    def run(self, consumer_group):
-        self.results = execute_tasks(self.tasks, consumer_group)
+    def run(self):
+        self.results = execute_tasks(self.tasks)
         return self
 
     def dump(self,dump_file = None):
