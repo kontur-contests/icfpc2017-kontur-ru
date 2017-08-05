@@ -18,7 +18,7 @@ namespace ConsoleApp
 
             foreach (var map in maps)
             {
-                var gamers = new List<IAi> { new ConnectClosestMinesAi(), new GreedyAi() };
+                var gamers = new List<IAi> { new ConnectClosestMinesAi(), new CrazyAi() };
                 var gameSimulator = new GameSimulatorRunner(new SimpleScoreCalculator(), true);
 
 
