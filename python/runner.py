@@ -38,9 +38,11 @@ class Fluent:
         self.battles = [[self.players[0] for _ in range(size)] for size in args]
         return self
 
+    def on_maps(self, *args):
+        self.battles_on_maps = [(battle,map) for battle in self.battles for map in args]
 
     def run_experiment(self, experiment_name):
-        self.tasks = [ {'Experiment' : experiment_name, 'Players' : battle } for battle in self.battles]
+        self.tasks = [ {'Experiment' : experiment_name, 'Map' : map,  'Players' : battle } for battle, map in self.battles_on_maps]
         self.results = execute_tasks(self.tasks)
         return self
 
@@ -53,13 +55,11 @@ class Fluent:
             file.write('\n')
             for game in self.results:
                 for player in game['Players']:
-                    file.write(','.join([str(player['Rank']),str(len(game['Players'])), '', player['Name'] ]))
+                    file.write(','.join([str(player['Rank']),str(len(game['Players'])), game['Map'], player['Name'] ]))
                     file.write(',')
                     file.write(','.join([str(player['Params'][key]) for key in keys]))
                     file.write('\n')
 
-
-k= (Fluent().from_params(key_1 = Param(0,1), key_2 = Param(0,1), key_3 = Param(0,1)).create_players_randomly(3).pair_battles().run_experiment('Test').store_pointwise('output.csv'))
 
 #k = Fluent().from_params().create_players_randomly(1).one_player_various_groupsize(1,2,4,8)
 print (k.results)
