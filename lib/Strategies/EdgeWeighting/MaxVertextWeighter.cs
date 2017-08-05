@@ -13,6 +13,7 @@ namespace lib.Strategies.EdgeWeighting
             MineDistCalculator = new MineDistCalculator(new Graph(map));
         }
 
+        private Graph Graph { get; set; }
         private MineDistCalculator MineDistCalculator { get; }
         private ShortestPathGraph SpGraph { get; set; }
         private Dictionary<int, double> SubGraphWeight { get; set; }
@@ -20,6 +21,7 @@ namespace lib.Strategies.EdgeWeighting
 
         public void Init(Graph graph, int[] claimedVertexIds)
         {
+            Graph = graph;
             SpGraph = ShortestPathGraph.Build(graph, claimedVertexIds);
             ClaimedMineIds = claimedVertexIds.Where(v => graph.Mines.ContainsKey(v)).ToArray();
             SubGraphWeight = new Dictionary<int, double>();
@@ -46,8 +48,9 @@ namespace lib.Strategies.EdgeWeighting
 
         private long CalcVertexScore(int vertexId)
         {
-            return ClaimedMineIds.Select(mineId => MineDistCalculator.GetDist(mineId, vertexId))
-                .Sum(x => x * x);
+            return (Graph.Mines.ContainsKey(vertexId) ? 100 : 1) *
+                   ClaimedMineIds.Select(mineId => MineDistCalculator.GetDist(mineId, vertexId))
+                       .Sum(x => x * x);
         }
     }
 }
