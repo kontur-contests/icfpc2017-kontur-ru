@@ -1,4 +1,6 @@
-﻿namespace lib.Arena
+﻿using System.Linq;
+
+namespace lib.Arena
 {
     public class ArenaMatch
     {
@@ -20,7 +22,7 @@
 
         public bool IsSuitableForReplayCollection()
         {
-            return TotalSeats - TakenSeats == 1;
+            return (TotalSeats - TakenSeats == 1) && !Extensions.Contains("futures");
         }
     }
 }
