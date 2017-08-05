@@ -8,18 +8,18 @@ namespace lib.GraphImpl
     public class MineDistCalculator
     {
         private readonly Graph graph;
-        private readonly Dictionary<int, Dictionary<int, int>> distFromMines;
+        private readonly Dictionary<int, Dictionary<int, SingleLinkedList<int>>> distFromMines;
 
         public MineDistCalculator(Graph graph)
         {
             this.graph = graph;
 
-            distFromMines = new Dictionary<int, Dictionary<int, int>>();
+            distFromMines = new Dictionary<int, Dictionary<int, SingleLinkedList<int>>>();
             foreach (var vertex in graph.Vertexes.Values)
             {
                 if (vertex.IsMine)
                 {
-                    Dictionary<int, int> dists = CalcDist(vertex.Id);
+                    var dists = CalcDist(vertex.Id);
                     distFromMines.Add(vertex.Id, dists);
                 }
             }
@@ -31,16 +31,26 @@ namespace lib.GraphImpl
                 throw new InvalidOperationException();
             if (!distFromMines[mineId].ContainsKey(vertexId))
                 return -1;
+            return distFromMines[mineId][vertexId].Length;
+        }
+
+        public SingleLinkedList<int> GetPath(int mineId, int vertexId)
+        {
+            if (!distFromMines.ContainsKey(mineId))
+                throw new InvalidOperationException();
+            if (!distFromMines[mineId].ContainsKey(vertexId))
+                return null;
             return distFromMines[mineId][vertexId];
         }
 
         //(v, dist)
-        private Dictionary<int, int> CalcDist(int start)
+
+        private Dictionary<int, SingleLinkedList<int>> CalcDist(int start)
         {
-            var dist = new Dictionary<int, int>();
+            var dist = new Dictionary<int, SingleLinkedList<int>>();
             var queue = new Queue<int>();
 
-            dist[start] = 0;
+            dist[start] = new SingleLinkedList<int>(start);
             queue.Enqueue(start);
 
             while (queue.Any())
@@ -51,13 +61,42 @@ namespace lib.GraphImpl
                     int u = edge.To;
                     if (dist.ContainsKey(u))
                         continue;
-                    dist.Add(u, dist[v] + 1);
+                    dist.Add(u, new SingleLinkedList<int>(u, dist[v]));
                     queue.Enqueue(u);
                 }
             }
 
             return dist;
         }
+    }
+    public class SingleLinkedList<T>
+    {
+        public SingleLinkedList(T value)
+        {
+            Value = value;
+            Length = 1;
+        }
+
+        public SingleLinkedList(T value, SingleLinkedList<T> prev)
+        {
+            Value = value;
+            Prev = prev;
+            Length = prev.Length + 1;
+        }
+
+        public IEnumerable<T> Enumerate()
+        {
+            yield return Value;
+            if (Prev == null) yield break;
+            foreach (var v in Prev.Enumerate())
+            {
+                yield return v;
+            }
+        }
+
+        public T Value;
+        public int Length;
+        public SingleLinkedList<T> Prev;
     }
 
     [TestFixture]
