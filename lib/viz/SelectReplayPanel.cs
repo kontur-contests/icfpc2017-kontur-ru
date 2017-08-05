@@ -1,7 +1,9 @@
 using System;
+using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using lib.Replays;
+using MoreLinq;
 
 namespace lib.viz
 {
@@ -9,6 +11,16 @@ namespace lib.viz
     {
         public SelectReplayPanel()
         {
+            debugTextArea = new TextBox()
+            {
+                Multiline = true,
+                ReadOnly = true,
+                Font = new Font("Consolas", 12),
+                Dock = DockStyle.Bottom,
+                Text = "",
+                Height = 400,
+                ScrollBars = ScrollBars.Vertical
+            };
             listView = new ListView
             {
                 Dock = DockStyle.Fill,
@@ -17,12 +29,17 @@ namespace lib.viz
                 Width = 600
             };
 
+            listView.FullRowSelect = true;
+            listView.HideSelection = false;
+
             listView.Columns.Add("Time");
             listView.Columns.Add("Ai");
-            listView.Columns.Add("W");
-            listView.Columns.Add("N");
+            listView.Columns.Add("Points per game (max = PuntersCount)");
+            listView.Columns.Add("PuntersCount");
+
 
             listView.ItemSelectionChanged += SelectedReplayChanged;
+            Controls.Add(debugTextArea);
             Controls.Add(listView);
         }
 
@@ -30,14 +47,16 @@ namespace lib.viz
         {
             if (repo == null || listView.SelectedItems.Count == 0) return;
             var lvItem = listView.SelectedItems[0];
-            var meta = (ReplayMeta) lvItem.Tag;
+            var meta = (ReplayMeta)lvItem.Tag;
             var data = repo.GetData(meta.DataId);
+            debugTextArea.Text = meta.ToString() + "\r\n\r\n" + data.Moves.ToDelimitedString("\r\n");
             SelectedReplay = new ReplayFullData(meta, data);
             ReplayChanged?.Invoke();
         }
 
         private ReplayRepo repo;
         private ListView listView;
+        private TextBox debugTextArea;
 
         public ReplayRepo Repo
         {
@@ -54,7 +73,7 @@ namespace lib.viz
         {
             foreach (var meta in metas)
             {
-                var lvItem = listView.Items.Add(meta.Timestamp.ToString());
+                var lvItem = listView.Items.Add(meta.Timestamp.ToString("T"));
                 lvItem.Tag = meta;
                 lvItem.SubItems.Add(meta.AiName);
                 var ourScore = meta.Scores.First(s => s.Punter == meta.OurPunter).Score;

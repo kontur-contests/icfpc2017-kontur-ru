@@ -23,7 +23,7 @@ namespace ReplayCollector
         
         public static void Main(string[] args)
         {
-            threadCount = args.Length == 1 ? int.Parse(args.First()) : 2;
+            threadCount = args.Length == 1 ? int.Parse(args.First()) : 1;
             
             for (var i = 0; i < threadCount; i++)
             {

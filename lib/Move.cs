@@ -52,6 +52,11 @@ namespace lib
         {
         }
 
+        public override string ToString()
+        {
+            return $"Pass id:{PunterId}";
+        }
+
         public override Map Execute(Map map)
         {
             return map;
@@ -115,7 +120,7 @@ namespace lib
 
         public override string ToString()
         {
-            return $"{nameof(Source)}: {Source}, {nameof(Target)}: {Target}";
+            return $"Claim id:{PunterId} {Source}-{Target}";
         }
     }
 }

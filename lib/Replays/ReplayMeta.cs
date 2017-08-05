@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using MoreLinq;
 using Newtonsoft.Json;
 
 namespace lib.Replays
@@ -27,12 +28,22 @@ namespace lib.Replays
             PunterCount = punterCount;
             Scores = scores;
         }
+
+        public override string ToString()
+        {
+            return $"Meta {Timestamp} {AiName} dataId: {DataId}";
+        }
     }
 
     public class ReplayData
     {
         public Map Map;
         public MoveJson[] Moves;
+
+        public override string ToString()
+        {
+            return $"{nameof(Moves)}: {Moves.Take(10).ToDelimitedString("; ")}";
+        }
 
         public ReplayData()
         {
@@ -56,6 +67,11 @@ namespace lib.Replays
     {
         public PassMove Pass;
         public ClaimMove Claim;
+
+        public override string ToString()
+        {
+            return ToMove().ToString();
+        }
 
         public Move ToMove()
         {
