@@ -7,19 +7,6 @@ import numpy as np
 
 
 
-def test_historical_algorithms_1():
-    runner = magic.Fluent()
-    (runner
-     .create_historical_players(2)
-     .battling_in_pairs()
-     .on_maps('sample.json', 'Sierpinski-triangle.json')
-     .repeating(1)
-     .experiment('Historical')
-     # .preview()
-     .run().dump()
-     #.store_pointwise('historical.csv')
-     )
-    print (runner.token)
 
 def test_historical_2():
     runner = magic.Fluent()
@@ -31,18 +18,18 @@ def test_historical_2():
     .experiment('Historical')
     .preview())
 
-test_historical_2()
+def test_parameter():
+    runner = magic.Fluent()
+    (runner
+    .from_params(MineWeight = magic.Param(10,300))
+    .create_random_players(100)
+    .battles_on_map('gothenburg-sparse.json', 8, 100)
+    .experiment('MRVW')
+    .preview()
+     )
+
+test_parameter()
 
 
-#test_historical_algorithms()
-
-#magic.Fluent().restore_dump('dumps\\result_dump_33915.json').store_pointwise('test.csv')
-
-#Fluent().restore_dump('result_dump_93839.json').store_pointwise('test.csv')
-
-
-#test_greedy_algorithms()
-
-#Fluent().restore_dump('greedy_results').store_pointwise('test.csv')
-
+#test_historical_2()
 
