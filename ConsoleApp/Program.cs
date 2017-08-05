@@ -24,7 +24,7 @@ namespace ConsoleApp
 
                 Console.WriteLine($"MAP: {map.Name}");
                 var results = gameSimulator.SimulateGame(
-                    gamers, map.Map);
+                    gamers, map.Map, new Settings());
 
                 foreach (var gameSimulationResult in results)
                     Console.Write($"{gameSimulationResult.Gamer.Name} ");

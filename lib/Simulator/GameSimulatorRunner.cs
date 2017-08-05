@@ -17,9 +17,9 @@ namespace lib
             this.silent = silent;
         }
 
-        public List<GameSimulationResult> SimulateGame(List<IAi> gamers, Map map)
+        public List<GameSimulationResult> SimulateGame(List<IAi> gamers, Map map, Settings settings)
         {
-            var gameSimulator = new GameSimulator(map);
+            var gameSimulator = new GameSimulator(map, settings);
             gameSimulator.StartGame(gamers);
             var state = gameSimulator.NextMove();
             while (!state.IsGameOver)
@@ -34,13 +34,10 @@ namespace lib
                 state = gameSimulator.NextMove();
             }
 
-            var results = new List<GameSimulationResult>();
-            for (int i = 0; i < gamers.Count; i++)
-            {
-                results.Add(new GameSimulationResult(gamers[i], scoreCalculator.GetScore(i, map)));
-            }
-
-            return results;
+            return gamers
+                .Zip(gameSimulator.Futures, (ai, futures) => new {Gamer = ai, Futures = futures})
+                .Select((e, i) => new GameSimulationResult(e.Gamer, scoreCalculator.GetScore(i, map, e.Futures)))
+                .ToList();
         }
     }
 

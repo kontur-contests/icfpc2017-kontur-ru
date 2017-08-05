@@ -107,13 +107,14 @@ namespace lib.Replays
             );
             var map = MapLoader.LoadMap(Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\..\maps\circle.json")).Map;
 
-            var data = new ReplayData(map, new Move[]
-            {
-                new ClaimMove(0, 15, 16), 
-                new ClaimMove(0, 16, 17), 
-                new ClaimMove(0, 17, 18), 
-            });
-            
+            var data = new ReplayData(
+                map, new Move[]
+                {
+                    new ClaimMove(0, 15, 16),
+                    new ClaimMove(0, 16, 17),
+                    new ClaimMove(0, 17, 18),
+                }, new[] {new Future(18, 15)});
+
             repo.SaveReplay(meta, data);
 
             var savedData = repo.GetData(meta.DataId);

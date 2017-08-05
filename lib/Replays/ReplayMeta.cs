@@ -39,6 +39,7 @@ namespace lib.Replays
     {
         public Map Map;
         public MoveJson[] Moves;
+        public Future[] Futures;
 
         public override string ToString()
         {
@@ -50,16 +51,18 @@ namespace lib.Replays
         }
         
         [JsonConstructor]
-        public ReplayData(Map map, MoveJson[] moves)
+        public ReplayData(Map map, MoveJson[] moves, Future[] futures)
         {
             Map = map;
             Moves = moves;
+            Futures = futures;
         }
 
-        public ReplayData(Map map, IEnumerable<Move> moves)
+        public ReplayData(Map map, IEnumerable<Move> moves, Future[] futures)
         {
             Map = map;
             Moves = moves.Select(move => new MoveJson(move)).ToArray();
+            Futures = futures;
         }
     }
 
