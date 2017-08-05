@@ -16,7 +16,8 @@ def test_historical_algorithms():
      .repeating(1)
      .experiment('Historical')
      # .preview()
-     .run().dump().store_pointwise('historical.csv')
+     .run().dump()
+     #.store_pointwise('historical.csv')
      )
     print (runner.token)
 

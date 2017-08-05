@@ -96,6 +96,8 @@ class Fluent:
                         str(game_number),
                         result['ServerName'],
                         str(result['Scores']),
+                        str(result['Ranking']),
+                        str(result['TournamentScore']),
                         str(len(game['Results'])),
                         game['Task']['Map'],
                         game['RiversCount'],
