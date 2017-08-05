@@ -11,7 +11,7 @@ namespace lib.Replays
         public DateTime Timestamp;
         public string AiName;
         public int OurPunter;
-        public List<Score> Scores;
+        public List<ScoreModel> Scores;
         
         public string DataId;
     }
