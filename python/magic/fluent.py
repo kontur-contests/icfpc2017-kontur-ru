@@ -85,7 +85,7 @@ class Fluent:
     def store_pointwise(self, filename):
         keys = self.param_names
         with open(filename,'w') as file:
-            file.write('game_number,server_name,scores,num_players,map,name,')
+            file.write('game_number,server_name,scores,num_players,map,map_rivers_count,map_sites_count,name,')
             file.write(",".join(keys))
             file.write('\n')
             for game_number, game in enumerate(self.results):
@@ -98,6 +98,8 @@ class Fluent:
                         str(result['Scores']),
                         str(len(game['Results'])),
                         game['Task']['Map'],
+                        game['RiversCount'],
+                        game['SitesCount'],
                         player['Name']
                     ]))
                     file.write(',')

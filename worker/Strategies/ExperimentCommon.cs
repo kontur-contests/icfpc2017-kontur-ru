@@ -18,13 +18,23 @@ namespace worker.Strategies
             var map = MapLoader.LoadMapByName(task.Map).Map;
             
             var results = gameSimulator.SimulateGame(ais, map, new Settings());
-            var playerResults =  results.Select(z => new PlayerResult { Scores = z.Score, ServerName = z.Gamer.Name }).ToList();
+            var rankings = Enumerable.Range(0, results.Count).OrderByDescending(z => results[z].Score).ToList();
+            var playerResults = results
+                .Zip(rankings, (res, ranking) => new PlayerResult
+                {
+                    Scores = res.Score,
+                    ServerName = res.Gamer.Name,
+                    Ranking = ranking,
+                    TournamentScore = rankings.Count - ranking
+                }).ToList();
+            
+
             var result = new Result
             {
                 Task = task,
                 Results = playerResults,
-                 RiversCount = map.Rivers.Length,
-                  SitesCount = map.Sites.Length
+                RiversCount = map.Rivers.Length,
+                SitesCount = map.Sites.Length
             };
             return result;
 

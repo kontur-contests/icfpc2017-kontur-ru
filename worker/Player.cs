@@ -25,6 +25,8 @@ namespace worker
     {
         public long Scores { get; set; }
         public string ServerName { get; set; }
+        public int Ranking { get;  set; }
+        public int TournamentScore { get;  set; }
     }
     
     public class Result
