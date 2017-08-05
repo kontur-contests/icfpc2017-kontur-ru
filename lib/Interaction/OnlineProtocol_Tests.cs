@@ -44,9 +44,9 @@ namespace lib.Interaction
             {
                 punter = 1
             };
-            A.CallTo(() => transport.Read<In>(A<int>.Ignored)).Returns(setup);
+            A.CallTo(() => transport.Read<In>(A<int?>.Ignored)).Returns(setup);
             gameTransport.ReadSetup();
-            A.CallTo(() => transport.Read<In>(A<int>.Ignored)).MustHaveHappened();
+            A.CallTo(() => transport.Read<In>(A<int?>.Ignored)).MustHaveHappened();
         }
     }
 }
