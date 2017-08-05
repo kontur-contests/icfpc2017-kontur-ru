@@ -15,7 +15,7 @@ class Fluent:
         self.params = kwargs
         return self
 
-    def create_players_randomly(self, count, seed=42):
+    def create_random_players(self, count, seed=42):
         players = []
         np.random.seed(seed)
         for i in range(count):
@@ -28,15 +28,16 @@ class Fluent:
         self.players = players
         return self
 
-    def one_player_various_groupsize(self, *args):
+    def battling_in_pairs(self):
+        self.battles = [[self.players[first], self.players[second]]
+                        for second in range(len(self.players))
+                        for first in range(second - 1)]
+        return self
+
+    def first_against_himself(self, *args):
         self.battles = [[self.players[0] for _ in range(size)] for size in args]
         return self
 
-    def pair_battles(self):
-        self.battles = [ [self.players[first], self.players[second]]
-                         for second in range(len(self.players))
-                         for first in range(second-1)]
-        return self
 
     def run_experiment(self, experiment_name):
         self.tasks = [ {'Experiment' : experiment_name, 'Players' : battle } for battle in self.battles]
@@ -58,12 +59,7 @@ class Fluent:
                     file.write('\n')
 
 
-k= (Fluent()
-    .from_params(key_1 = Param(0,1), key_2 = Param(0,1), key_3 = Param(0,1))
-    .create_players_randomly(3)
-    .pair_battles()
-    .run_experiment('Test')
-    .store_pointwise('output.csv')
-    )
+k= (Fluent().from_params(key_1 = Param(0,1), key_2 = Param(0,1), key_3 = Param(0,1)).create_players_randomly(3).pair_battles().run_experiment('Test').store_pointwise('output.csv'))
 
-print(k.results)
+#k = Fluent().from_params().create_players_randomly(1).one_player_various_groupsize(1,2,4,8)
+print (k.results)
