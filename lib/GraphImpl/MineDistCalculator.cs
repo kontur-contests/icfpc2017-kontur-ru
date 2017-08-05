@@ -31,7 +31,7 @@ namespace lib.GraphImpl
                 throw new InvalidOperationException();
             if (!distFromMines[mineId].ContainsKey(vertexId))
                 return -1;
-            return distFromMines[mineId][vertexId].Length;
+            return distFromMines[mineId][vertexId].Length-1;
         }
 
         public SingleLinkedList<int> GetPath(int mineId, int vertexId)
