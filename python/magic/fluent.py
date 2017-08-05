@@ -32,7 +32,8 @@ class Fluent:
         return self
 
     def create_historical_players(self, history_length):
-        self.players = [ { 'Name' : str(i), 'Params' : {'Age' : i}} for i in range(history_length)]
+        self.players = [ { 'Name' : 'Age'+str(i), 'Params' : {'Age' : i}} for i in range(history_length)]
+        self.param_names = ['Age']
         return self;
 
 
@@ -65,7 +66,7 @@ class Fluent:
         return self
 
     def dump(self,dump_file = None):
-        self.result_dump_file = dump_file or ('result_dump_'+str(self.token)+'.json')
+        self.result_dump_file = dump_file or ('dumps\\result_dump_'+str(self.token)+'.json')
         with open(self.result_dump_file,'w') as file:
             file.write(json.dumps(self.results,indent=2))
         return self
@@ -73,20 +74,27 @@ class Fluent:
     def restore_dump(self, dump_file):
         with open(dump_file,'r') as file:
             self.results = json.loads(file.read())
-        self.param_names = list()
+        self.param_names = list(self.results[0]['Task']['Players'][0]['Params'])
         return self
 
     def store_pointwise(self, filename):
         keys = self.param_names
         with open(filename,'w') as file:
-            file.write('scores,num_players,name,')
+            file.write('game_number,server_name,scores,num_players,name,')
             file.write(",".join(keys))
             file.write('\n')
-            for game in self.results:
+            for game_number, game in enumerate(self.results):
                 for player_index in range(len(game['Results'])):
                     player = game['Task']['Players'][player_index]
-                    result = game['Results'][player_index]['Scores']
-                    file.write(','.join([str(result),str(len(game['Results'])), game['Task']['Map'], player['Name'] ]))
+                    result = game['Results'][player_index]
+                    file.write(','.join([
+                        str(game_number),
+                        result['ServerName'],
+                        str(result['Scores']),
+                        str(len(game['Results'])),
+                        game['Task']['Map'],
+                        player['Name']
+                    ]))
                     file.write(',')
                     file.write(','.join([str(player['Params'][key]) for key in keys]))
                     file.write('\n')

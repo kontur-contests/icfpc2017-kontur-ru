@@ -1,8 +1,3 @@
-scores,num_players,name,
-6,4,sample.json,0,
-15,4,sample.json,0,
-15,4,sample.json,0,
-3,4,sample.json,0,
-27,2,sample.json,0,
-22,2,sample.json,0,
-32,1,sample.json,0,
+scores,server_name,num_players,name,Age
+27,GreedyAi,2,sample.json,0,0.0
+22,Dummy,2,sample.json,1,1.0

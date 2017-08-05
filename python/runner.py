@@ -28,7 +28,8 @@ def test_historical_algorithms():
 
 #test_historical_algorithms()
 
-#Fluent().restore_dump('result_dump_2247.json')
+Fluent().restore_dump('result_dump_93839.json').store_pointwise('test.csv')
+
 
 #test_greedy_algorithms()
 

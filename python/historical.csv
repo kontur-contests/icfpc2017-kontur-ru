@@ -1,0 +1,5 @@
+game_number,server_name,scores,num_players,name,Age
+0,GreedyAi,25,2,sample.json,Age0,0.0
+0,Dummy,20,2,sample.json,Age1,1.0
+1,GreedyAi,733,2,Sierpinski-triangle.json,Age0,0.0
+1,Dummy,484,2,Sierpinski-triangle.json,Age1,1.0
