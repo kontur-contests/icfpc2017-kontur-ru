@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using lib.GraphImpl;
 using lib.GraphImpl.ShortestPath;
+using MoreLinq;
 
 namespace lib.Strategies.EdgeWeighting
 {
@@ -32,12 +33,12 @@ namespace lib.Strategies.EdgeWeighting
                 .SelectMany(x => x.Vertices, (component, vertex) => new { component, vertex })
                 .ToDictionary(x => x.vertex, x => x.component);
             MutualComponentWeights = new Dictionary<Tuple<int, int>, long>();
-            foreach (var component in connectedComponents)
+            var maxComponent = connectedComponents.MaxBy(comp => comp.Vertices.Count);
             {
-                CurrentComponent = component;
-                SpGraph = ShortestPathGraph.Build(Graph, component.Vertices);
-                ClaimedMineIds = component.Mines;
-                foreach (var vertex in component.Vertices)
+                CurrentComponent = maxComponent;
+                SpGraph = ShortestPathGraph.Build(Graph, maxComponent.Vertices);
+                ClaimedMineIds = maxComponent.Mines;
+                foreach (var vertex in maxComponent.Vertices)
                     SubGraphWeight[vertex] = CalcSubGraphWeight(vertex);
             }
         }

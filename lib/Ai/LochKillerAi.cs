@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using lib.Ai.StrategicFizzBuzz;
 using lib.GraphImpl;
 
 namespace lib.Ai
@@ -57,26 +58,27 @@ namespace lib.Ai
         public string Name => nameof(LochMaxVertexWeighterKillerAi);
         public string Version => "0.1";
 
-        private GreedyAi Base = new GreedyAi();
+        private MaxReachableVertexWeightAi Base = new MaxReachableVertexWeightAi();
+
+        private int puntersCount;
 
         public Future[] StartRound(int punterId, int puntersCount, Map map, Settings settings)
         {
+            this.puntersCount = puntersCount;
             return Base.StartRound(punterId, puntersCount, map, settings);
         }
 
         Random rand = new Random();
         public Move GetNextMove(Move[] prevMoves, Map map)
         {
-            var playersCount = map.Rivers.Select(river => river.Owner).Distinct().Count(i => i >= 0);
-
-            if (map.Sites.Length / playersCount  < 150)
+            if (map.Sites.Length / puntersCount < 150)
                 return Base.GetNextMove(prevMoves, map);
 
             var graph = new Graph(map);
             
             var nearMinesEdge = map.Mines
                 .Select(mine => new { mine, edges = graph.Vertexes[mine].Edges.Select(edge => edge.River).ToList() })
-                .Where(mine => mine.edges.Select(edge => edge.Owner).Distinct().Count() < playersCount + 1)
+                .Where(mine => mine.edges.Select(edge => edge.Owner).Distinct().Count() < puntersCount + 1)
                 .OrderBy(mine => Tuple.Create(mine.edges.Select(edge => edge.Owner).Distinct().Count(), rand.Next()))
                 .Where(mine => mine.edges.Count <= 100)
                 .SelectMany(mine => mine.edges)
