@@ -126,8 +126,7 @@ namespace lib.GraphImpl
                         ? INF
                         : 1;
 
-                    if (edge.From < edge.To)
-                        add_edge(edge.From, edge.To, cap);
+                    add_edge(edge.From, edge.To, cap);
                 }
             }
 

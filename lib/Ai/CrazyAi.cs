@@ -98,7 +98,7 @@ namespace lib.Ai
             var gameSimulator = new GameSimulatorRunner(new SimpleScoreCalculator());
 
             var results = gameSimulator.SimulateGame(
-                gamers, MapLoader.LoadMapByName("boston-sparse.json").Map);
+                gamers, MapLoader.LoadMapByName("edge.json").Map);
 
             foreach (var gameSimulationResult in results)
             {
