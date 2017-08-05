@@ -13,7 +13,7 @@ namespace lib.Ai
     public class GreedyAi : IAi
     {
         public string Name { get; set; } = nameof(GreedyAi);
-        private int punterId;
+        public int punterId { get; private set; }
         private GreedyAiHelper GreedyAiHelper;
 
         private MineDistCalculator mineDistCalulator;
