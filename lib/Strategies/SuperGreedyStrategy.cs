@@ -46,7 +46,7 @@ namespace lib.Strategies
 
             foreach (var mine in graph.Mines)
             {
-                if(mine.Value.Edges.All(edge => edge.Owner == owner) || usedMines.Contains(mine.Key))
+                if(usedMines.Contains(mine.Key))
                     continue;
                 
                 var component = new ConnectedComponent(componentIndexer);
