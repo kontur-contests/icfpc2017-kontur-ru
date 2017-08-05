@@ -15,7 +15,7 @@ namespace lib.Replays
     {
         void SaveReplay(ReplayMeta meta, ReplayData data);
 
-        IList<ReplayMeta> GetRecentMetas(int limit = 10);
+        ReplayMeta[] GetRecentMetas(int limit = 10);
         ReplayData GetData(string dataId);
     }
 
@@ -23,9 +23,15 @@ namespace lib.Replays
     {
         private readonly FirebaseClient fb;
 
-        public ReplayRepo()
+        private ChildQuery metas;
+        private ChildQuery datas;
+
+        public ReplayRepo(bool test = false)
         {
             fb = Connect().Result;
+
+            metas = test ? fb.Child("replays").Child("metas") : fb.Child("test").Child("replays").Child("metas");
+            datas = test ? fb.Child("replays").Child("datas") : fb.Child("test").Child("replays").Child("datas");
         }
         
         private static async Task<FirebaseClient> Connect()
@@ -41,27 +47,35 @@ namespace lib.Replays
         
         public void SaveReplay(ReplayMeta meta, ReplayData data)
         {
-            var result = fb.Child("replays").Child("datas")
+            var result = datas
                 .PostAsync(data)
                 .ConfigureAwait(false).GetAwaiter()
                 .GetResult();
 
             meta.DataId = result.Key;
             
-            fb.Child("replays").Child("metas")
+            metas
                 .PostAsync(meta)
                 .ConfigureAwait(false).GetAwaiter()
                 .GetResult();
         }
 
-        public IList<ReplayMeta> GetRecentMetas(int limit = 10)
+        public ReplayMeta[] GetRecentMetas(int limit = 10)
         {
-            throw new System.NotImplementedException();
+            return metas
+                .OrderBy("timestamp")
+                .LimitToLast(limit)
+                .OnceAsync<ReplayMeta>()
+                .ConfigureAwait(false).GetAwaiter()
+                .GetResult()
+                .Select(x => x.Object)
+                .OrderByDescending(x => x.Timestamp)
+                .ToArray();
         }
 
         public ReplayData GetData(string dataId)
         {
-            return fb.Child("replays").Child("datas")
+            return datas
                 .Child(dataId)
                 .OnceSingleAsync<ReplayData>()
                 .ConfigureAwait(false).GetAwaiter()
@@ -75,7 +89,7 @@ namespace lib.Replays
         [Test]
         public void SaveReplay_ShouldSave()
         {
-            var repo = new ReplayRepo();
+            var repo = new ReplayRepo(true);
             
             var meta = new ReplayMeta(
                 DateTime.UtcNow,
@@ -102,6 +116,16 @@ namespace lib.Replays
             var savedData = repo.GetData(meta.DataId);
             
             Assert.NotNull(savedData);
+        }
+        
+        [Test]
+        public void GetRecentMetas_Should()
+        {
+            var repo = new ReplayRepo(true);
+            
+            var metas = repo.GetRecentMetas();
+            
+            Assert.That(metas[0].Timestamp > metas[1].Timestamp);
         }
     }
 }
