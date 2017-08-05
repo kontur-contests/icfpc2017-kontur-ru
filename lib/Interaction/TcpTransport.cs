@@ -32,7 +32,7 @@ namespace lib.Interaction
         public void Write(string data)
         {
             var strToSend = data.Length + ":" + data;
-            log.Info($"Write {strToSend}");
+            log.Debug($"{client.Client.RemoteEndPoint}|Write {strToSend}");
             var buffer = Encoding.ASCII.GetBytes(strToSend);
             networkStream.Write(buffer, 0, buffer.Length);
         }
@@ -57,7 +57,7 @@ namespace lib.Interaction
             }
 
             sb.Remove(sb.Length - 1, 1);
-            log.Info($"Read {sb}");
+            log.Debug($"{client.Client.RemoteEndPoint}|Read {sb}");
             return sb.ToString();
         }
 
