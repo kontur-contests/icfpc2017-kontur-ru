@@ -29,7 +29,15 @@ namespace worker
             inputTopicName = input;
             outputTopicName = output;
             this.experiment = experiment;
-            commitHash = File.ReadAllLines("commit_hash.txt").FirstOrDefault();
+            try
+            {
+                commitHash = File.ReadAllLines("commit_hash.txt").FirstOrDefault();
+            }
+            catch (Exception)
+            {
+                commitHash = "Unknown";
+                logger.Warn("Can't read commit_hash.txt");
+            }
         }
 
         public void Start()
