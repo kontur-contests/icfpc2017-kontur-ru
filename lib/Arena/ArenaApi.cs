@@ -14,11 +14,15 @@ namespace lib.Arena
         {
             var matches = new ArenaApi().GetArenaMatchesAsync()
                 .ConfigureAwait(false).GetAwaiter()
-                .GetResult();
+                .GetResult()
+                .Where(x => x.IsSuitableForReplayCollection())
+                .ToArray();
+            
+            Console.WriteLine(matches.Length + " matches available");
 
             return matches
                 .OrderBy(x => Guid.NewGuid())
-                .FirstOrDefault(x => x.IsSuitableForReplayCollection());
+                .FirstOrDefault();
         }
 
         public async Task<ArenaMatch[]> GetArenaMatchesAsync()

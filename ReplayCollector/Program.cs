@@ -8,6 +8,7 @@ using lib.Arena;
 using lib.Interaction;
 using lib.Replays;
 using lib.viz;
+using MoreLinq;
 using NLog;
 
 namespace ReplayCollector
@@ -58,9 +59,11 @@ namespace ReplayCollector
                                 interaction.Start();
                             }
 
+                            log.Info("Collector " + index + ": Running game");
                             var metaAndData = interaction.RunGame(ai);
 
                             Repo.SaveReplay(metaAndData.Item1, metaAndData.Item2);
+                            log.Info("Collector " + index + ": Saved replay " + metaAndData.Item1.Scores.ToDelimitedString(", "));
 
                             ++completedTasksCount;
 
