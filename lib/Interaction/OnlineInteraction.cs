@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using lib.Interaction.Internal;
 using lib.Replays;
@@ -34,9 +35,14 @@ namespace lib.Interaction
             
             var serverResponse = connection.ReadGameState();
 
+            var allMoves = new List<Move>();
+            
             while (!connection.IsGameOver)
             {
                 var moves = connection.GetMoves(serverResponse);
+                
+                allMoves.AddRange(moves);
+                
                 foreach (var move in moves)
                     map = move.Execute(map);
 
@@ -47,8 +53,10 @@ namespace lib.Interaction
             }
             var score = connection.GetScore(serverResponse);
 
+            allMoves.AddRange(score.MoveModels.Select(ProtocolBase.MoveModel.GetMove));
+            
             var meta = new ReplayMeta(DateTime.UtcNow, ai.Name, setup.Id, setup.PunterCount, score.Scores);
-            var data = new ReplayData(setup.Map, score.MoveModels.Select(ProtocolBase.MoveModel.GetMove));
+            var data = new ReplayData(setup.Map, allMoves);
             
             return Tuple.Create(meta, data);
         }
