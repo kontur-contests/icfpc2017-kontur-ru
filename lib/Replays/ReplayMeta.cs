@@ -57,6 +57,11 @@ namespace lib.Replays
         public PassMove Pass;
         public ClaimMove Claim;
 
+        public Move ToMove()
+        {
+            return (Move) Pass ?? Claim;
+        }
+
         public MoveJson()
         {
         }

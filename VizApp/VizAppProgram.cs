@@ -25,6 +25,7 @@ namespace VizApp
             catch (Exception e)
             {
                 MessageBox.Show(e.ToString());
+                Environment.Exit(-1);
             }
         }
     }

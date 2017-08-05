@@ -30,7 +30,7 @@ namespace lib.Interaction
             {
                 var moves = connection.GetMoves(serverResponse);
                 foreach (var move in moves)
-                    MapUpdater.ApplyMove(map, move);
+                    map = move.Execute(map);
 
                 var nextMove = ai.GetNextMove(moves, map);
                 connection.WriteMove(nextMove);

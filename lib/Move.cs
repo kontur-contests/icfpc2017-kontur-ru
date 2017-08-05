@@ -35,32 +35,47 @@ namespace lib
 
     public abstract class Move
     {
+        protected Move(int punterId)
+        {
+            PunterId = punterId;
+        }
+
+        [JsonProperty("punter")] public int PunterId;
+        public abstract Map Execute(Map map);
     }
 
     public class PassMove : Move
     {
-        [JsonProperty("punter")] public int PunterId;
 
         public PassMove(int punterId)
+        : base(punterId)
         {
-            PunterId = punterId;
+        }
+
+        public override Map Execute(Map map)
+        {
+            return map;
         }
     }
 
 
     public class ClaimMove : Move, IEquatable<ClaimMove>
     {
-        [JsonProperty("punter")] public int PunterId;
-
         [JsonProperty("source")] public int Source;
 
         [JsonProperty("target")] public int Target;
 
         public ClaimMove(int punterId, int source, int target)
+            :base(punterId)
         {
-            PunterId = punterId;
             Source = source;
             Target = target;
+        }
+
+        public override Map Execute(Map map)
+        {
+            var mapRivers = map.RiversList.Remove(new River(Source, Target)).Add(new River(Source, Target, PunterId));
+            return new Map(map.Sites, mapRivers, map.Mines);
         }
 
         public bool Equals(ClaimMove other)
@@ -75,7 +90,7 @@ namespace lib
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
-            return Equals((ClaimMove) obj);
+            return Equals((ClaimMove)obj);
         }
 
         public override int GetHashCode()

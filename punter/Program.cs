@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using lib;
 using Newtonsoft.Json;
 
@@ -16,34 +17,31 @@ namespace punter
         {
             ai = new ConnectClosestMinesAi();
 
-            Write(new HandshakeOut { me = TeamName });
+            Write(new HandshakeOut {me = TeamName});
             var handshakeIn = Read<HandshakeIn>();
             if (handshakeIn.you != TeamName)
                 throw new InvalidOperationException($"Couldn't pass handshake. handshakeIn.You = {handshakeIn.you}");
 
-            while (true)
+            var @in = Read<In>();
+            if (@in.IsSetup())
             {
-                var @in = Read<In>();
-                if (@in.IsSetup())
-                {
-                    Write(DoSetup(@in.punter.Value, @in.punters, @in.map));
-                }
-                else if (@in.IsGameplay())
-                {
-                    Write(DoGameplay(@in.move.moves, @in.state));
-                }
-                else if (@in.IsScoring())
-                {
-                    DoScoring(@in.stop.moves, @in.stop.scores, @in.state);
-                    return;
-                }
-                else
-                    throw new InvalidOperationException($"Invalid input: {@in.line}");
+                Write(DoSetup(@in.punter.Value, @in.punters, @in.map));
             }
+            else if (@in.IsGameplay())
+            {
+                Write(DoGameplay(@in.move.moves, @in.state));
+            }
+            else if (@in.IsScoring())
+            {
+                DoScoring(@in.stop.moves, @in.stop.scores, @in.state);
+            }
+            else
+                throw new InvalidOperationException($"Invalid input: {@in.line}");
         }
 
         private static SetupOut DoSetup(int punter, int punters, Map map)
         {
+            Console.Error.WriteLine($"punter={punter}/{punters}");
             ai.StartRound(punter, punters, map);
             return new SetupOut
             {
@@ -82,7 +80,7 @@ namespace punter
         private static void DoScoring(MoveIn[] moves, ScoreModel[] scores, State state)
         {
             foreach (var scoreModel in scores)
-                Console.Error.WriteLine($"{(scoreModel.Punter == state.punter ? "*" : "")}{scoreModel.Punter}={scoreModel.Score}");
+                Console.Error.WriteLine($"{scoreModel.Punter}={scoreModel.Score}");
         }
 
         private static void ApplyMove(Map map, MoveIn moveIn)
@@ -107,16 +105,24 @@ namespace punter
 
         private static void Write<T>(T obj)
         {
+            Console.Error.WriteLine($"Writing {typeof(T)}");
             var line = JsonConvert.SerializeObject(obj);
+            Console.Error.WriteLine($"Writing {typeof(T)} line: {line}");
             Console.Out.Write($"{line.Length}:{line}");
         }
 
         private static T Read<T>() where T : InBase
         {
+            Console.Error.WriteLine($"Reading {typeof(T)}");
             var nBuilder = new StringBuilder();
-            char ch;
-            while ((ch = Convert.ToChar(Console.In.Read())) != ':')
+            while (true)
             {
+                var charCode = Console.In.Read();
+                if (charCode == -1)
+                    continue;
+                var ch = Convert.ToChar(charCode);
+                if (ch == ':')
+                    break;
                 nBuilder.Append(ch);
             }
             var n = int.Parse(nBuilder.ToString());
@@ -128,6 +134,7 @@ namespace punter
                 message.Append(buffer, 0, charsRead);
             }
             var line = message.ToString();
+            Console.Error.WriteLine($"Read {typeof(T)} line: {line}");
             var result = JsonConvert.DeserializeObject<T>(line);
             result.line = line;
             return result;

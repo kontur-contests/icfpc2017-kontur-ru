@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using System.Linq;
 using Newtonsoft.Json;
 
@@ -32,7 +33,14 @@ namespace lib
     {
         [JsonProperty("mines", Order = 3)] public int[] Mines = new int[0];
 
-        [JsonProperty("rivers", Order = 2)] public River[] Rivers = new River[0];
+        [JsonIgnore] public ImmutableHashSet<River> RiversList = ImmutableHashSet<River>.Empty;
+
+        [JsonProperty("rivers", Order = 2)]
+        public River[] Rivers
+        {
+            get => RiversList.ToArray();
+            set => RiversList = value.ToImmutableHashSet();
+        }
 
         [JsonProperty("sites", Order = 1)] public Site[] Sites = new Site[0];
 
@@ -41,15 +49,14 @@ namespace lib
         }
 
         public Map(Site[] sites, River[] rivers, int[] mines)
+            :this(sites, rivers.ToImmutableHashSet(), mines)
+        {
+        }
+        public Map(Site[] sites, ImmutableHashSet<River> rivers, int[] mines)
         {
             Sites = sites;
-            Rivers = rivers;
+            RiversList = rivers;
             Mines = mines;
-        }
-
-        public Map Clone()
-        {
-            return new Map(Sites, Rivers.Select(r => r.Clone()).ToArray(), Mines);
         }
     }
 
@@ -72,14 +79,42 @@ namespace lib
             Owner = owner;
         }
 
+        protected bool Equals(River other)
+        {
+            return Source == other.Source && Target == other.Target 
+                || Source == other.Target && Target == other.Source;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((River) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return Source <= Target ? (Source * 397) ^ Target : (Target * 397) ^ Source;
+            }
+        }
+
+        public static bool operator ==(River left, River right)
+        {
+            return Equals(left, right);
+        }
+
+        public static bool operator !=(River left, River right)
+        {
+            return !Equals(left, right);
+        }
+
         public override string ToString()
         {
             return $"{nameof(Source)}: {Source}, {nameof(Target)}: {Target}, {nameof(Owner)}: {Owner}";
         }
 
-        public River Clone()
-        {
-            return new River(Source, Target, Owner);
-        }
     }
 }
