@@ -17,12 +17,14 @@ def execute_tasks(tasks_to_do, token):
     )
 
     with tasks.get_sync_producer() as producer:
-        for task in tasks_to_do:
+        for index, task in enumerate(tasks_to_do):
+            print('sending '+str(index)+'                                 \r', end='')
             producer.produce(json.dumps(task).encode('utf-8'))
 
     results = []
 
     remaining_answers = num_tasks
+    print('')
     for message in consumer:
         if message is not None:
             data = json.loads(message.value.decode('utf-8'))
@@ -31,7 +33,7 @@ def execute_tasks(tasks_to_do, token):
                 results.append(data)
         if not remaining_answers:
             break
-        print(str(remaining_answers)+"             \r",end='')
+        print('remaining ' + str(remaining_answers) + "                 \r", end='')
 
     return results
 
