@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using lib.GraphImpl;
+using lib.Structures;
 
 namespace lib.Ai
 {
@@ -39,10 +40,10 @@ namespace lib.Ai
             }
             if (bestEdge != null)
             {
-                nextMove = new ClaimMove(punterId, bestEdge.From, bestEdge.To);
+                nextMove = Move.Claim(punterId, bestEdge.From, bestEdge.To);
                 return true;
             }
-            nextMove = new PassMove(punterId);
+            nextMove = Move.Pass(punterId);
             return false;
         }
 

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using lib.Structures;
 
 namespace lib
 {

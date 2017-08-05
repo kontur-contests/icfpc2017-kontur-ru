@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using lib.Ai;
 using lib.Scores;
+using lib.Structures;
 
 namespace lib
 {
@@ -26,10 +27,8 @@ namespace lib
             {
                 var lastMove = state.PreviousMoves.Last();
 
-                if (lastMove is ClaimMove claimMove && !silent)
-                    Console.WriteLine($"PunterId: {claimMove.PunterId} move source: {claimMove.Source} target: {claimMove.Target}");
-                if (lastMove is PassMove passMove && !silent)
-                    Console.WriteLine($"PunterId: {passMove.PunterId} pass");
+                if (!silent)
+                    Console.WriteLine($"{lastMove}");
 
                 state = gameSimulator.NextMove();
             }

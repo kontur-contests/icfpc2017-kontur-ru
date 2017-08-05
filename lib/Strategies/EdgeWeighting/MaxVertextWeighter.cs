@@ -19,8 +19,9 @@ namespace lib.Strategies.EdgeWeighting
         private Dictionary<int, double> SubGraphWeight { get; set; }
         private int[] ClaimedMineIds { get; set; }
 
-        public void Init(Graph graph, int[] claimedVertexIds, int ownerId)
+        public void Init(Graph graph, List<ConnectedComponent> connectedComponents)
         {
+            var claimedVertexIds = connectedComponents.SelectMany(comp => comp.Vertices).ToArray();
             Graph = graph;
             SpGraph = ShortestPathGraph.Build(graph, claimedVertexIds);
             ClaimedMineIds = claimedVertexIds.Where(v => graph.Mines.ContainsKey(v)).ToArray();

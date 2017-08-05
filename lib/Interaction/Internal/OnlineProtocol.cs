@@ -1,13 +1,11 @@
 using System;
-using System.Linq;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using lib.Structures;
 
 namespace lib.Interaction.Internal
 {
-    internal class OnlineProtocol : ProtocolBase
+    internal class OnlineProtocol
     {
-        public bool IsGameOver { get; private set; }
+        private readonly ITransport transport;
 
         public OnlineProtocol(ITransport transport)
         {
@@ -16,10 +14,13 @@ namespace lib.Interaction.Internal
 
         public bool HandShake(string name)
         {
-            transport.Write($"{{\"me\":\"{name}\"}}");
+            transport.Write(new HandshakeOut {me = name});
             try
             {
-                transport.Read(1000);
+                var handshakeIn = transport.Read<HandshakeIn>(1000);
+                if (handshakeIn.you != name)
+                    throw new InvalidOperationException(
+                        $"Couldn't pass handshake. handshakeIn.You = {handshakeIn.you}; me = {name}");
                 return true;
             }
             catch (TimeoutException)
@@ -28,54 +29,30 @@ namespace lib.Interaction.Internal
             }
         }
 
-        public Setup ReadSetup(int? timeout = null)
+        public In ReadSetup(int? timeout = null)
         {
-            return JsonConvert.DeserializeObject<Setup>(transport.Read(timeout));
+            var @in = transport.Read<In>(timeout);
+            if (!@in.IsSetup())
+                throw new InvalidOperationException("Invalid response. Expected setup");
+            return @in;
         }
 
-        public void WriteSetupReply(SetupReply reply)
+        public void WriteSetupReply(SetupOut reply)
         {
-            transport.Write(Serialize(reply));
+            transport.Write(reply);
         }
 
         public void WriteMove(Move move)
         {
-            transport.Write(SerializeMove(move));
+            transport.Write(move);
         }
 
-        public JToken ReadGameState()
+        public In ReadNextTurn()
         {
-            var state = JObject.Parse(transport.Read());
-            if (state["stop"] != null)
-            {
-                IsGameOver = true;
-                return state["stop"];
-            }
-            if (state["move"] != null)
-            {
-                return state["move"];
-            }
-            throw new TimeoutException("azaza");
+            var @in = transport.Read<In>();
+            if (@in.IsGameplay() || @in.IsScoring())
+                return @in;
+            throw new InvalidOperationException("Invalid response. Expected gameplay or stop");
         }
-
-        public Move[] GetMoves(JToken moves)
-        {
-            return moves.ToObject<LastRoundModel>().MoveModels.Select(MoveModel.GetMove).ToArray();
-        }
-
-        public ScoreData GetScore(JToken score)
-        {
-            return score.ToObject<ScoreData>();
-        }
-
-        public Tuple<Move[], ScoreModel[]> ReadScore()
-        {
-            var scoreJsonResponse = JsonConvert.DeserializeObject<ScoreJsonResponse>(transport.Read());
-            return Tuple.Create(
-                scoreJsonResponse.ScoreData.MoveModels.Select(MoveModel.GetMove).ToArray(),
-                scoreJsonResponse.ScoreData.Scores);
-        }
-
-        private readonly ITransport transport;
     }
 }

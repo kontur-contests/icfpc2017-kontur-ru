@@ -8,7 +8,7 @@ using lib.GraphImpl.ShortestPath;
 
 namespace lib.Strategies
 {
-    class SuperGreedyStrategy : IStrategy
+    public class SuperGreedyStrategy : IStrategy
     {
         private MineDistCalculator MineDistCalulator;
 
@@ -23,7 +23,7 @@ namespace lib.Strategies
         }
     }
 
-    class ConnectedComponent
+    public class ConnectedComponent
     {
         public HashSet<int> Vertices = new HashSet<int>();
         public HashSet<int> Mines = new HashSet<int>();

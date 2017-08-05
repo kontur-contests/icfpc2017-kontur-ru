@@ -1,7 +1,7 @@
-using System;
 using System.Linq;
 using lib.GraphImpl;
 using lib.Strategies;
+using lib.Structures;
 using MoreLinq;
 
 namespace lib.Ai.StrategicFizzBuzz
@@ -23,9 +23,9 @@ namespace lib.Ai.StrategicFizzBuzz
         {
             var turns = Strategy.Turn(new Graph(map));
             if (!turns.Any())
-                return new PassMove(PunterId);
+                return Move.Pass(PunterId);
             var bestTurn = turns.MaxBy(x => x.Estimation);
-            return new ClaimMove(PunterId, bestTurn.River.Source, bestTurn.River.Target);
+            return Move.Claim(PunterId, bestTurn.River.Source, bestTurn.River.Target);
         }
 
         public string SerializeGameState()

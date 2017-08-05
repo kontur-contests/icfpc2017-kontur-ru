@@ -19,6 +19,7 @@ namespace lib.QualityControl
                 yield return () => new ConnectClosestMinesAi();
                 yield return () => new LochKillerAi();
                 yield return () => new MaxReachableVertexWeightAi();
+                yield return () => new LochMaxVertexWeighterKillerAi();
             }
         }
     }

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using lib.Structures;
 
 namespace lib.viz
 {
@@ -33,8 +34,8 @@ namespace lib.viz
         {
             if (nextMoveIndex < data.Data.Moves.Length)
             {
-                var move = data.Data.Moves[nextMoveIndex++].ToMove();
-                map = move.Execute(map);
+                var move = data.Data.Moves[nextMoveIndex++];
+                map = map.ApplyMove(move);
                 prevMoves.Add(move);
             }
             return new GameState(map, prevMoves, nextMoveIndex >= data.Data.Moves.Length);

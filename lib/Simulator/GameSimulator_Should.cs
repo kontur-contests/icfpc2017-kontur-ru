@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using FluentAssertions;
 using lib.Ai;
+using lib.Structures;
 using lib.viz;
 using NUnit.Framework;
 
@@ -59,7 +59,7 @@ namespace lib
 
             public Move GetNextMove(Move[] prevMoves, Map map)
             {
-                return new ClaimMove(0, 0, 1);
+                return Move.Claim(0, 0, 1);
             }
 
             public string SerializeGameState()

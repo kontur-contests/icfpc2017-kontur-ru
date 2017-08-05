@@ -1,6 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Linq;
+using lib.Structures;
 
 namespace lib.viz.Detalization
 {
@@ -32,7 +35,6 @@ namespace lib.viz.Detalization
     public class DefaultPainterAugmentor : IPainterAugmentor
     {
         private const float defaultRadius = 30f;
-
         private static Color[] Colors = ColorsPalette.Colors;
 
         private IndexedMap map;
@@ -64,9 +66,21 @@ namespace lib.viz.Detalization
             {
                 Color = river.Owner == -1 ? Color.LightGray : Colors[river.Owner],
                 PenWidth = river.Owner == -1 ? 1 : 3,
-                HoverText = "It's a river!"
+                HoverText = "It's a river!",
+                DashStyle = DashStyle.Solid
             };
         }
+
+        public FuturePainterData GetData(int punderId, Future future)
+        {
+            return new FuturePainterData
+            {
+                Color = Colors[punderId],
+                PenWidth = 5
+            };
+        }
+
+        public bool ShowFutures { get; set; }
 
         private float CalcMinDistance()
         {
