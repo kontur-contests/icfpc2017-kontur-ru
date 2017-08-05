@@ -13,6 +13,7 @@ class Fluent:
     def __init__(self):
         self.params = dict()
         self.param_names = list()
+        self.battles_on_maps = []
 
     def from_params(self, **kwargs):
         self.params = kwargs
@@ -56,6 +57,14 @@ class Fluent:
         self.battles_on_maps = [x for x in self.battles_on_maps for _ in range(count)]
         return self
 
+
+    def battles_on_map(self, map, player_count, battles_count):
+        for _ in range(battles_count):
+            players = [ self.players[np.random.randint(0,len(self.players))] for __ in range(player_count)]
+            self.battles_on_maps.append((players,map))
+        return self
+
+
     def experiment(self, experiment_name):
         self.token = np.random.randint(1,100000)
         self.tasks = [{'Experiment': experiment_name, 'Token' : self.token, 'Part' : index, 'Map': map, 'Players': battle}
@@ -67,7 +76,7 @@ class Fluent:
         return self
 
     def run(self):
-        self.results = execute_tasks(self.tasks)
+        self.results = execute_tasks(self.tasks,self.token)
         return self
 
     def dump(self,dump_file = None):
@@ -85,21 +94,25 @@ class Fluent:
     def store_pointwise(self, filename):
         keys = self.param_names
         with open(filename,'w') as file:
-            file.write('game_number,server_name,scores,num_players,map,name,')
+            file.write('game_number,server_name,scores,ranking,tournament_scores,num_players,map,map_rivers_count,map_sites_count,name,')
             file.write(",".join(keys))
             file.write('\n')
             for game_number, game in enumerate(self.results):
                 for player_index in range(len(game['Results'])):
                     player = game['Task']['Players'][player_index]
                     result = game['Results'][player_index]
-                    file.write(','.join([
-                        str(game_number),
+                    file.write(','.join([ str(x) for x in [
+                        game_number,
                         result['ServerName'],
-                        str(result['Scores']),
-                        str(len(game['Results'])),
+                        result['Scores'],
+                        result['Ranking'],
+                        result['TournamentScore'],
+                        len(game['Results']),
                         game['Task']['Map'],
+                        game['RiversCount'],
+                        game['SitesCount'],
                         player['Name']
-                    ]))
+                    ]]))
                     file.write(',')
                     file.write(','.join([str(player['Params'][key]) for key in keys]))
                     file.write('\n')

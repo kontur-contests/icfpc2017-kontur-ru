@@ -10,7 +10,7 @@ namespace punter
 {
     class Program
     {
-        private static ConnectClosestMinesAi ai;
+        private static IAi ai;
         private static TextReader inputReader;
 
         private const string TeamName = "kontur.ru";
@@ -21,7 +21,7 @@ namespace punter
                 inputReader = Console.In;
             else
                 inputReader = new StreamReader(args[0]);
-            ai = new ConnectClosestMinesAi();
+            ai = new LochKillerAi();
 
             Write(new HandshakeOut {me = TeamName});
             var handshakeIn = Read<HandshakeIn>();

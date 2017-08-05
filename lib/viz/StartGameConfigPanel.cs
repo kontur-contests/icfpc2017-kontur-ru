@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using lib.Ai;
+using lib.viz;
 using NUnit.Framework;
 
 namespace lib
@@ -119,10 +120,12 @@ namespace lib
             form.Controls.Add(panel);
             form.ShowDialog();
         }
-
+        
+        [ShoulNotRunOnline]
         private class JunkAi : IAi
         {
             public string Name => "Junk";
+            public string Version { get; }
 
             public Future[] StartRound(int punterId, int puntersCount, Map map, Settings settings)
             {

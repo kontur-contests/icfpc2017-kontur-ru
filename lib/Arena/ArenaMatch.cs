@@ -20,8 +20,8 @@
 
         public bool IsSuitableForReplayCollection()
         {
-            return Status == MatchStatus.Waiting && TotalSeats - TakenSeats == 1 &&  MapName.IsOneOf("sample.json", "circle.json", "lambda.json", "Sierpinski-triangle.json");
-//            
+            return Status == MatchStatus.Waiting; 
+            //&& TotalSeats - TakenSeats == 1; //&&  MapName.IsOneOf("sample.json", "circle.json", "lambda.json", "Sierpinski-triangle.json");
         }
     }
 }

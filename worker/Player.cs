@@ -25,41 +25,16 @@ namespace worker
     {
         public long Scores { get; set; }
         public string ServerName { get; set; }
+        public int Ranking { get;  set; }
+        public int TournamentScore { get;  set; }
     }
     
-
     public class Result
     {
         public List<PlayerResult> Results { get; set; }
         public string Error { get; set; }
         public Task Task { get; set; }
-    }
-
-    public interface IPlayer
-    {
-        Result Play(Task task);
-    }
-    
-    public class Player : IPlayer
-    {
-        private readonly IExperiment playerStrategy;
-        
-        public Player(IExperiment playerStrategy)
-        {
-            this.playerStrategy = playerStrategy;
-        }
-        
-        public Result Play(Task task)
-        {
-            var players = playerStrategy
-                .Play(task)
-                .ToList();
-
-            return new Result
-            {
-                Task = task,
-                Results = players
-            };
-        }
+        public int RiversCount { get; set; }
+        public int SitesCount { get; set; }
     }
 }

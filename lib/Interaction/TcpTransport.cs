@@ -24,7 +24,7 @@ namespace lib.Interaction
             var ipHostInfo = Dns.Resolve("punter.inf.ed.ac.uk");
             var ipAddress = ipHostInfo.AddressList[0];
 
-             
+
             client.Connect(ipAddress.ToString(), port);
             log.Debug($"{client.Client.RemoteEndPoint}|Connect established");
             client.ReceiveTimeout = 10000;
@@ -42,7 +42,7 @@ namespace lib.Interaction
         }
 
 
-        public string Read(int timeout = 15000)
+        public string Read(int? timeout = 15000)
         {
             var n = ReadN(timeout);
             var sb = new StringBuilder();
@@ -65,7 +65,7 @@ namespace lib.Interaction
             return sb.ToString();
         }
 
-        private int ReadN(int timeout)
+        private int ReadN(int? timeout)
         {
             var sw = Stopwatch.StartNew();
             var nStr = new StringBuilder();
@@ -75,8 +75,8 @@ namespace lib.Interaction
                 while (!networkStream.DataAvailable)
                 {
                     Thread.Sleep(20);
-                    if (sw.ElapsedMilliseconds > timeout)
-                        throw new TimeoutException();
+                    if (timeout != null && sw.ElapsedMilliseconds > timeout)
+                        throw new TimeoutException($"Wait too long {client.Client.RemoteEndPoint}");
                 }
                 networkStream.Read(buffer, 0, 1);
                 nStr.AppendFormat("{0}", Encoding.ASCII.GetString(buffer, 0, 1));

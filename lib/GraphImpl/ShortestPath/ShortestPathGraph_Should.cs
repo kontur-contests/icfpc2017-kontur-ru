@@ -6,8 +6,7 @@ using NUnit.Framework;
 
 namespace lib.GraphImpl.ShortestPath
 {
-    [TestFixture]
-    public class ShortestPathGraph_Should
+    public class ShortestPathGraph_Should : TestBase
     {
         private class TestGraph : Graph, IEnumerable<int>
         {
@@ -61,7 +60,7 @@ namespace lib.GraphImpl.ShortestPath
                     {2, 1, new[] {4}},
                     {3, 1, new[] {4}, new[] {2}},
                     {4, 2}
-                }, config => config.Using<River>(ctx => ctx.Subject.Should().Be(ctx.Expectation)).WhenTypeIs<River>());
+                });
         }
 
         [Test]
@@ -83,7 +82,7 @@ namespace lib.GraphImpl.ShortestPath
                     {2, 1},
                     {3, 1, null, new[] {2}},
                     {4, 0, new[] {2, 3}}
-                }, config => config.Using<River>(ctx => ctx.Subject.Should().Be(ctx.Expectation)).WhenTypeIs<River>());
+                });
         }
 
         [Test]
@@ -117,7 +116,7 @@ namespace lib.GraphImpl.ShortestPath
                     {8, 3, null, new[] {7}},
                     {9, 3, null, new[] {8}},
                     {10, 3, null, new[] {9}},
-                }, config => config.Using<River>(ctx => ctx.Subject.Should().Be(ctx.Expectation)).WhenTypeIs<River>());
+                });
         }
     }
 }

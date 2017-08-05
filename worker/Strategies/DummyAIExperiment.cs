@@ -13,11 +13,10 @@ namespace worker
 
     public class DummyAIExperiment : IExperiment
     {
-        public List<PlayerResult> Play(Task task)
+        public Result Play(Task task)
         {
-            return ExperimentCommon.Run(task.Players,
-                player => new DummyAi(player.Params["Param"]) { Name = player.Name },
-                task.Map??"sample.json");
+            return ExperimentCommon.Run(task,
+                player => new DummyAi(player.Params["Param"]) { Name = player.Name });
         }
     }
 }

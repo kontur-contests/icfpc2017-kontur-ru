@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using lib.Ai;
 
@@ -11,19 +12,20 @@ namespace lib.viz
         static AiFactoryRegistry()
         {
             var types = typeof(AiFactoryRegistry).Assembly.GetTypes()
-                .Where(x => typeof(IAi).IsAssignableFrom(x) && x.GetConstructor(Type.EmptyTypes) != null);
+                .Where(
+                    x => typeof(IAi).IsAssignableFrom(x) && x.GetConstructor(Type.EmptyTypes) != null &&
+                         Attribute.GetCustomAttribute(x, typeof(ShoulNotRunOnlineAttribute)) == null);
             Factories = types.Select(type => new AiFactory(type.Name, () => (IAi) Activator.CreateInstance(type)))
                 .ToArray();
         }
 
         public static IAi GetNextAi()
         {
-            return Factories
-                .Where(x =>
-                    x.Name.Equals("GreedyAi") 
-                    //|| x.Name.Equals("ConnectClosestMinesAi")
-                    )
-                .OrderBy(x => Guid.NewGuid()).First().Create();
+            return Factories.OrderBy(x => Guid.NewGuid()).First().Create();
         }
+    }
+
+    public class ShoulNotRunOnlineAttribute : Attribute
+    {
     }
 }
