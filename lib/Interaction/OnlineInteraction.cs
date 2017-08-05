@@ -25,7 +25,7 @@ namespace lib.Interaction
 
         public string CreateBotName()
         {
-            return "XXX"; // Sneaky fucker...
+            return "kontur.ru"; // Sneaky fucker...
         }
 
         public Tuple<ReplayMeta, ReplayData> RunGame(IAi ai)
