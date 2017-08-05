@@ -13,7 +13,7 @@ namespace worker
                 
                 x.Service<WorkerService>(s =>
                 {
-                    var player = new Player(new ExperimentSelector());
+                    var player = new ExperimentSelector();
                     
                     var config = new Dictionary<string, object>
                     {

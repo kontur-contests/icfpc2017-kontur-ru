@@ -11,12 +11,11 @@ namespace worker.Strategies
 {
     class GreedyExperiment : IExperiment
     {
-        public List<PlayerResult> Play(Task task)
+        public Result Play(Task task)
         {
             return ExperimentCommon.Run(
-                task.Players,
-                player => new GreedyAi(),
-                task.Map??"sample.json");
+                task,
+                player => new GreedyAi());
         }
     }
 }
