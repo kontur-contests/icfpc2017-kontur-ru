@@ -122,7 +122,7 @@ namespace lib.Replays
             Assert.NotNull(savedData);
         }
         
-        [Test]
+        [Test, Explicit]
         public void GetRecentMetas_Should()
         {
             var repo = new ReplayRepo(true);
