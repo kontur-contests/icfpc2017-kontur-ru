@@ -71,7 +71,7 @@ namespace lib.Strategies.EdgeWeighting
             }
             var vertexWeight = CalcProperVertexScore(vertexId, ClaimedMineIds);
             if (Graph.Mines.ContainsKey(vertexId))
-                return MineMultiplier*vertexWeight + CurrentComponent.Vertices.Sum(v => CalcProperVertexScore(v, new [] {vertexId}));
+                return (long)(MineMultiplier*vertexWeight) + CurrentComponent.Vertices.Sum(v => CalcProperVertexScore(v, new [] {vertexId}));
             return vertexWeight;
         }
 

@@ -25,7 +25,7 @@ namespace lib.Ai.StrategicFizzBuzz
         protected override IEdgeWeighter CreateEdgeWeighter(int punterId, int puntersCount, Map map, Settings settings)
         {
             this.punterId = punterId;
-            return new MaxVertextWeighterWithConnectedComponents(map, MineWeight);
+            return new MaxVertextWeighter(map, MineWeight);
         }
     }
 }
