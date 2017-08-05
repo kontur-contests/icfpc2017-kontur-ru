@@ -112,11 +112,7 @@ namespace lib.Ai
                 var current = queue.Dequeue();
                 if (current.CurrentVertex.Edges.Any(x => x.Owner == punterId))
                 {
-                    int edgeFrom = current.Edge.From;
-                    if (graph.Mines.ContainsKey(edgeFrom))
-                        myMines.Add(edgeFrom);
-                    if (graph.Mines.ContainsKey(current.Edge.To))
-                        myMines.Add(current.Edge.To);
+                    TryAddMine(graph, current.Edge);
                     move = MakeMove(current.Edge);
                     return true;
                 }
@@ -170,10 +166,13 @@ namespace lib.Ai
                             myMines.Add(bestMine.Id);
                             if (bestMine == prev.SourceMine)
                             {
+                                TryAddMine(graph, prev.FirstEdge ?? edge);
                                 move = MakeMove(prev.FirstEdge ?? edge);
                                 return true;
                             }
+                            if (bestMine == current.SourceMine)
                             {
+                                TryAddMine(graph, current.FirstEdge ?? edge);
                                 move = MakeMove(current.FirstEdge ?? edge);
                                 return true;
                             }
@@ -194,6 +193,14 @@ namespace lib.Ai
             }
             move = null;
             return false;
+        }
+
+        private void TryAddMine(Graph graph, Edge edge)
+        {
+            if (graph.Mines.ContainsKey(edge.From))
+                myMines.Add(edge.From);
+            if (graph.Mines.ContainsKey(edge.To))
+                myMines.Add(edge.To);
         }
 
         private long Calc(HashSet<int> mineIds, int vertexId)
