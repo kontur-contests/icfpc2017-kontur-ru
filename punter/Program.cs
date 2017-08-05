@@ -2,10 +2,8 @@
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading;
 using lib;
 using lib.Ai;
-using lib.viz;
 using Newtonsoft.Json;
 
 namespace punter
@@ -71,19 +69,37 @@ namespace punter
             foreach (var moveIn in moves)
                 ApplyMove(map, moveIn);
             ai.DeserializeGameState(state.ai);
-            var nextMove = ai.GetNextMove(moves.Select(m => (Move) m.claim ?? m.pass).ToArray(), map);
-            return new GameplayOut
+            try
             {
-                claim = nextMove as ClaimMove,
-                pass = nextMove as PassMove,
-                state = new State
+                var nextMove = ai.GetNextMove(moves.Select(m => (Move) m.claim ?? m.pass).ToArray(), map);
+                return new GameplayOut
                 {
-                    ai = ai.SerializeGameState(),
-                    punter = state.punter,
-                    punters = state.punters,
-                    map = map
-                }
-            };
+                    claim = nextMove as ClaimMove,
+                    pass = nextMove as PassMove,
+                    state = new State
+                    {
+                        ai = ai.SerializeGameState(),
+                        punter = state.punter,
+                        punters = state.punters,
+                        map = map
+                    }
+                };
+            }
+            catch (Exception e)
+            {
+                Console.Error.WriteLine(e);
+                return new GameplayOut
+                {
+                    pass = new PassMove(state.punter),
+                    state = new State
+                    {
+                        ai = state.ai,
+                        punter = state.punter,
+                        punters = state.punters,
+                        map = map
+                    }
+                };
+            }
         }
 
         private static void DoScoring(MoveIn[] moves, ScoreModel[] scores, State state)
