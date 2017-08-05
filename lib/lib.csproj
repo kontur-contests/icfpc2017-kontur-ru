@@ -49,6 +49,9 @@
     <Compile Update="viz\ScorePanel.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Update="viz\SelectReplayPanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Update="viz\StartGameConfigPanel.cs">
       <SubType>Component</SubType>
     </Compile>

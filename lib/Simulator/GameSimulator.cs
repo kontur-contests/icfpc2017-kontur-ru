@@ -33,15 +33,14 @@ namespace lib
         public GameState NextMove()
         {
             if (turnsAmount <= 0)
-                return new GameState(map, currentPunter, moves.TakeLast(punters.Count).ToList(), true);
+                return new GameState(map, moves.TakeLast(punters.Count).ToList(), true);
 
             var nextMove = punters[currentPunter].GetNextMove(moves.ToArray(), map);
-
             ApplyMove(nextMove);
             moves.Add(nextMove);
             currentPunter = (currentPunter + 1) % punters.Count;
             turnsAmount--;
-            return new GameState(map, currentPunter, moves.TakeLast(punters.Count).ToList(), false);
+            return new GameState(map, moves.TakeLast(punters.Count).ToList(), false);
         }
 
         private void ApplyMove(Move nextMove)
