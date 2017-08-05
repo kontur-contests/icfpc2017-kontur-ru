@@ -59,7 +59,7 @@ namespace lib.Strategies
                         if (edgeNode.IsMine)
                         {
                             component.Mines.Add(edgeNode.Id);
-                            usedMines.Add(mine.Key);
+                            usedMines.Add(edgeNode.Id);
                         }
                         component.Vertices.Add(edgeNode.Id);
                         queue.Enqueue(edgeNode);
