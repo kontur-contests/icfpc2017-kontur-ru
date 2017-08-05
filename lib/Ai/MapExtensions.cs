@@ -53,6 +53,7 @@ namespace lib.Ai
             set
             {
                 map = value;
+                var badSegments = riversPath.Where(r => !map.Rivers.Contains(r)).ToList();
                 fallbackAugmentor.Map = value;
             }
         }

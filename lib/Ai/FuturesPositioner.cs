@@ -10,12 +10,14 @@ namespace lib.Ai
     public class FuturesPositioner
     {
         private readonly Map map;
+        private readonly Graph graph;
         private readonly MineDistCalculator minDists;
         private readonly IList<int> path;
 
-        public FuturesPositioner(Map map, IList<int> path, MineDistCalculator minDists)
+        public FuturesPositioner(Map map, Graph graph, IList<int> path, MineDistCalculator minDists)
         {
             this.map = map;
+            this.graph = graph;
             this.path = path;
             this.minDists = minDists;
         }
@@ -28,7 +30,7 @@ namespace lib.Ai
                 .Select(
                     mine => new Future(
                         mine,
-                        nonMinesOnPath.MaxBy(site => minDists.GetDist(mine, site))))
+                        nonMinesOnPath.MaxBy(site => minDists.GetDist(mine, site) + graph.Vertexes[site].Edges.Count / 10)))
                 .ToArray();
         }
     }
