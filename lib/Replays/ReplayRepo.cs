@@ -30,8 +30,8 @@ namespace lib.Replays
         public ReplayRepo(bool test = false)
         {
             fb = Connect().ConfigureAwait(false).GetAwaiter().GetResult();
-            metas = test ? fb.Child("replays").Child("metas") : fb.Child("test").Child("replays").Child("metas");
-            datas = test ? fb.Child("replays").Child("datas") : fb.Child("test").Child("replays").Child("datas");
+            metas = test ? fb.Child("test").Child("replays").Child("metas") : fb.Child("replays").Child("metas");
+            datas = test ? fb.Child("test").Child("replays").Child("datas") : fb.Child("replays").Child("datas");
         }
         
         private static async Task<FirebaseClient> Connect()

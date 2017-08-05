@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using AngleSharp;
@@ -15,7 +16,9 @@ namespace lib.Arena
                 .ConfigureAwait(false).GetAwaiter()
                 .GetResult();
 
-            return matches.FirstOrDefault(x => x.IsSuitableForReplayCollection());
+            return matches
+                .OrderBy(x => Guid.NewGuid())
+                .FirstOrDefault(x => x.IsSuitableForReplayCollection());
         }
 
         public async Task<ArenaMatch[]> GetArenaMatchesAsync()

@@ -5,7 +5,7 @@ using Newtonsoft.Json.Linq;
 
 namespace lib.Interaction.Internal
 {
-    internal abstract class ProtocolBase
+    public abstract class ProtocolBase
     {
         public static string SerializeMove(Move move)
         {

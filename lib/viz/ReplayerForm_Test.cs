@@ -12,7 +12,7 @@ namespace lib.viz
         [STAThread]
         public void Test()
         {
-            var repo = new ReplayRepo(true);
+            var repo = new ReplayRepo();
             var form = new ReplayerForm(repo);
             form.ShowDialog();
         }

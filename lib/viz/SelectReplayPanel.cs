@@ -14,7 +14,7 @@ namespace lib.viz
                 Dock = DockStyle.Fill,
                 View = View.Details,
                 MultiSelect = false,
-                Width = 400
+                Width = 600
             };
 
             listView.Columns.Add("Time");

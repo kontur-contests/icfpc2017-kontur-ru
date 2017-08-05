@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Diagnostics;
+using System.Linq;
 using lib.Interaction.Internal;
-using NLog;
+using lib.Replays;
 using NUnit.Framework;
 
 namespace lib.Interaction
@@ -16,14 +16,22 @@ namespace lib.Interaction
             connection = new OnlineProtocol(new TcpTransport(port));
         }
 
-        public void RunGame(IAi ai)
+        public void Start()
         {
-            connection.HandShake("rutnok bks");
+            connection.HandShake(CreateBotName());
+        }
 
+        public string CreateBotName()
+        {
+            return "XXX"; // Sneaky fucker...
+        }
+
+        public Tuple<ReplayMeta, ReplayData> RunGame(IAi ai)
+        {
             var setup = connection.ReadSetup();
             ai.StartRound(setup.Id, setup.PunterCount, setup.Map);
             map = setup.Map;
-            Console.WriteLine($"I'm {setup.Id}");
+            
             var serverResponse = connection.ReadGameState();
 
             while (!connection.IsGameOver)
@@ -38,7 +46,11 @@ namespace lib.Interaction
                 serverResponse = connection.ReadGameState();
             }
             var score = connection.GetScore(serverResponse);
-            Console.WriteLine(score);
+
+            var meta = new ReplayMeta(DateTime.UtcNow, ai.Name, setup.Id, setup.PunterCount, score.Scores);
+            var data = new ReplayData(setup.Map, score.MoveModels.Select(ProtocolBase.MoveModel.GetMove));
+            
+            return Tuple.Create(meta, data);
         }
     }
 
@@ -49,8 +61,9 @@ namespace lib.Interaction
         [Explicit]
         public static void Main()
         {
-            var onlineInteraction = new OnlineInteraction(901);
-            onlineInteraction.RunGame(new ConnectClosestMinesAi());
+            var interaction = new OnlineInteraction(901);
+            interaction.Start();
+            interaction.RunGame(new ConnectClosestMinesAi());
         }
     }
 }

@@ -17,7 +17,9 @@ namespace lib.viz
 
         public static IAi GetNextAi()
         {
-            return Factories.OrderBy(x => Guid.NewGuid()).First().Create();
+            return Factories
+                .Where(x => x.Name.Equals("GreedyAi") || x.Name.Equals("ConnectClosestMinesAi"))
+                .OrderBy(x => Guid.NewGuid()).First().Create();
         }
     }
 }
