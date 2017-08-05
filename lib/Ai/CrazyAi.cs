@@ -10,33 +10,51 @@ using NUnit.Framework;
 
 namespace lib.Ai
 {
-    public class CrazyAi : GreedyAi
+    public class CrazyAi : IAi
     {
-        public new string Name => nameof(CrazyAi);
+        public string Name => nameof(CrazyAi);
         private int punterId;
-        
+        public static Random Random = new Random(314);
+        private MineDistCalculator mineDistCalulator;
+        public GreedyAiHelper GreedyAiHelper { get; set; }
+
         // ReSharper disable once ParameterHidesMember
-        public new void StartRound(int punterId, int puntersCount, Map map)
+        public void StartRound(int punterId, int puntersCount, Map map)
         {
             this.punterId = punterId;
-            base.StartRound(punterId, puntersCount, map);
+            this.mineDistCalulator = new MineDistCalculator(new Graph(map));
+            this.GreedyAiHelper = new GreedyAiHelper(punterId, mineDistCalulator);
         }
 
-        public new Move GetNextMove(Move[] prevMoves, Map map)
+        public Move GetNextMove(Move[] prevMoves, Map map)
         {
             var graph = new Graph(map);
 
-            if (TryExtendAnything(graph, out Move nextMove))
-                return nextMove;
-            return new PassMove(punterId);
+            var mines = map.Mines.Shuffle(Random).ToList();
+            for (int i = 0; i < mines.Count(); i++)
+            {
+                for (int j = i + 1; j < mines.Count(); j++)
+                {
+                    var denic = new Dinic(graph, punterId, mines[i], mines[j], out int flow);
+                    if (flow != 0 && flow != Dinic.INF)
+                    {
+                        var cut = denic.GetMinCut();
+                        var edge = cut[Random.Next(cut.Count)];
+                        return new ClaimMove(punterId, edge.From, edge.To);
+                    }
+                }
+            }
+
+            GreedyAiHelper.TryExtendAnything(graph, out Move nextMove);
+            return nextMove;
         }
 
-        public new string SerializeGameState()
+        public string SerializeGameState()
         {
             throw new System.NotImplementedException();
         }
 
-        public new void DeserializeGameState(string gameState)
+        public void DeserializeGameState(string gameState)
         {
             throw new System.NotImplementedException();
         }
@@ -76,11 +94,11 @@ namespace lib.Ai
         [Test]
         public void Test1()
         {
-            var gamers = new List<IAi> { new CrazyAi() };
+            var gamers = new List<IAi> { new CrazyAi(), new ConnectClosestMinesAi() };
             var gameSimulator = new GameSimulatorRunner(new SimpleScoreCalculator());
 
             var results = gameSimulator.SimulateGame(
-                gamers, MapLoader.LoadMapByName("sample.json").Map);
+                gamers, MapLoader.LoadMapByName("boston-sparse.json").Map);
 
             foreach (var gameSimulationResult in results)
             {

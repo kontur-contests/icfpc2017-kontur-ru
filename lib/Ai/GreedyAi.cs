@@ -14,6 +14,7 @@ namespace lib.Ai
     {
         public string Name => nameof(GreedyAi);
         private int punterId;
+        private GreedyAiHelper GreedyAiHelper;
 
         private MineDistCalculator mineDistCalulator;
 
@@ -22,56 +23,15 @@ namespace lib.Ai
         {
             this.punterId = punterId;
             this.mineDistCalulator = new MineDistCalculator(new Graph(map));
+            GreedyAiHelper = new GreedyAiHelper(punterId, mineDistCalulator);
         }
 
         public Move GetNextMove(Move[] prevMoves, Map map)
         {
             var graph = new Graph(map);
 
-            if (TryExtendAnything(graph, out Move nextMove))
-                return nextMove;
-
-            return new PassMove(punterId);
-        }
-
-        protected bool TryExtendAnything(Graph graph, out Move nextMove)
-        {
-            var calculator = new ConnectedCalculator(graph, punterId);
-            var maxAddScore = long.MinValue;
-            Edge bestEdge = null;
-            foreach (var vertex in graph.Vertexes.Values)
-            {
-                foreach (var edge in vertex.Edges.Where(x => x.Owner == -1))
-                {
-                    var fromMines = calculator.GetConnectedMines(edge.From);
-                    var toMines = calculator.GetConnectedMines(edge.To);
-                    long addScore = Math.Max(
-                        Calc(toMines, fromMines, edge.From),
-                        Calc(fromMines, toMines, edge.To));
-                    if (addScore > maxAddScore)
-                    {
-                        maxAddScore = addScore;
-                        bestEdge = edge;
-                    }
-                }
-            }
-            if (bestEdge != null)
-            {
-                nextMove = new ClaimMove(punterId, bestEdge.From, bestEdge.To);
-                return true;
-            }
-            nextMove = null;
-            return false;
-        }
-
-        private long Calc(HashSet<int> mineIds, HashSet<int> diff, int vertexId)
-        {
-            return mineIds.Where(x => !diff.Contains(x)).Sum(
-                mineId =>
-                {
-                    var dist = mineDistCalulator.GetDist(mineId, vertexId);
-                    return (long) dist * dist;
-                });
+            GreedyAiHelper.TryExtendAnything(graph, out Move nextMove);
+            return nextMove;
         }
 
         public string SerializeGameState()
