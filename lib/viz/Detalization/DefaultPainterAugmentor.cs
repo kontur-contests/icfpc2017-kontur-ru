@@ -12,7 +12,20 @@ namespace lib.viz.Detalization
             Color.Red,
             Color.Orange,
             Color.Fuchsia,
-            Color.Green
+            Color.Green,
+            Color.Brown,
+            Color.CornflowerBlue,
+            Color.CadetBlue,
+            Color.DimGray,
+            Color.Chocolate,
+            Color.BlueViolet,
+            Color.LightSeaGreen,
+            Color.DeepPink,
+            Color.MediumOrchid,
+            Color.MidnightBlue,
+            Color.Teal,
+            Color.Sienna,
+            Color.SlateBlue,
         };
 
     }

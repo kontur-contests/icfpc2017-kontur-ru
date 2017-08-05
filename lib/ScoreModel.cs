@@ -8,5 +8,10 @@ namespace lib
 		public int Punter { get; set; }
 		[JsonProperty("score")]
 		public long Score { get; set; }
+
+		public override string ToString()
+		{
+			return $"{nameof(Punter)}: {Punter}, {nameof(Score)}: {Score}";
+		}
 	}
 }
