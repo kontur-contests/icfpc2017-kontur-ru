@@ -103,6 +103,8 @@ namespace worker
                             {
                                 result = new Result { Error = exception.Message };
                             }
+                            result.Task = task;
+                            result.Token = task.Token;
                             var resultString = JsonConvert.SerializeObject(result);
 
                             var deliveryReport = producer.ProduceAsync(outputTopicName, null, resultString);

@@ -26,7 +26,9 @@ def test_parameter():
     .battles_on_map('gothenburg-sparse.json', 8, 100)
     .experiment('MRVW')
     .preview()
+    .run().dump()
      )
+    print(runner.token)
 
 test_parameter()
 

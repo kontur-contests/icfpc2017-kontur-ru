@@ -28,7 +28,7 @@ def execute_tasks(tasks_to_do, token):
     for message in consumer:
         if message is not None:
             data = json.loads(message.value.decode('utf-8'))
-            if 'Task' in data and 'Token' in data['Task'] and data['Task']['Token'] == token:
+            if ('Token' in data) and (data['Token'] == token):
                 remaining_answers -= 1
                 results.append(data)
         if not remaining_answers:
