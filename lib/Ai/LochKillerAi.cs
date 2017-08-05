@@ -67,13 +67,13 @@ namespace lib.Ai
         Random rand = new Random();
         public Move GetNextMove(Move[] prevMoves, Map map)
         {
-            if (map.Sites.Length < 300)
+            var playersCount = map.Rivers.Select(river => river.Owner).Distinct().Count(i => i >= 0);
+
+            if (map.Sites.Length / playersCount  < 150)
                 return Base.GetNextMove(prevMoves, map);
 
             var graph = new Graph(map);
-
-            var playersCount = map.Rivers.Select(river => river.Owner).Distinct().Count(i => i >= 0);
-
+            
             var nearMinesEdge = map.Mines
                 .Select(mine => new { mine, edges = graph.Vertexes[mine].Edges.Select(edge => edge.River).ToList() })
                 .Where(mine => mine.edges.Select(edge => edge.Owner).Distinct().Count() < playersCount + 1)
