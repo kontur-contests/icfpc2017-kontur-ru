@@ -15,23 +15,24 @@ namespace lib.viz
         {
         }
 
-        public void SetPlayers(IList<IAi> players)
+        public void SetPlayers(IList<string> playerNames)
         {
             foreach (var label in labels)
                 Controls.Remove(label);
             labels.Clear();
-            for (var index = 0; index < players.Count; index++)
+            for (var index = 0; index < playerNames.Count; index++)
             {
-                var player = players[index];
+                var player = playerNames[index];
                 var label = new Label
                 {
-                    Text = player.Name + ": 0",
+                    Text = player + ": 0",
                     Dock = DockStyle.Right,
                     AutoSize = true,
                     Font = new Font(new FontFamily("Arial"), 14),
                     ForeColor = Color.White,
                     BackColor = ColorsPalette.Colors[index],
-                    Padding = new Padding(5)
+                    Padding = new Padding(5),
+                    Tag = player
                 };
                 labels.Add(label);
                 Controls.Add(label);
@@ -41,26 +42,26 @@ namespace lib.viz
                 Height = labels[0].Height;
         }
 
-        public void SetScores(GameSimulationResult[] results)
+        public void SetScores(long[] scores)
         {
             var bestScoreIndex = 0;
-            for (var index = 0; index < results.Length; index++)
+            for (var index = 0; index < scores.Length; index++)
             {
-                var result = results[index];
-                labels[index].Text = FormatScore(result);
-                if (result.Score > results[bestScoreIndex].Score)
+                var result = scores[index];
+                labels[index].Text = FormatScore((string)labels[index].Tag, result);
+                if (result > scores[bestScoreIndex])
                     bestScoreIndex = index;
             }
-            for (var index = 0; index < results.Length; index++)
+            for (var index = 0; index < scores.Length; index++)
             {
                 labels[index].Font = new Font(labels[index].Font, index == bestScoreIndex ? FontStyle.Underline : FontStyle.Regular);
             }
             PerformLayout();
         }
 
-        private static string FormatScore(GameSimulationResult result)
+        private static string FormatScore(string name, long score)
         {
-            return result.Gamer.Name + ": " + result.Score;
+            return name + ": " + score;
         }
     }
 }

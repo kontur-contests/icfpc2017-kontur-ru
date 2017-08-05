@@ -29,7 +29,8 @@ namespace lib.viz
             set
             {
                 painterAugmentor = value;
-                painterAugmentor.Map = map;
+                if (map != null)
+                    painterAugmentor.Map = map;
             }
         }
 
