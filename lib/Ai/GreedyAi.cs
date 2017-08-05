@@ -37,12 +37,12 @@ namespace lib.Ai
 
         public string SerializeGameState()
         {
-            throw new System.NotImplementedException();
+            return "";
         }
 
         public void DeserializeGameState(string gameState)
         {
-            throw new System.NotImplementedException();
+            
         }
     }
 

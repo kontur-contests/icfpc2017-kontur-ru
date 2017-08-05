@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using lib.Ai;
 
@@ -18,11 +19,10 @@ namespace lib.viz
 
         public static IAi GetNextAi()
         {
+            var botNames = new HashSet<string> {"GreedyAi", "ConnectClosestMinesAi", 
+                "LochKillerAi"};
             return Factories
-                .Where(x =>
-                    x.Name.Equals("GreedyAi") 
-                    //|| x.Name.Equals("ConnectClosestMinesAi")
-                    )
+//                .Where(x => botNames.Contains(x.Name))
                 .OrderBy(x => Guid.NewGuid()).First().Create();
         }
     }

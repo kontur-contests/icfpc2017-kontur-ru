@@ -62,4 +62,7 @@
       <SubType>Form</SubType>
     </Compile>
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Structures\" />
+  </ItemGroup>
 </Project>
