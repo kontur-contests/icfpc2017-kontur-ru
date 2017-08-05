@@ -6,7 +6,19 @@ using System.Threading.Tasks;
 
 namespace lib.Replays
 {
-    class ReplayMeta
+    public class ReplayMeta
     {
+        public DateTime Timestamp;
+        public string AiName;
+        public int OurPunter;
+        public List<Score> Scores;
+        
+        public string DataId;
+    }
+
+    public class ReplayData
+    {
+        public Map Map;
+        public List<Move> Moves;
     }
 }
