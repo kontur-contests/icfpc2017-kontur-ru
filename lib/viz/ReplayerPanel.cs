@@ -75,7 +75,7 @@ namespace lib.viz
         public void SetDataProvider(Map map, IReplayDataProvider newProvider)
         {
             provider = newProvider;
-            mapPainter.Map = map.Clone();
+            mapPainter.Map = map;
             mapPainter.GameState = null;
             scorePanel.SetPlayers(newProvider.PunterNames);
             Refresh();

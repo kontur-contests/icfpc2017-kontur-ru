@@ -35,6 +35,7 @@ namespace lib
 
     public abstract class Move
     {
+        public abstract Map Execute(Map map);
     }
 
     public class PassMove : Move
@@ -44,6 +45,11 @@ namespace lib
         public PassMove(int punterId)
         {
             PunterId = punterId;
+        }
+
+        public override Map Execute(Map map)
+        {
+            return map;
         }
     }
 
@@ -61,6 +67,12 @@ namespace lib
             PunterId = punterId;
             Source = source;
             Target = target;
+        }
+
+        public override Map Execute(Map map)
+        {
+            var mapRivers = map.RiversList.Remove(new River(Source, Target)).Add(new River(Source, Target, PunterId));
+            return new Map(map.Sites, mapRivers, map.Mines);
         }
 
         public bool Equals(ClaimMove other)

@@ -6,9 +6,6 @@
     <TargetFramework>net461</TargetFramework>
     <AssemblyName>lib</AssemblyName>
     <RootNamespace>lib</RootNamespace>
-    <ApplicationIcon />
-    <OutputTypeEx>library</OutputTypeEx>
-    <StartupObject />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DebugType>pdbonly</DebugType>
@@ -31,6 +28,7 @@
     <PackageReference Include="NUnit.Extension.VSProjectLoader" Version="3.5.0" />
     <PackageReference Include="NUnit.Runners" Version="3.7.0" />
     <PackageReference Include="Shouldly" Version="2.8.3" />
+    <PackageReference Include="System.Collections.Immutable" Version="1.3.1" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Firebase">

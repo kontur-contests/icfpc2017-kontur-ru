@@ -6,7 +6,7 @@ namespace lib
 {
     public class GameSimulator : ISimulator
     {
-        private readonly Map map;
+        private Map map;
         private List<IAi> punters;
         private int currentPunter = 0;
         private readonly List<Move> moves;
@@ -14,7 +14,7 @@ namespace lib
 
         public GameSimulator(Map map)
         {
-            this.map = map.Clone();
+            this.map = map;
             punters = new List<IAi>();
             moves = new List<Move>();
         }
@@ -46,7 +46,7 @@ namespace lib
 
         private void ApplyMove(Move nextMove)
         {
-            MapUpdater.ApplyMove(map, nextMove);
+            map = nextMove.Execute(map);
         }
     }
 }
