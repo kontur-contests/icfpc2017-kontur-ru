@@ -8,6 +8,6 @@ namespace worker
 {
     public interface IExperiment
     {
-        IEnumerable<Tuple<PlayerWithParams, long>> Play(List<PlayerWithParams> players);
+        IEnumerable<Tuple<PlayerWithParams, long>> Play(Task task);
     }
 }

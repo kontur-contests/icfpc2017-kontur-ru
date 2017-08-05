@@ -39,7 +39,7 @@ namespace worker
         public Result Play(Task task)
         {
             var players = playerStrategy
-                .Play(task.Players)
+                .Play(task)
                 .Select(pair => new PlayerWithParams
                 {
                     Name = pair.Item1.Name,

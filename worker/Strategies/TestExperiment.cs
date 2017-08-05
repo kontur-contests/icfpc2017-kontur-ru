@@ -12,9 +12,9 @@ namespace worker
     
     public class TestExperiment : IExperiment
     {
-        public IEnumerable<Tuple<PlayerWithParams, long>> Play(List<PlayerWithParams> players)
+        public IEnumerable<Tuple<PlayerWithParams, long>> Play(Task task)
         {
-            return players
+            return task.Players
             .OrderBy(player => player.Params.Values.Sum())
             .Select((player, i) => Tuple.Create(player, (long)i));
         }

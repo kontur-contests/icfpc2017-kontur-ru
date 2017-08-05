@@ -30,7 +30,7 @@ namespace worker
                 },
             };
 
-            var playersOut = strategy.Play(playersIn);
+            var playersOut = strategy.Play(new Task { Players = playersIn });
             var bestPlayerOut = playersOut.First().Item1;
             
             Assert.AreEqual(2, bestPlayerOut.Rank);
