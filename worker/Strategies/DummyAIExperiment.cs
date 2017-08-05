@@ -8,12 +8,9 @@ using System.Linq;
 
 namespace worker
 {
-    public interface IPlayerStrategy
-    {
-        IEnumerable<Tuple<PlayerWithParams, long>> Play(List<PlayerWithParams> players);
-    }
     
-    public class DummySumPlayerStrategy : IPlayerStrategy
+
+    public class DummyAIExperiment : IExperiment
     {
         public IEnumerable<Tuple<PlayerWithParams, long>> Play(List<PlayerWithParams> players)
         {

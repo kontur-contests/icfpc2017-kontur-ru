@@ -12,7 +12,7 @@ namespace worker
                 
                 x.Service<WorkerService>(s =>
                 {
-                    var strategy = new DummySumPlayerStrategy();
+                    var strategy = new TestExperiment();
                     var player = new Player(strategy);
                     
                     var config = new Dictionary<string, object>

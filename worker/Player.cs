@@ -29,9 +29,9 @@ namespace worker
     
     public class Player : IPlayer
     {
-        private readonly IPlayerStrategy playerStrategy;
+        private readonly IExperiment playerStrategy;
         
-        public Player(IPlayerStrategy playerStrategy)
+        public Player(IExperiment playerStrategy)
         {
             this.playerStrategy = playerStrategy;
         }

@@ -5,12 +5,12 @@ using NUnit.Framework;
 namespace worker
 {
     [TestFixture]
-    public class StrategyTests
+    public class TestExperimentTests
     {
         [Test]
         public void DummySumPlayerStrategy_Should()
         {
-            var strategy = new DummySumPlayerStrategy();
+            var strategy = new TestExperiment();
             var playersIn = new List<PlayerWithParams>
             {
                 new PlayerWithParams
