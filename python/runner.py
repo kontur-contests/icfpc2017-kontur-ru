@@ -2,12 +2,6 @@ import magic
 import json
 import numpy as np
 
-
-
-
-
-
-
 def test_historical_2():
     runner = magic.Fluent()
     (runner
@@ -25,7 +19,7 @@ def test_parameter():
     .create_random_players(100)
     .battles_on_map('gothenburg-sparse.json', 8, 100)
     .experiment('MRVW')
-    .preview()
+    #.preview()
     .run().dump()
      )
     print(runner.token)

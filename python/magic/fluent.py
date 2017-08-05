@@ -64,6 +64,11 @@ class Fluent:
             self.battles_on_maps.append((players,map))
         return self
 
+    def battles_on_map_set(self, maps, battles_count):
+        for map in maps:
+            self.battles_on_map(map,maps[map],battles_count)
+        return self
+
 
     def experiment(self, experiment_name):
         self.token = np.random.randint(1,100000)
