@@ -223,7 +223,7 @@ namespace lib
 
         public void DeserializeGameState(string gameState)
         {
-            var split = gameState.Split(';');
+            var split = gameState.Split(new[]{';'}, StringSplitOptions.RemoveEmptyEntries);
             punterId = int.Parse(split[0]);
             myMines.Clear();
             myMines.UnionWith(split.Skip(1).Select(int.Parse));
