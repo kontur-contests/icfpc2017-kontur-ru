@@ -110,9 +110,10 @@ namespace lib.Ai
             while (queue.Count > 0)
             {
                 var current = queue.Dequeue();
-                //Is it correct expression?
-                if (current.Edge != null && current.CurrentVertex.Edges.Any(x => x.Owner == punterId))
+                if (current.CurrentVertex.Edges.Any(x => x.Owner == punterId))
                 {
+                    if (current.Edge == null)
+                        throw new InvalidOperationException("Mine is already part of component! WTF?");
                     TryAddMine(graph, current.Edge);
                     move = MakeMove(current.Edge);
                     return true;
@@ -164,7 +165,6 @@ namespace lib.Ai
                         if (prev.SourceMine != current.SourceMine)
                         {
                             var bestMine = SelectBestMine(prev.SourceMine, current.SourceMine);
-                            myMines.Add(bestMine.Id);
                             if (bestMine == prev.SourceMine)
                             {
                                 TryAddMine(graph, prev.FirstEdge ?? edge);
