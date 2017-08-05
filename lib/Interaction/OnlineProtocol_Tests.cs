@@ -3,6 +3,7 @@ using FakeItEasy;
 using lib.Interaction.Internal;
 using Newtonsoft.Json;
 using NUnit.Framework;
+using Shouldly;
 
 namespace lib.Interaction
 {
@@ -15,7 +16,7 @@ namespace lib.Interaction
         {
             var transport = A.Fake<ITransport>();
             var gameTransport = new OnlineProtocol(transport);
-            A.CallTo(() => transport.Read()).Returns("{\"you\":\"player\"}");
+            A.CallTo(() => transport.Read(A<int>.Ignored)).Returns("{\"you\":\"player\"}");
 
             gameTransport.HandShake("player");
 
@@ -47,7 +48,7 @@ namespace lib.Interaction
             };
             var data = JsonConvert.SerializeObject(setup);
 
-            A.CallTo(() => transport.Read()).Returns(data);
+            A.CallTo(() => transport.Read(A<int>.Ignored)).Returns(data);
 
             gameTransport.ReadSetup();
 

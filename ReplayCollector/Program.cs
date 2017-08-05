@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using lib;
@@ -55,16 +56,28 @@ namespace ReplayCollector
                                     "Collector " + index + ": Match on port " + match.Port + " for " + ai.Name +
                                     " AI...");
 
-                                interaction = new OnlineInteraction(match.Port);
-                                interaction.Start();
+
+                                try
+                                {
+                                    interaction = new OnlineInteraction(match.Port);
+                                }
+                                catch (SocketException e)
+                                {
+                                    log.Error(e);
+                                    return;
+                                }
+                                if (!interaction.Start()) return;
                             }
 
                             log.Info("Collector " + index + ": Running game");
                             var metaAndData = interaction.RunGame(ai);
 
+                            var tStart = DateTime.UtcNow;
                             Repo.SaveReplay(metaAndData.Item1, metaAndData.Item2);
+                            var tEnd = DateTime.UtcNow;
                             log.Info("Collector " + index + ": Saved replay " + metaAndData.Item1.Scores.ToDelimitedString(", "));
-
+                            log.Info("Collector " + index + ": time to save " + (tEnd - tStart).TotalSeconds);
+                            
                             ++completedTasksCount;
 
                             log.Info("Collector " + index + ": " + completedTasksCount + " replays collected");

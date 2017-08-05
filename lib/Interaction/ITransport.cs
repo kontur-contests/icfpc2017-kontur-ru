@@ -3,6 +3,6 @@ namespace lib.Interaction
     public interface ITransport
     {
         void Write(string data);
-        string Read();
+        string Read(int timeout = 15000);
     }
 }
