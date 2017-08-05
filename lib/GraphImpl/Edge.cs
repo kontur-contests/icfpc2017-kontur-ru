@@ -22,6 +22,9 @@ namespace lib.GraphImpl
         public static Edge Forward(River river) => new Edge(river, EdgeDirection.Forward);
         public static Edge Backward(River river) => new Edge(river, EdgeDirection.Backward);
 
+        public Edge Reverse() => new Edge(
+            River, Direction == EdgeDirection.Forward ? EdgeDirection.Backward : EdgeDirection.Forward);
+
         private enum EdgeDirection
         {
             Forward,
