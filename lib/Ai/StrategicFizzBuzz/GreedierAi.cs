@@ -1,23 +1,14 @@
-﻿using lib.Strategies;
-using lib.Structures;
+﻿using lib.GraphImpl;
+using lib.Strategies;
 
 namespace lib.Ai.StrategicFizzBuzz
 {
     public class GreedierAi : StrategicAi
     {
-        private IStrategy strategy;
-
-        public GreedierAi() : base(s => new GreedyStrategy(s.Map, s.PunterId))
+        public GreedierAi() : base((state, services) => new GreedyStrategy(state.punter, services.Get<MineDistCalculator>(state)))
         {
         }
 
-        public override string Name => nameof(GreedierAi);
         public override string Version => "1.0";
-
-        public override Future[] StartRound(int punterId, int puntersCount, Map map, Settings settings)
-        {
-            strategy = new GreedyStrategy(map, punterId);
-            return base.StartRound(punterId, puntersCount, map, settings);
-        }
     }
 }

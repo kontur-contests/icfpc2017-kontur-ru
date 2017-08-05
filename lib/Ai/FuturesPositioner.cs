@@ -11,10 +11,10 @@ namespace lib.Ai
     {
         private readonly Map map;
         private readonly Graph graph;
-        private readonly MineDistCalculator minDists;
+        private readonly MineDistCalculator.Impl minDists;
         private readonly IList<int> path;
 
-        public FuturesPositioner(Map map, Graph graph, IList<int> path, MineDistCalculator minDists)
+        public FuturesPositioner(Map map, Graph graph, IList<int> path, MineDistCalculator.Impl minDists)
         {
             this.map = map;
             this.graph = graph;

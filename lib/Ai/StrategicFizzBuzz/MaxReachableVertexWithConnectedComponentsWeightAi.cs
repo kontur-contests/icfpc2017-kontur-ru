@@ -12,11 +12,10 @@ namespace lib.Ai.StrategicFizzBuzz
         }
 
         public MaxReachableVertexWithConnectedComponentsWeightAi(double mineWeight)
-            : base(s => new MaxVertextWeighterWithConnectedComponents(new Graph(s.Map), mineWeight))
+            : base((state, services) => new MaxVertextWeighterWithConnectedComponents(mineWeight, services.Get<MineDistCalculator>(state)))
         {
         }
 
-        public override string Name => nameof(MaxReachableVertexWithConnectedComponentsWeightAi);
         public override string Version => "1.0";
     }
 }

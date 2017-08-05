@@ -7,11 +7,10 @@ namespace lib.Ai.StrategicFizzBuzz
     public class RandomEdgeWeightingAi : EdgeWeightingStrategicAi
     {
         public RandomEdgeWeightingAi()
-            : base(s => new RandomEdgeWeighter())
+            : base((state, services) => new RandomEdgeWeighter())
         {
         }
 
-        public override string Name => nameof(RandomEdgeWeightingAi);
         public override string Version => "1.0";
     }
 }

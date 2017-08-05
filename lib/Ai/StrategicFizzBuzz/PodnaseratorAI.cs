@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using lib.GraphImpl;
+using lib.StateImpl;
 using lib.Strategies;
 using lib.Strategies.EdgeWeighting;
 using lib.Structures;
@@ -22,36 +23,38 @@ namespace lib.Ai.StrategicFizzBuzz
 
     public abstract class PodnaseratorAi : IAi
     {
-        protected PodnaseratorAi(PodnaseratorSettings settings, Func<SuperSettings, IStrategy> strategyProvider)
+        protected PodnaseratorAi(PodnaseratorSettings settings, Func<int, State, IServices, IStrategy> strategyProvider)
         {
             Settings = settings;
             StrategyProvider = strategyProvider;
         }
 
-        private int PunterId { get; set; }
-        private IStrategy MyStrategy { get; set; }
-        private IStrategy[] EnemyStrategies { get; set; }
         public PodnaseratorSettings Settings { get; }
-        private Func<SuperSettings, IStrategy> StrategyProvider { get; }
+        private Func<int, State, IServices, IStrategy> StrategyProvider { get; }
         public abstract string Name { get; }
         public abstract string Version { get; }
 
-        public virtual Future[] StartRound(int punterId, int puntersCount, Map map, Settings settings)
+        public AiSetupDecision Setup(State state, IServices services)
         {
-            MyStrategy = StrategyProvider(new SuperSettings(punterId, puntersCount, map, settings));
-            EnemyStrategies = Enumerable.Range(0, puntersCount)
-                .Except(new[] {punterId})
-                .Select(enemyId => StrategyProvider(new SuperSettings(enemyId, puntersCount, map, settings)))
+            services.Setup<GraphService>(state);
+            StrategyProvider(state.punter, state, services);
+            Enumerable.Range(0, state.punters)
+                .Except(new[] { state.punter })
+                .Select(enemyId => StrategyProvider(enemyId, state, services))
                 .ToArray();
-            PunterId = punterId;
-            return new Future[0];
+            return AiSetupDecision.Empty();
         }
 
-        public Move GetNextMove(Move[] prevMoves, Map map)
+        public AiMoveDecision GetNextMove(State state, IServices services)
         {
-            var graph = new Graph(map);
-            var bestTurn = GetMyBestTurn(map);
-            var enemyBestTurns = EnemyStrategies
+            var graph = services.Get<GraphService>(state).Graph;
+            var myStrategy = StrategyProvider(state.punter, state, services);
+            var enemyStrategies = Enumerable.Range(0, state.punters)
+                .Except(new[] { state.punter })
+                .Select(enemyId => StrategyProvider(enemyId, state, services))
+                .ToArray();
+            var bestTurn = GetMyBestTurn(myStrategy, state.map);
+            var enemyBestTurns = enemyStrategies
                 .Select(s => s.Turn(graph))
                 .Where(ts => ts.Count >= 2)
                 .Select(ts => ts.OrderByDescending(x => x.Estimation).Take(2).ToArray())
@@ -65,22 +68,13 @@ namespace lib.Ai.StrategicFizzBuzz
                     bestTurn = bestestEnemyTurns[0];
             }
             if (bestTurn.Estimation < 0)
-                return Move.Pass(PunterId);
-            return Move.Claim(PunterId, bestTurn.River.Source, bestTurn.River.Target);
+                return AiMoveDecision.Pass(state.punter);
+            return AiMoveDecision.Claim(state.punter, bestTurn.River.Source, bestTurn.River.Target);
         }
-
-        public string SerializeGameState()
+        
+        private TurnResult GetMyBestTurn(IStrategy myStrategy, Map map)
         {
-            return "";
-        }
-
-        public void DeserializeGameState(string gameState)
-        {
-        }
-
-        private TurnResult GetMyBestTurn(Map map)
-        {
-            var turns = MyStrategy.Turn(new Graph(map));
+            var turns = myStrategy.Turn(new Graph(map));
             if (!turns.Any())
                 return new TurnResult
                 {
@@ -103,9 +97,11 @@ namespace lib.Ai.StrategicFizzBuzz
             int mineMultiplier)
             : base(
                 new PodnaseratorSettings(enemyTurnEstimationDifferenceWeight, myTurnEsimationWeight),
-                s => new EdgeWeightingStrategy(
-                    s.Map, s.PunterId,
-                    new MaxVertextWeighterWithConnectedComponents(new Graph(s.Map), mineMultiplier)))
+                (punterId, state, services) => 
+                new EdgeWeightingStrategy(
+                    punterId,
+                    new MaxVertextWeighterWithConnectedComponents(mineMultiplier, services.Get<MineDistCalculator>(state)),
+                    services.Get<MineDistCalculator>(state)))
         {
         }
 

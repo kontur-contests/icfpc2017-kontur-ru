@@ -1,56 +1,36 @@
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using lib.GraphImpl;
-using lib.GraphImpl.ShortestPath;
-using lib.Strategies;
-using lib.Structures;
+using lib.StateImpl;
 using lib.viz;
-using lib.viz.Detalization;
 using MoreLinq;
-using NUnit.Framework;
 
 namespace lib.Ai
 {
     [ShoulNotRunOnline]
     public class FutureIsNow : IAi
     {
-        private List<int> path;
-        private int punterId;
-        private Future[] futures;
         public string Name => "Futurer";
         public string Version => "0";
-        public Future[] StartRound(int punterId, int puntersCount, Map map, Settings settings)
+
+        public AiSetupDecision Setup(State state, IServices services)
         {
-            this.punterId = punterId;
-            var graph = new Graph(map);
-            var mineDists = new MineDistCalculator(graph);
-            var length = 5*puntersCount;
-            path = new PathSelector(map, mineDists, length).SelectPath();
-            futures = new FuturesPositioner(map, graph, path, mineDists).GetFutures();
-            return futures;
+            var graph = services.Get<GraphService>(state).Graph;
+            var mineDists = services.Get<MineDistCalculator>(state);
+            var length = 5 * state.punters;
+            var path = new PathSelector(state.map, mineDists.impl, length).SelectPath();
+            var futures = new FuturesPositioner(state.map, graph, path, mineDists.impl).GetFutures();
+            return AiSetupDecision.Create(futures);
         }
 
-        public Move GetNextMove(Move[] prevMoves, Map map)
+        public AiMoveDecision GetNextMove(State state, IServices services)
         {
-            var sitesToDefend = futures.SelectMany(f => new[]{f.source, f.target}).ToArray();
-            var edge = new MovesSelector(map,new Graph(map), sitesToDefend, punterId).GetNeighbourToGo();
+            var graph = services.Get<GraphService>(state).Graph;
+            var sitesToDefend = state.aiSetupDecision.futures.SelectMany(f => new[]{f.source, f.target}).ToArray();
+            var edge = new MovesSelector(state.map, graph, sitesToDefend, state.punter).GetNeighbourToGo();
             if (edge == null)
-            {
-                return new GameplayOut { pass = new PassMove() };
-            }
-            var claimMove = new ClaimMove { punter = punterId, source = edge.From, target = edge.To };
-            return new GameplayOut { claim = claimMove };
-        }
-
-        public string SerializeGameState()
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public void DeserializeGameState(string gameState)
-        {
-            throw new System.NotImplementedException();
+                return AiMoveDecision.Pass(state.punter);
+            return AiMoveDecision.Claim(state.punter, edge.From, edge.To);
         }
     }
 
