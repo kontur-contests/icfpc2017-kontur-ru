@@ -57,12 +57,6 @@ namespace lib.viz
 			DoubleBuffered = true;
 		}
 
-		protected override void OnKeyDown(KeyEventArgs e)
-		{
-			base.OnKeyDown(e);
-
-		}
-
 		protected override void OnMouseClick(MouseEventArgs e)
 		{
 			base.OnMouseClick(e);
