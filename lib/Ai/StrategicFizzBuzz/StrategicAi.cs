@@ -11,6 +11,7 @@ namespace lib.Ai.StrategicFizzBuzz
         private int PunterId { get; set; }
         protected abstract IStrategy Strategy { get; }
         public abstract string Name { get; }
+        public string Version { get; }
 
         public virtual Future[] StartRound(int punterId, int puntersCount, Map map, Settings settings)
         {

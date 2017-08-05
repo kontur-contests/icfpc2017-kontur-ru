@@ -10,6 +10,7 @@ namespace lib.Ai
     public class LochKillerAi : IAi
     {
         public string Name => nameof(LochKillerAi);
+        public string Version => "0.1";
 
         private GreedyAi Base = new GreedyAi();
 
@@ -54,6 +55,7 @@ namespace lib.Ai
     public class LochMaxVertexWeighterKillerAi : IAi
     {
         public string Name => nameof(LochMaxVertexWeighterKillerAi);
+        public string Version => "0.1";
 
         private GreedyAi Base = new GreedyAi();
 

@@ -22,13 +22,15 @@ namespace ReplayCollector
         
         private static int threadCount;
         private static readonly object Locker = new object();
-
         private static int completedTasksCount = 0;
+        private static string commitHash;
         
         public static void Main(string[] args)
         {
             log.Info("Hello");
-            threadCount = args.Length == 1 ? int.Parse(args.First()) : 1;
+//            threadCount = args.Length == 1 ? int.Parse(args.First()) : 1;
+            threadCount = 128;
+            commitHash = args[0];
             
             for (var i = 0; i < threadCount; i++)
             {
@@ -67,11 +69,11 @@ namespace ReplayCollector
                             log.Info($"Collector {index}: Running game");
                             var metaAndData = interaction.RunGame(ai);
 
-                            var tStart = DateTime.UtcNow;
-                            Repo.SaveReplay(metaAndData.Item1, metaAndData.Item2);
-                            var tEnd = DateTime.UtcNow;
+
+                            metaAndData.Item1.CommitHash = commitHash;
+
+                            Repo.SaveReplay(metaAndData.Item1, metaAndData.Item2);                            
                             log.Info($"Collector {index}: Saved replay {metaAndData.Item1.Scores.ToDelimitedString(", ")}");
-                            log.Info($"Collector {index}: time to save {(tEnd - tStart).TotalSeconds}");
                             
                             ++completedTasksCount;
 

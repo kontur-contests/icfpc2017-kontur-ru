@@ -50,6 +50,7 @@ namespace lib
         private class Ai : IAi
         {
             public string Name { get; }
+            public string Version { get; }
 
             public Future[] StartRound(int punterId, int puntersCount, Map map, Settings settings)
             {
