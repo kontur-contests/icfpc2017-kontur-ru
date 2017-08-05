@@ -42,22 +42,25 @@ class Fluent:
         self.battles_on_maps = [(battle,map) for battle in self.battles for map in args]
         return self
 
+
+
     def experiment(self, experiment_name):
-        self.tasks = [{'Experiment': experiment_name, 'Map': map, 'Players': battle} for battle, map in
-                      self.battles_on_maps]
+        experiment_token = np.random.randint(1,100000)
+        self.tasks = [{'Experiment': experiment_name, 'Token' : experiment_token, 'Part' : index, 'Map': map, 'Players': battle}
+                      for index, (battle, map) in enumerate(self.battles_on_maps)]
         return self
 
     def preview(self):
         print(json.dumps(self.tasks,indent=2))
         return self
 
-    def run_experiment(self, experiment_name):
+    def run(self):
         self.results = execute_tasks(self.tasks)
         return self
 
     def dump(self,dump_file):
         with open(dump_file,'w') as file:
-            file.write(json.dumps(self.results))
+            file.write(json.dumps(self.results,indent=2))
         return self
 
     def store_pointwise(self, filename):
@@ -80,9 +83,14 @@ def test_greedy_algorithms():
     (Fluent()
     .from_params()
     .create_random_players(1)
-    .first_against_himself(1,2,4,8,16)
+    .first_against_himself(1,2,4)
     .on_maps('sample.json')
     .experiment('Greedy')
-    .preview())
+    .preview()
+    #.run()
+    #.dump('greedy_results')
+     )
 
 test_greedy_algorithms()
+
+#empty_queue()

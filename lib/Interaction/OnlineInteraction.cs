@@ -18,9 +18,9 @@ namespace lib.Interaction
             connection = new OnlineProtocol(new TcpTransport(port));
         }
 
-        public void Start()
+        public bool Start()
         {
-            connection.HandShake(CreateBotName());
+            return connection.HandShake(CreateBotName());
         }
 
         public string CreateBotName()

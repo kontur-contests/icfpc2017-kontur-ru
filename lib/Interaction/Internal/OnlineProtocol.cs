@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using System.Security.Cryptography;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -15,10 +14,18 @@ namespace lib.Interaction.Internal
             this.transport = transport;
         }
 
-        public void HandShake(string name)
+        public bool HandShake(string name)
         {
             transport.Write($"{{\"me\":\"{name}\"}}");
-            transport.Read();
+            try
+            {
+                transport.Read(1000);
+                return true;
+            }
+            catch (TimeoutException)
+            {
+                return false;
+            }
         }
 
         public Setup ReadSetup()
@@ -64,7 +71,9 @@ namespace lib.Interaction.Internal
         public Tuple<Move[], ScoreModel[]> ReadScore()
         {
             var scoreJsonResponse = JsonConvert.DeserializeObject<ScoreJsonResponse>(transport.Read());
-            return Tuple.Create(scoreJsonResponse.ScoreData.MoveModels.Select(MoveModel.GetMove).ToArray(), scoreJsonResponse.ScoreData.Scores);
+            return Tuple.Create(
+                scoreJsonResponse.ScoreData.MoveModels.Select(MoveModel.GetMove).ToArray(),
+                scoreJsonResponse.ScoreData.Scores);
         }
 
         private readonly ITransport transport;

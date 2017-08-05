@@ -11,7 +11,7 @@ namespace worker.Strategies
 {
     class GreedyExperiment : IExperiment
     {
-        public IEnumerable<Tuple<PlayerWithParams, long>> Play(Task task)
+        public List<PlayerResult> Play(Task task)
         {
             return ExperimentCommon.Run(
                 task.Players,

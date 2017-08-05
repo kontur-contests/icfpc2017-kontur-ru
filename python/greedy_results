@@ -1,0 +1,45 @@
+[
+  {
+    "Players": [
+      {
+        "Name": "0",
+        "Params": {},
+        "Rank": 32
+      }
+    ],
+    "Error": null,
+    "Map": "sample.json"
+  },
+  {
+    "Players": [
+      {
+        "Name": "0",
+        "Params": {},
+        "Rank": 27
+      },
+      {
+        "Name": "0",
+        "Params": {},
+        "Rank": 22
+      }
+    ],
+    "Error": null,
+    "Map": "sample.json"
+  },
+  {
+    "Players": [
+      {
+        "Name": "0",
+        "Params": {},
+        "Rank": 27
+      },
+      {
+        "Name": "0",
+        "Params": {},
+        "Rank": 22
+      }
+    ],
+    "Error": null,
+    "Map": "sample.json"
+  }
+]
