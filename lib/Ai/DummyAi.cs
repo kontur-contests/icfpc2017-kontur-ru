@@ -14,6 +14,7 @@ namespace lib.Ai
         }
 
         public string Name { get; set; } = "Dummy";
+        public string Version => "0.1";
 
         public Future[] StartRound(int punterId, int puntersCount, Map map, Settings settings)
         {

@@ -109,7 +109,7 @@ namespace lib.Interaction
 
             allMoves.AddRange(score.MoveModels.Select(ProtocolBase.MoveModel.GetMove));
             
-            var meta = new ReplayMeta(DateTime.UtcNow, ai.Name, setup.Id, setup.PunterCount, score.Scores);
+            var meta = new ReplayMeta(DateTime.UtcNow, ai.Name, ai.Version, "", setup.Id, setup.PunterCount, score.Scores);
             var data = new ReplayData(setup.Map, allMoves, futures);
             
             return Tuple.Create(meta, data);

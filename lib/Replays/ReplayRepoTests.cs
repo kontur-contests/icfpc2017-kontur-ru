@@ -41,6 +41,8 @@ namespace lib.Replays
             var meta = new ReplayMeta(
                 DateTime.UtcNow,
                 "player",
+                "0.1",
+                "aabbcc",
                 0,
                 1,
                 new[]
