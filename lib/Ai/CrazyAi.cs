@@ -5,6 +5,7 @@ using System.Linq;
 using System.Windows.Forms;
 using lib.GraphImpl;
 using lib.Scores.Simple;
+using lib.Structures;
 using lib.viz;
 using NUnit.Framework;
 
@@ -43,7 +44,7 @@ namespace lib.Ai
                     {
                         var cut = denic.GetMinCut();
                         var edge = cut[random.Next(cut.Count)];
-                        return new ClaimMove(punterId, edge.From, edge.To);
+                        return Move.Claim(punterId, edge.From, edge.To);
                     }
                 }
             }

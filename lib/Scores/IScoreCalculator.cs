@@ -1,3 +1,5 @@
+using lib.Structures;
+
 namespace lib.Scores
 {
     public interface IScoreCalculator

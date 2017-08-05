@@ -5,6 +5,7 @@ using System.Linq;
 using System.Windows.Forms;
 using lib.GraphImpl;
 using lib.Scores.Simple;
+using lib.Structures;
 using lib.viz;
 using NUnit.Framework;
 

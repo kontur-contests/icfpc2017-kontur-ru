@@ -1,4 +1,5 @@
 ﻿using lib.Strategies;
+using lib.Structures;
 
 namespace lib.Ai.StrategicFizzBuzz
 {

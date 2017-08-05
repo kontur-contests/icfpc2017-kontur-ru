@@ -1,6 +1,5 @@
-﻿using System;
-using System.Threading;
-using FluentAssertions;
+﻿using FluentAssertions;
+using lib.Structures;
 using NUnit.Framework;
 
 namespace lib.Interaction
@@ -14,8 +13,8 @@ namespace lib.Interaction
         {
             var client = new TcpTransport(9019);
 
-            client.Write("{\"me\":\"Ya\"}");
-            client.Read().Should().BeEquivalentTo("{\"you\":\"Ya\"}");
+            client.Write(new HandshakeOut { me = "Ya" });
+            client.Read<HandshakeIn>().Should().ShouldBeEquivalentTo(new HandshakeIn { you = "Ya" });
         }
     }
 }

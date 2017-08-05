@@ -5,6 +5,7 @@ using lib;
 using lib.Ai;
 using lib.Scores.Simple;
 using lib.Strategies;
+using lib.Structures;
 
 namespace ConsoleApp
 {

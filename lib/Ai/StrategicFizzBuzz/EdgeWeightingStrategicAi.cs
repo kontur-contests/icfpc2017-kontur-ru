@@ -1,5 +1,6 @@
 using lib.Strategies;
 using lib.Strategies.EdgeWeighting;
+using lib.Structures;
 
 namespace lib.Ai.StrategicFizzBuzz
 {

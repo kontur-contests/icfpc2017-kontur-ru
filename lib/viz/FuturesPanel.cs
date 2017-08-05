@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using lib.GraphImpl;
+using lib.Structures;
 
 namespace lib.viz
 {
@@ -15,7 +16,7 @@ namespace lib.viz
             foreach (var futuresGroup in futures)
             {
                 var id = futuresGroup.Key;
-                futuresList.Items.AddRange(futuresGroup.Value.Select(f => $"{id}:\t{f.Source}->{f.Target}\t|{CalculateCost(f, calculator)}").Cast<object>().ToArray());
+                futuresList.Items.AddRange(futuresGroup.Value.Select(f => $"{id}:\t{f.source}->{f.target}\t|{CalculateCost(f, calculator)}").Cast<object>().ToArray());
             }
         }
 
@@ -49,13 +50,13 @@ namespace lib.viz
 
             try
             {
-                dist = calculator.GetDist(future.Source, future.Target);
+                dist = calculator.GetDist(future.source, future.target);
             }
             catch (InvalidOperationException)
             {
                 try
                 {
-                    dist = calculator.GetDist(future.Target, future.Source);
+                    dist = calculator.GetDist(future.target, future.source);
                 }
                 catch (InvalidOperationException)
                 {

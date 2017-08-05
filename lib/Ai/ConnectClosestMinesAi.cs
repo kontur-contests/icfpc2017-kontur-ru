@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using lib.GraphImpl;
+using lib.Structures;
 using lib.viz;
 using NUnit.Framework;
 using Shouldly;
@@ -61,7 +62,7 @@ namespace lib.Ai
             if (TryExtendAnything(graph, out move))
                 return move;
 
-            return new PassMove(punterId);
+            return Move.Pass(punterId);
         }
 
         private bool TryExtendAnything(Graph graph, out Move nextMove)
@@ -234,7 +235,7 @@ namespace lib.Ai
 
         private Move MakeMove(Edge edge)
         {
-            return new ClaimMove(punterId, edge.From, edge.To);
+            return Move.Claim(punterId, edge.From, edge.To);
         }
 
         public string SerializeGameState()
@@ -275,7 +276,7 @@ namespace lib.Ai
             var ai = new ConnectClosestMinesAi();
             ai.StartRound(0, 1, map, new Settings());
             var move = ai.GetNextMove(null, map);
-            Assert.That(move, Is.EqualTo(new ClaimMove(0, 5, 7)).Or.EqualTo(new ClaimMove(0, 5, 3)));
+            Assert.That(move, Is.EqualTo(Move.Claim(0, 5, 7)).Or.EqualTo(Move.Claim(0, 5, 3)));
         }
 
         [Test]
@@ -287,7 +288,7 @@ namespace lib.Ai
             simulator.StartGame(new List<IAi> {ai});
             var gameState = simulator.NextMove();
             var move = ai.GetNextMove(null, gameState.CurrentMap);
-            move.ShouldBe(new ClaimMove(0, 1, 3));
+            move.ShouldBe(Move.Claim(0, 1, 3));
         }
 
         [Test]
@@ -300,7 +301,7 @@ namespace lib.Ai
             simulator.NextMove();
             var gameState = simulator.NextMove();
             var move = ai.GetNextMove(null, gameState.CurrentMap);
-            move.ShouldBe(new ClaimMove(0, 0, 1));
+            move.ShouldBe(Move.Claim(0, 0, 1));
         }
 
         [Test]

@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
+using lib.Structures;
 using lib.viz.Detalization;
 using MoreLinq;
 
@@ -62,7 +63,7 @@ namespace lib.viz
         {
             if (map == null) return;
             var sw = Stopwatch.StartNew();
-                HightlightLastMove(g, gameState?.PreviousMoves?.LastOrDefault());
+            HightlightLastMove(g, gameState?.PreviousMoves?.LastOrDefault());
             foreach (var river in map.Rivers)
                 DrawRiver(g, river);
             foreach (var site in map.Sites)
@@ -77,10 +78,11 @@ namespace lib.viz
 
         private void HightlightLastMove(Graphics g, Move move)
         {
-            if (move is ClaimMove m)
+            var m = move?.claim;
+            if (m != null)
             {
-                var start = map.SiteById[m.Source];
-                var end = map.SiteById[m.Target];
+                var start = map.SiteById[m.source];
+                var end = map.SiteById[m.target];
                 var radius = 7;
                 using (var pen = new Pen(Color.GreenYellow, radius))
                 {
@@ -118,8 +120,8 @@ namespace lib.viz
         private void DrawFuture(Graphics g, int punderId, Future future)
         {
             var data = PainterAugmentor.GetData(punderId, future);
-            var source = map.SiteById[future.Source];
-            var target = map.SiteById[future.Target];
+            var source = map.SiteById[future.source];
+            var target = map.SiteById[future.target];
             var pen = new Pen(data.Color, data.PenWidth)
             {
                 StartCap = LineCap.ArrowAnchor,

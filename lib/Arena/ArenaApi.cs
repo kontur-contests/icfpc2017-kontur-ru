@@ -10,15 +10,13 @@ namespace lib.Arena
     {
         private const string Address = "http://punter.inf.ed.ac.uk/status.html";
 
-        public ArenaMatch GetNextMatch()
+        public static ArenaMatch GetNextMatch()
         {
             var matches = new ArenaApi().GetArenaMatchesAsync()
                 .ConfigureAwait(false).GetAwaiter()
                 .GetResult()
                 .Where(x => x.IsSuitableForReplayCollection())
                 .ToArray();
-            
-//            Console.WriteLine(matches.Length + " matches available");
 
             return matches
                 .OrderBy(x => Guid.NewGuid())
