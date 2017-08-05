@@ -20,7 +20,10 @@ chmod a+x punter
 touch PACKAGES
 
 # ./src
-# TODO
+pushd ..
+mkdir _submission/src
+git archive -o _submission/src/sources.zip master
+popd
 
 # ./README
 cp ../README .
