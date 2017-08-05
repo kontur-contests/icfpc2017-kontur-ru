@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Topshelf;
+using worker.Strategies;
 
 namespace worker
 {
@@ -12,8 +13,7 @@ namespace worker
                 
                 x.Service<WorkerService>(s =>
                 {
-                    var strategy = new DummySumPlayerStrategy();
-                    var player = new Player(strategy);
+                    var player = new Player(new ExperimentSelector());
                     
                     var config = new Dictionary<string, object>
                     {

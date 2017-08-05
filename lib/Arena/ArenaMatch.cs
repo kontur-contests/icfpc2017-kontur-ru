@@ -1,6 +1,4 @@
-﻿using System.Linq;
-
-namespace lib.Arena
+﻿namespace lib.Arena
 {
     public class ArenaMatch
     {
@@ -22,7 +20,7 @@ namespace lib.Arena
 
         public bool IsSuitableForReplayCollection()
         {
-            return (TotalSeats - TakenSeats == 1) && !Extensions.Contains("futures");
+            return TotalSeats - TakenSeats == 1 && MapName.IsOneOf("sample.json", "circle.json", "lambda.json", "Sierpinski-triangle.json");
         }
     }
 }

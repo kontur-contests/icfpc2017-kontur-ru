@@ -14,12 +14,15 @@ namespace worker
     
     public class Task
     {
+        public string Map { get; set; }
+        public string Experiment { get; set; }
         public List<PlayerWithParams> Players { get; set; }
     }
 
     public class Result
     {
         public IEnumerable<PlayerWithParams> Players { get; set; }
+        public string Error { get; set; }
     }
 
     public interface IPlayer
@@ -29,9 +32,9 @@ namespace worker
     
     public class Player : IPlayer
     {
-        private readonly IPlayerStrategy playerStrategy;
+        private readonly IExperiment playerStrategy;
         
-        public Player(IPlayerStrategy playerStrategy)
+        public Player(IExperiment playerStrategy)
         {
             this.playerStrategy = playerStrategy;
         }
@@ -39,7 +42,7 @@ namespace worker
         public Result Play(Task task)
         {
             var players = playerStrategy
-                .Play(task.Players)
+                .Play(task)
                 .Select(pair => new PlayerWithParams
                 {
                     Name = pair.Item1.Name,

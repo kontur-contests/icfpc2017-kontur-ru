@@ -46,15 +46,15 @@ namespace lib.viz
             timer.Start();
         }
 
-        private bool showScore;
+        private bool liveScoreUpdate;
 
-        public bool ShowScore
+        public bool LiveScoreUpdate
         {
-            get { return showScore; }
+            get { return liveScoreUpdate; }
             set
             {
-                showScore = value;
-                if (showScore) timer.Start();
+                liveScoreUpdate = value;
+                if (liveScoreUpdate) timer.Start();
                 else timer.Stop();
             }
         }
