@@ -37,5 +37,6 @@ namespace worker
         public int RiversCount { get; set; }
         public int SitesCount { get; set; }
         public int Token { get; set; }
+        public int MinesCount { get; internal set; }
     }
 }

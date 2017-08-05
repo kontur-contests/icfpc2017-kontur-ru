@@ -17,10 +17,10 @@ def test_parameter():
     (runner
     .from_params(MineWeight = magic.Param(10,300))
     .create_random_players(100)
-    .battles_on_map('gothenburg-sparse.json', 8, 100)
+    .battles_on_map('Sierpinski-triangle.json', 3, 100)
     .experiment('MRVW')
     #.preview()
-    .run().dump()
+    .run().dump().store_pointwise('exp.csv')
      )
     print(runner.token)
 
