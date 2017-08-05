@@ -5,12 +5,12 @@ using NUnit.Framework;
 namespace worker
 {
     [TestFixture]
-    public class StrategyTests
+    public class TestExperimentTests
     {
         [Test]
         public void DummySumPlayerStrategy_Should()
         {
-            var strategy = new DummySumPlayerStrategy();
+            var strategy = new TestExperiment();
             var playersIn = new List<PlayerWithParams>
             {
                 new PlayerWithParams
@@ -30,7 +30,7 @@ namespace worker
                 },
             };
 
-            var playersOut = strategy.Play(playersIn);
+            var playersOut = strategy.Play(new Task { Players = playersIn });
             var bestPlayerOut = playersOut.First().Item1;
             
             Assert.AreEqual(2, bestPlayerOut.Rank);

@@ -114,11 +114,9 @@ namespace lib.Ai
                 var current = queue.Dequeue();
                 if (current.CurrentVertex.Edges.Any(x => x.Owner == punterId))
                 {
-                    int edgeFrom = current.Edge.From;
-                    if (graph.Mines.ContainsKey(edgeFrom))
-                        myMines.Add(edgeFrom);
-                    if (graph.Mines.ContainsKey(current.Edge.To))
-                        myMines.Add(current.Edge.To);
+                    if (current.Edge == null)
+                        throw new InvalidOperationException("Mine is already part of component! WTF?");
+                    TryAddMine(graph, current.Edge);
                     move = MakeMove(current.Edge);
                     return true;
                 }
@@ -169,13 +167,15 @@ namespace lib.Ai
                         if (prev.SourceMine != current.SourceMine)
                         {
                             var bestMine = SelectBestMine(prev.SourceMine, current.SourceMine);
-                            myMines.Add(bestMine.Id);
                             if (bestMine == prev.SourceMine)
                             {
+                                TryAddMine(graph, prev.FirstEdge ?? edge);
                                 move = MakeMove(prev.FirstEdge ?? edge);
                                 return true;
                             }
+                            if (bestMine == current.SourceMine)
                             {
+                                TryAddMine(graph, current.FirstEdge ?? edge);
                                 move = MakeMove(current.FirstEdge ?? edge);
                                 return true;
                             }
@@ -196,6 +196,14 @@ namespace lib.Ai
             }
             move = null;
             return false;
+        }
+
+        private void TryAddMine(Graph graph, Edge edge)
+        {
+            if (graph.Mines.ContainsKey(edge.From))
+                myMines.Add(edge.From);
+            if (graph.Mines.ContainsKey(edge.To))
+                myMines.Add(edge.To);
         }
 
         private long Calc(HashSet<int> mineIds, int vertexId)

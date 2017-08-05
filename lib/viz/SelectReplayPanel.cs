@@ -11,6 +11,18 @@ namespace lib.viz
     {
         public SelectReplayPanel()
         {
+            var buttonsPanel = new FlowLayoutPanel
+            {
+                AutoSize = true,
+                Dock =DockStyle.Top
+            };
+            var refreshButton = new Button()
+            {
+                Text = "Refresh",
+                AutoSize = true
+            };
+            refreshButton.Click += (sender, args) => RefreshMetasList();
+            buttonsPanel.Controls.Add(refreshButton);
             debugTextArea = new TextBox()
             {
                 Multiline = true,
@@ -41,6 +53,7 @@ namespace lib.viz
             listView.ItemSelectionChanged += SelectedReplayChanged;
             Controls.Add(debugTextArea);
             Controls.Add(listView);
+            Controls.Add(buttonsPanel);
         }
 
         private void SelectedReplayChanged(object sender, ListViewItemSelectionChangedEventArgs args)
@@ -64,23 +77,34 @@ namespace lib.viz
             set
             {
                 repo = value;
-                var metas = repo.GetRecentMetas();
-                UpdateList(metas);
+                RefreshMetasList();
             }
+        }
+
+        private void RefreshMetasList()
+        {
+            var metas = repo.GetRecentMetas(50);
+            UpdateList(metas);
         }
 
         private void UpdateList(ReplayMeta[] metas)
         {
+            listView.BeginUpdate();
+            listView.Items.Clear();
             foreach (var meta in metas)
             {
                 var lvItem = listView.Items.Add(meta.Timestamp.ToString("T"));
                 lvItem.Tag = meta;
                 lvItem.SubItems.Add(meta.AiName);
                 var ourScore = meta.Scores.First(s => s.Punter == meta.OurPunter).Score;
-                var count = meta.Scores.Count(s => s.Score < ourScore);
+                var count = meta.Scores.Count(s => s.Score < ourScore) + 1;
                 lvItem.SubItems.Add(count.ToString());
                 lvItem.SubItems.Add(meta.Scores.Length.ToString());
+                lvItem.BackColor = (count == meta.Scores.Length) ? Color.GreenYellow : Color.White;
             }
+            listView.Columns[0].AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
+            listView.Columns[1].AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
+            listView.EndUpdate();
         }
 
         public ReplayFullData SelectedReplay { get; private set; }

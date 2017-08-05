@@ -12,7 +12,7 @@ namespace lib.viz
 
         public ReplayerForm(ReplayRepo repo = null)
         {
-            Size = new Size(800, 600);
+            WindowState = FormWindowState.Maximized;
             selectReplayPanel = new SelectReplayPanel
             {
                 Dock = DockStyle.Fill,
@@ -22,7 +22,7 @@ namespace lib.viz
             var rightPanel = new ReplayerPanel()
             {
                 Dock = DockStyle.Fill,
-                ShowScore = false
+                LiveScoreUpdate = true
             };
             //UpdateMap(rightPanel);
             selectReplayPanel.ReplayChanged += () =>
@@ -33,10 +33,11 @@ namespace lib.viz
             var split = new SplitContainer()
             {
                 Dock=DockStyle.Fill,
-                Orientation = Orientation.Vertical
+                //Orientation = Orientation.Vertical
             };
             split.Panel1.Controls.Add(selectReplayPanel);
             split.Panel2.Controls.Add(rightPanel);
+            split.SplitterDistance = 10;
             Controls.Add(split);
         }
 

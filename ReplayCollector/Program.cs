@@ -8,6 +8,8 @@ using lib.Arena;
 using lib.Interaction;
 using lib.Replays;
 using lib.viz;
+using MoreLinq;
+using NLog;
 
 namespace ReplayCollector
 {
@@ -15,6 +17,7 @@ namespace ReplayCollector
     {
         private static readonly ArenaApi ArenaApi = new ArenaApi();
         private static readonly ReplayRepo Repo = new ReplayRepo();
+        private static readonly ILogger log = LogManager.GetCurrentClassLogger();
         
         private static int threadCount;
         private static readonly object Locker = new object();
@@ -23,6 +26,7 @@ namespace ReplayCollector
         
         public static void Main(string[] args)
         {
+            log.Info("Hello");
             threadCount = args.Length == 1 ? int.Parse(args.First()) : 1;
             
             for (var i = 0; i < threadCount; i++)
@@ -47,7 +51,7 @@ namespace ReplayCollector
 
                                 if (match == null) return;
 
-                                Console.WriteLine(
+                                log.Info(
                                     "Collector " + index + ": Match on port " + match.Port + " for " + ai.Name +
                                     " AI...");
 
@@ -55,17 +59,19 @@ namespace ReplayCollector
                                 interaction.Start();
                             }
 
+                            log.Info("Collector " + index + ": Running game");
                             var metaAndData = interaction.RunGame(ai);
 
                             Repo.SaveReplay(metaAndData.Item1, metaAndData.Item2);
+                            log.Info("Collector " + index + ": Saved replay " + metaAndData.Item1.Scores.ToDelimitedString(", "));
 
                             ++completedTasksCount;
 
-                            Console.WriteLine("Collector " + index + ": " + completedTasksCount + " replays collected");
+                            log.Info("Collector " + index + ": " + completedTasksCount + " replays collected");
                         }
                         catch (Exception e)
                         {
-                            Console.WriteLine("Collector " + index + " failed: " + e);
+                            log.Error(e, "Collector " + index + " failed: " + e);
                         }
                     }
                 });

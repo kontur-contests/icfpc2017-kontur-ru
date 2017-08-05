@@ -36,7 +36,7 @@ namespace lib
 
             return gamers
                 .Zip(gameSimulator.Futures, (ai, futures) => new {Gamer = ai, Futures = futures})
-                .Select((e, i) => new GameSimulationResult(e.Gamer, scoreCalculator.GetScore(i, map, e.Futures)))
+                .Select((e, i) => new GameSimulationResult(e.Gamer, scoreCalculator.GetScore(i, state.CurrentMap, e.Futures)))
                 .ToList();
         }
     }

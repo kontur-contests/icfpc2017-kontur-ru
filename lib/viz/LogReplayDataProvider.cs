@@ -19,7 +19,7 @@ namespace lib.viz
             PunterNames = data.Meta.Scores
                 .Select((s, i) => i == data.Meta.OurPunter ? data.Meta.AiName : i.ToString())
                 .ToArray();
-            futures = data.Data.Futures;
+            futures = data.Data.Futures ?? new Future[0];
         }
 
         public string[] PunterNames { get; }

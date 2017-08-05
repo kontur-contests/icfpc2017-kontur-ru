@@ -18,20 +18,26 @@ namespace ConsoleApp
 
             foreach (var map in maps)
             {
-                var gamers = new List<IAi> { new GreedyAi(), new ConnectClosestMinesAi() };
+                var gamers = new List<IAi> { new ConnectClosestMinesAi(), new GreedyAi() };
                 var gameSimulator = new GameSimulatorRunner(new SimpleScoreCalculator(), true);
 
 
                 Console.WriteLine($"MAP: {map.Name}");
-                var results = gameSimulator.SimulateGame(
-                    gamers, map.Map, new Settings());
+                var results = gameSimulator.SimulateGame(gamers, map.Map, new Settings())
+                    .OrderByDescending(r => r.Score).ToList();
 
-                foreach (var gameSimulationResult in results)
-                    Console.Write($"{gameSimulationResult.Gamer.Name} ");
+                
+                Console.Write($"WIN {results[0].Gamer.Name}");
+                if (results.Count > 1)
+                    Console.Write($" (+{results[0].Score - results[1].Score})");
                 Console.WriteLine();
-                foreach (var gameSimulationResult in results)
-                    Console.Write($"{gameSimulationResult.Score} ");
-                Console.WriteLine();
+
+                //foreach (var gameSimulationResult in results)
+                //    Console.Write($"{gameSimulationResult.Gamer.Name} ");
+                //Console.WriteLine();
+                //foreach (var gameSimulationResult in results)
+                //    Console.Write($"{gameSimulationResult.Score} ");
+                //Console.WriteLine();
             }
         }
     }
