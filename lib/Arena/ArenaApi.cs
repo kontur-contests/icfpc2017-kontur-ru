@@ -10,6 +10,15 @@ namespace lib.Arena
     {
         private const string Address = "http://punter.inf.ed.ac.uk/status.html";
 
+        public ArenaMatch GetNextMatch()
+        {
+            var matches = new ArenaApi().GetArenaMatchesAsync()
+                .ConfigureAwait(false).GetAwaiter()
+                .GetResult();
+
+            return matches.FirstOrDefault(x => x.IsSuitableForReplayCollection());
+        }
+
         public async Task<ArenaMatch[]> GetArenaMatchesAsync()
         {
             var config = Configuration.Default.WithDefaultLoader();

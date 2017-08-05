@@ -17,5 +17,10 @@
         public string[] Extensions;
         public int Port;
         public string MapName;
+
+        public bool IsSuitableForReplayCollection()
+        {
+            return TotalSeats - TakenSeats == 1;
+        }
     }
 }
