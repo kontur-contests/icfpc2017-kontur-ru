@@ -27,9 +27,9 @@ namespace lib
             var gamer = new Ai();
             simulator.StartGame(new List<IAi> {gamer});
 
-            simulator.NextMove();
+            var state = simulator.NextMove();
 
-            Assert.AreEqual(0, map.Map.Rivers.First(x => x.Source == 0 && x.Target == 1).Owner);
+            Assert.AreEqual(0, state.CurrentMap.Rivers.First(x => x.Source == 0 && x.Target == 1).Owner);
         }
 
         [Test]

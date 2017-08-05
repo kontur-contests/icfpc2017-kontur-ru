@@ -23,7 +23,7 @@ namespace lib.Interaction
             var setup = connection.ReadSetup();
             ai.StartRound(setup.Id, setup.PunterCount, setup.Map);
             map = setup.Map;
-            
+            Console.WriteLine($"I'm {setup.Id}");
             var serverResponse = connection.ReadGameState();
 
             while (!connection.IsGameOver)
@@ -47,11 +47,10 @@ namespace lib.Interaction
     {
         [Test]
         [Explicit]
-        public static  void Main()
+        public static void Main()
         {
-            var onlineInteraction = new OnlineInteraction(9008);
+            var onlineInteraction = new OnlineInteraction(901);
             onlineInteraction.RunGame(new ConnectClosestMinesAi());
         }
-
     }
 }

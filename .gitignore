@@ -84,4 +84,4 @@ __pycache__
 !/tools/packages.config
 .pack/
 
-submission.tar.gz
+icfp-*.tar.gz
