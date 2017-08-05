@@ -51,6 +51,7 @@ namespace lib.viz
 
         public void Paint(Graphics g, PointF mouseLogicalPos, RectangleF clipRect)
         {
+            if (map == null) return;
             var sw = Stopwatch.StartNew();
                 HightlightLastMove(g, gameState?.PreviousMoves?.LastOrDefault());
             foreach (var river in map.Rivers)

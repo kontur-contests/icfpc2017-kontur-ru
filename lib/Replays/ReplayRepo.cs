@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Firebase.Auth;
@@ -28,8 +29,7 @@ namespace lib.Replays
 
         public ReplayRepo(bool test = false)
         {
-            fb = Connect().Result;
-
+            fb = Connect().ConfigureAwait(false).GetAwaiter().GetResult();
             metas = test ? fb.Child("replays").Child("metas") : fb.Child("test").Child("replays").Child("metas");
             datas = test ? fb.Child("replays").Child("datas") : fb.Child("test").Child("replays").Child("datas");
         }
@@ -93,7 +93,7 @@ namespace lib.Replays
             
             var meta = new ReplayMeta(
                 DateTime.UtcNow,
-                "testAi",
+                "player",
                 0,
                 1,
                 new[]
@@ -105,10 +105,13 @@ namespace lib.Replays
                     }
                 }
             );
-            
-            var data = new ReplayData(new Map(), new[]
+            var map = MapLoader.LoadMap(Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\..\maps\circle.json")).Map;
+
+            var data = new ReplayData(map, new Move[]
             {
-                new PassMove(0)
+                new ClaimMove(0, 15, 16), 
+                new ClaimMove(0, 16, 17), 
+                new ClaimMove(0, 17, 18), 
             });
             
             repo.SaveReplay(meta, data);

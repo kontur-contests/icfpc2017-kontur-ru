@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using lib.Replays;
@@ -11,9 +12,9 @@ namespace lib.viz
     {
         private readonly SelectReplayPanel selectReplayPanel;
 
-        public ReplayerForm()
+        public ReplayerForm(ReplayRepo repo = null)
         {
-            var repo = new ReplayRepo();
+            Size = new Size(800, 600);
             selectReplayPanel = new SelectReplayPanel
             {
                 Dock = DockStyle.Left,
@@ -24,7 +25,7 @@ namespace lib.viz
             {
                 Dock = DockStyle.Fill
             };
-            UpdateMap(rightPanel);
+            //UpdateMap(rightPanel);
             selectReplayPanel.ReplayChanged += () =>
             {
                 UpdateMap(rightPanel);
@@ -59,10 +60,10 @@ namespace lib.viz
         public string[] PunterNames { get; }
         public GameState NextMove()
         {
-            var move = data.Data.Moves[nextMoveIndex++];
+            var move = data.Data.Moves[nextMoveIndex++].ToMove();
             map = move.Execute(map);
             prevMoves.Add(move);
-            return new GameState(map, move.PunterId, prevMoves, nextMoveIndex >= data.Data.Moves.Count);
+            return new GameState(map, move.PunterId, prevMoves, nextMoveIndex >= data.Data.Moves.Length);
         }
     }
 
@@ -84,14 +85,23 @@ namespace lib.viz
             listView = new ListView
             {
                 Dock = DockStyle.Fill,
+                View = View.Details,
                 MultiSelect = false
             };
 
+            listView.Width = 400;
+            listView.Columns.Add("Time");
+            listView.Columns.Add("Ai");
+            listView.Columns.Add("W");
+            listView.Columns.Add("N");
+
             listView.ItemSelectionChanged += SelectedReplayChanged;
+            Controls.Add(listView);
         }
 
         private void SelectedReplayChanged(object sender, ListViewItemSelectionChangedEventArgs args)
         {
+            if (repo == null || listView.SelectedItems.Count == 0) return;
             var lvItem = listView.SelectedItems[0];
             var meta = (ReplayMeta) lvItem.Tag;
             var data = repo.GetData(meta.DataId);
@@ -113,16 +123,17 @@ namespace lib.viz
             }
         }
 
-        private void UpdateList(List<ReplayMeta> metas)
+        private void UpdateList(ReplayMeta[] metas)
         {
             foreach (var meta in metas)
             {
                 var lvItem = listView.Items.Add(meta.Timestamp.ToString());
+                lvItem.Tag = meta;
                 lvItem.SubItems.Add(meta.AiName);
                 var ourScore = meta.Scores.First(s => s.Punter == meta.OurPunter).Score;
                 var count = meta.Scores.Count(s => s.Score < ourScore);
                 lvItem.SubItems.Add(count.ToString());
-                lvItem.SubItems.Add(meta.Scores.Count.ToString());
+                lvItem.SubItems.Add(meta.Scores.Length.ToString());
             }
         }
 
@@ -139,7 +150,8 @@ namespace lib.viz
         [STAThread]
         public void Test()
         {
-            var form = new ReplayerForm();
+            var repo = new ReplayRepo(true);
+            var form = new ReplayerForm(repo);
             form.ShowDialog();
         }
     }
