@@ -65,7 +65,15 @@ namespace worker
                         try
                         {
                             var task = JsonConvert.DeserializeObject<Task>(msg.Value);
-                            var result = player.Play(task);
+                            Result result = null;
+                            try
+                            {
+                                result = player.Play(task);
+                            }
+                            catch(Exception exception)
+                            {
+                                result = new Result { Error = exception.Message };
+                            }
                             var resultString = JsonConvert.SerializeObject(result);
 
                             var deliveryReport = producer.ProduceAsync(outputTopicName, null, resultString);
