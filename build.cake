@@ -15,6 +15,7 @@ var solutionDir = Directory("./");
 var solution = solutionDir + File("icfpc2017.sln");
 var buildLibDir = Directory("./lib/bin") + Directory(configuration);
 var buildWorkerDir = Directory("./worker/bin") + Directory(configuration);
+var buildPunterDir = Directory("./punter/bin") + Directory(configuration);
 var buildSettings = new DotNetCoreBuildSettings
 {
     Configuration = configuration
@@ -30,6 +31,7 @@ Task("Clean")
 {
     CleanDirectory(buildLibDir);
     CleanDirectory(buildWorkerDir);
+    CleanDirectory(buildPunterDir);
 });
 
 Task("Restore")
