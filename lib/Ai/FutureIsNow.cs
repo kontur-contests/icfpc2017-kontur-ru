@@ -17,7 +17,7 @@ namespace lib.Ai
         public string Version => "0";
         public Future[] StartRound(int punterId, int puntersCount, Map map, Settings settings)
         {
-            throw new System.NotImplementedException();
+            throw new System.NotImplementedException(); 
         }
 
         public Move GetNextMove(Move[] prevMoves, Map map)
@@ -40,6 +40,7 @@ namespace lib.Ai
     public class FutureIsNow_Should
     {
         [Test]
+        [Explicit]
         public void SelectMines()
         {
             var map = MapLoader.LoadMapByNameInTests("tube.json").Map;
