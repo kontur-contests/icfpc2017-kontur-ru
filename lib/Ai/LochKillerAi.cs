@@ -7,7 +7,7 @@ using lib.GraphImpl;
 
 namespace lib.Ai
 {
-    class LochKillerAi : IAi
+    public class LochKillerAi : IAi
     {
         public string Name => nameof(LochKillerAi);
 
