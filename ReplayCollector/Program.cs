@@ -40,22 +40,17 @@ namespace ReplayCollector
                     {
                         try
                         {
-                            ArenaMatch match;
                             IAi ai;
-
                             IServerInteraction interaction;
 
                             lock (Locker)
                             {
-                                match = ArenaApi.GetNextMatch();
+                                var match = ArenaApi.GetNextMatch();
                                 ai = AiFactoryRegistry.GetNextAi();
 
                                 if (match == null) return;
-
-                                log.Info(
-                                    "Collector " + index + ": Match on port " + match.Port + " for " + ai.Name +
-                                    " AI...");
-
+                                
+                                log.Info($"Collector {index}: Match on port {match.Port} for {ai.Name}");
 
                                 try
                                 {
@@ -69,22 +64,22 @@ namespace ReplayCollector
                                 if (!interaction.Start()) return;
                             }
 
-                            log.Info("Collector " + index + ": Running game");
+                            log.Info($"Collector {index}: Running game");
                             var metaAndData = interaction.RunGame(ai);
 
                             var tStart = DateTime.UtcNow;
                             Repo.SaveReplay(metaAndData.Item1, metaAndData.Item2);
                             var tEnd = DateTime.UtcNow;
-                            log.Info("Collector " + index + ": Saved replay " + metaAndData.Item1.Scores.ToDelimitedString(", "));
-                            log.Info("Collector " + index + ": time to save " + (tEnd - tStart).TotalSeconds);
+                            log.Info($"Collector {index}: Saved replay {metaAndData.Item1.Scores.ToDelimitedString(", ")}");
+                            log.Info($"Collector {index}: time to save {(tEnd - tStart).TotalSeconds}");
                             
                             ++completedTasksCount;
 
-                            log.Info("Collector " + index + ": " + completedTasksCount + " replays collected");
+                            log.Info($"Collector {index}: {completedTasksCount} replays collected");
                         }
                         catch (Exception e)
                         {
-                            log.Error(e, "Collector " + index + " failed: " + e);
+                            log.Error(e, $"Collector {index} failed: {e}");
                         }
                     }
                 });
