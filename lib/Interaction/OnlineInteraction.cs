@@ -70,7 +70,7 @@ namespace lib.Interaction
         [Explicit]
         public static void Main()
         {
-            var interaction = new OnlineInteraction(901);
+            var interaction = new OnlineInteraction(9011);
             interaction.Start();
             interaction.RunGame(new ConnectClosestMinesAi());
         }
