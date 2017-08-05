@@ -7,10 +7,24 @@ fi
 
 cp -r punter/bin/Release/net461 _submission
 pushd _submission
-mv punter.exe punter
-chmod a+x punter
+
+# ./install
 echo "#!/usr/bin/env bash" > install
 chmod a+x install
-tar -cvzf ../submission.tar.gz .
+
+# ./punter
+mv punter.exe punter
+chmod a+x punter
+
+# ./PACKAGES
+touch PACKAGES
+
+# ./src
+# TODO
+
+# ./README
+cp ../README .
+
+tar -cvzf ../icfp-b6ef35be-3e2b-458e-a17f-21cd407a8522.tar.gz .
 popd
 rm -rf _submission
