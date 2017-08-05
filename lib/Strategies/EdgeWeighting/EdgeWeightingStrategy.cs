@@ -30,7 +30,7 @@ namespace lib.Strategies.EdgeWeighting
             if (claimedVertexes.Length == 0)
                 claimedVertexes = graph.Mines.Keys.ToArray();
 
-            EdgeWeighter.Init(graph, claimedVertexes);
+            EdgeWeighter.Init(graph, claimedVertexes, PunterId);
             return claimedVertexes.SelectMany(v => graph.Vertexes[v].Edges)
                 .Where(e => e.Owner == -1)
                 .Select(
