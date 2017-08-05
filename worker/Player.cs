@@ -14,12 +14,14 @@ namespace worker
     
     public class Task
     {
+        public string Experiment { get; set; }
         public List<PlayerWithParams> Players { get; set; }
     }
 
     public class Result
     {
         public IEnumerable<PlayerWithParams> Players { get; set; }
+        public string Error { get; set; }
     }
 
     public interface IPlayer
