@@ -6,20 +6,10 @@ using lib.Structures;
 
 namespace lib.Ai
 {
-    public class GreedyAiHelper
+    public static class GreedyAiHelper
     {
-        private readonly int punterId;
-        private readonly MineDistCalculator mineDistCalulator;
-
-        public GreedyAiHelper(int punterId, MineDistCalculator mineDistCalulator)
+        public static bool TryExtendAnything(int punterId, Graph graph, ConnectedCalculator calculator, MineDistCalculator mineDistCalulator, out Move nextMove)
         {
-            this.punterId = punterId;
-            this.mineDistCalulator = mineDistCalulator;
-        }
-
-        public bool TryExtendAnything(Graph graph, out Move nextMove)
-        {
-            var calculator = new ConnectedCalculator(graph, punterId);
             var maxAddScore = long.MinValue;
             Edge bestEdge = null;
             foreach (var vertex in graph.Vertexes.Values)
@@ -29,8 +19,8 @@ namespace lib.Ai
                     var fromMines = calculator.GetConnectedMines(edge.From);
                     var toMines = calculator.GetConnectedMines(edge.To);
                     long addScore = Math.Max(
-                        Calc(toMines, fromMines, edge.From),
-                        Calc(fromMines, toMines, edge.To));
+                        Calc(mineDistCalulator, toMines, fromMines, edge.From),
+                        Calc(mineDistCalulator, fromMines, toMines, edge.To));
                     if (addScore > maxAddScore)
                     {
                         maxAddScore = addScore;
@@ -47,7 +37,7 @@ namespace lib.Ai
             return false;
         }
 
-        private long Calc(HashSet<int> mineIds, HashSet<int> diff, int vertexId)
+        private static long Calc(MineDistCalculator mineDistCalulator, HashSet<int> mineIds, HashSet<int> diff, int vertexId)
         {
             return mineIds.Where(x => !diff.Contains(x)).Sum(
                 mineId =>

@@ -1,4 +1,4 @@
-using lib.Structures;
+using lib.StateImpl;
 
 namespace lib.Ai
 {
@@ -6,9 +6,7 @@ namespace lib.Ai
     {
         string Name { get; }
         string Version { get; }
-        Future[] StartRound(int punterId, int puntersCount, Map map, Settings settings);
-        Move GetNextMove(Move[] prevMoves, Map map);
-        string SerializeGameState();
-        void DeserializeGameState(string gameState);
+        AiSetupDecision Setup(State state, IServices services);
+        AiMoveDecision GetNextMove(State state, IServices services);
     }
 }

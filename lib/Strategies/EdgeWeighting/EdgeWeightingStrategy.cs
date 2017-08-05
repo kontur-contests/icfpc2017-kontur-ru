@@ -7,11 +7,11 @@ namespace lib.Strategies.EdgeWeighting
 {
     public class EdgeWeightingStrategy : IStrategy
     {
-        public EdgeWeightingStrategy(Map map, int punterId, IEdgeWeighter edgeWeighter)
+        public EdgeWeightingStrategy(int punterId, IEdgeWeighter edgeWeighter, MineDistCalculator mineDistCalculator)
         {
             PunterId = punterId;
             EdgeWeighter = edgeWeighter;
-            MineDistCalulator = new MineDistCalculator(new Graph(map));
+            MineDistCalulator = mineDistCalculator;
         }
 
         private MineDistCalculator MineDistCalulator { get; }

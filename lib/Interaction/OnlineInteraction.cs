@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using lib.Ai;
 using lib.Interaction.Internal;
 using lib.Replays;
+using lib.StateImpl;
 using lib.Structures;
 using Newtonsoft.Json;
 using NUnit.Framework;
@@ -33,11 +35,20 @@ namespace lib.Interaction
         {
             var setup = connection.ReadSetup();
 
-            Future[] futures;
+            var services = new Services();
+            var state = new State
+            {
+                map = setup.map,
+                punter = setup.punter,
+                punters = setup.punters,
+                settings = setup.settings
+            };
+
+            AiSetupDecision setupDecision;
 
             try
             {
-                futures = ai.StartRound(setup.punter, setup.punters, setup.map, setup.settings);
+                setupDecision = ai.Setup(state, services);
             }
             catch
             {
@@ -47,9 +58,17 @@ namespace lib.Interaction
                 throw;
             }
 
-            connection.WriteSetupReply(new SetupOut { ready = setup.punter, futures = futures });
+            if (setup.settings?.futures != true && setupDecision.futures?.Any() == true)
+                throw new InvalidOperationException($"BUG in Ai {ai.Name} - futures are not supported");
+            state.aiSetupDecision = new AiInfoSetupDecision
+            {
+                name = ai.Name,
+                version = ai.Version,
+                futures = setupDecision.futures,
+                reason = setupDecision.reason
+            };
 
-            var map = setup.map;
+            connection.WriteSetupReply(new SetupOut { ready = setup.punter, futures = setupDecision.futures });
 
             var allMoves = new List<Move>();
 
@@ -62,12 +81,20 @@ namespace lib.Interaction
 
                 allMoves.AddRange(moves);
                 foreach (var move in moves)
-                    map = map.ApplyMove(move);
+                    state.map = state.map.ApplyMove(move);
 
-                Move nextMove;
+                state.turns.Add(new TurnState
+                {
+                    moves = moves,
+                    aiMoveDecision = state.lastAiMoveDecision
+                });
+
+                services.ApplyNextState(state);
+
+                AiMoveDecision moveDecision;
                 try
                 {
-                    nextMove = ai.GetNextMove(moves, map);
+                    moveDecision = ai.GetNextMove(state, services);
                 }
                 catch
                 {
@@ -75,11 +102,16 @@ namespace lib.Interaction
                     File.WriteAllText($@"error-turn-{DateTime.UtcNow.ToString("O").Replace(":", "_")}.json", $@"{handshake.Length}:{handshake}{gameplay.Length}:{gameplay}");
                     throw;
                 }
+                state.lastAiMoveDecision = new AiInfoMoveDecision
+                {
+                    name = ai.Name,
+                    version = ai.Version,
+                    move = moveDecision.move,
+                    reason = moveDecision.reason
+                };
 
-                allMoves.Add(nextMove);
-                connection.WriteMove(nextMove);
+                connection.WriteMove(moveDecision.move);
                 serverResponse = connection.ReadNextTurn();
-
             }
 
             var stopIn = serverResponse.stop;
@@ -87,7 +119,7 @@ namespace lib.Interaction
             allMoves.AddRange(stopIn.moves);
             
             var meta = new ReplayMeta(DateTime.UtcNow, ai.Name, ai.Version, "", setup.punter, setup.punters, stopIn.scores);
-            var data = new ReplayData(setup.map, allMoves, futures);
+            var data = new ReplayData(setup.map, allMoves, state.aiSetupDecision.futures);
             
             return Tuple.Create(meta, data);
         }

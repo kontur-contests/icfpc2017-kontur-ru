@@ -11,7 +11,7 @@ namespace lib.viz
     { 
         public  void SetFutures(Dictionary<int, Future[]> futures, Graph graph)
         {
-            var calculator = new MineDistCalculator(graph);
+            var calculator = new MineDistCalculator.Impl(graph);
             futuresList.Items.Clear();
             foreach (var futuresGroup in futures)
             {
@@ -44,7 +44,7 @@ namespace lib.viz
             Controls.Add(futuresList, 0, 3);
         }
 
-        private static int CalculateCost(Future future, MineDistCalculator calculator)
+        private static int CalculateCost(Future future, MineDistCalculator.Impl calculator)
         {
             var dist = 0;
 

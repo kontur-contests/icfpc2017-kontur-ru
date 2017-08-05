@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using lib.Ai.StrategicFizzBuzz;
 using lib.GraphImpl;
-using lib.Structures;
+using lib.StateImpl;
 
 namespace lib.Ai
 {
@@ -16,22 +13,23 @@ namespace lib.Ai
 
         private GreedyAi Base = new GreedyAi();
 
-        public Future[] StartRound(int punterId, int puntersCount, Map map, Settings settings)
+        Random rand = new Random();
+
+        public AiSetupDecision Setup(State state, IServices services)
         {
-            return Base.StartRound(punterId, puntersCount, map, settings);
+            services.Setup<GraphService>(state);
+            return Base.Setup(state, services);
         }
 
-        Random rand = new Random();
-        public Move GetNextMove(Move[] prevMoves, Map map)
+        public AiMoveDecision GetNextMove(State state, IServices services)
         {
-            if (map.Sites.Length < 300)
-                return Base.GetNextMove(prevMoves, map);
+            if (state.map.Sites.Length < 300)
+                return Base.GetNextMove(state, services);
 
-                var graph = new Graph(map);
+            var graph = services.Get<GraphService>(state).Graph;
+            var playersCount = state.map.Rivers.Select(river => river.Owner).Distinct().Count(i => i >= 0);
 
-            var playersCount = map.Rivers.Select(river => river.Owner).Distinct().Count(i => i >= 0);
-
-                var nearMinesEdge = map.Mines
+                var nearMinesEdge = state.map.Mines
                     .Select(mine => new { mine, edges = graph.Vertexes[mine].Edges.Select(edge => edge.River).ToList() })
                 .Where(mine => mine.edges.Select(edge => edge.Owner).Distinct().Count() < playersCount+1)
                     .OrderBy(mine => Tuple.Create(mine.edges.Select(edge => edge.Owner).Distinct().Count(), rand.Next()))
@@ -39,66 +37,43 @@ namespace lib.Ai
                     .SelectMany(mine => mine.edges)
                     .FirstOrDefault(edge => edge.Owner < 0);
                 if (nearMinesEdge == null)
-                    return Base.GetNextMove(prevMoves, map);
-                return Move.Claim(Base.punterId, nearMinesEdge.Source, nearMinesEdge.Target);
+                    return Base.GetNextMove(state, services);
+                return AiMoveDecision.Claim(state.punter, nearMinesEdge.Source, nearMinesEdge.Target);
         }
-
-        public string SerializeGameState()
-        {
-            return Base.SerializeGameState();
-        }
-
-        public void DeserializeGameState(string gameState)
-        {
-            Base.DeserializeGameState(gameState);
-            }
     }
 
     public class LochMaxVertexWeighterKillerAi : IAi
-            {
+    {
         public string Name => nameof(LochMaxVertexWeighterKillerAi);
         public string Version => "0.1";
 
         private IAi Base = new MaxReachableVertexWithConnectedComponentsWeightAi();
 
-        private int punterId;
-        private int puntersCount;
-
-        public Future[] StartRound(int punterId, int puntersCount, Map map, Settings settings)
-        {
-            this.punterId = punterId;
-            this.puntersCount = puntersCount;
-            return Base.StartRound(punterId, puntersCount, map, settings);
-            }
-
         Random rand = new Random();
-        public Move GetNextMove(Move[] prevMoves, Map map)
+
+        public AiSetupDecision Setup(State state, IServices services)
         {
-            if (map.Sites.Length / puntersCount < 150)
-                return Base.GetNextMove(prevMoves, map);
+            services.Setup<GraphService>(state);
+            return Base.Setup(state, services);
+        }
 
-            var graph = new Graph(map);
+        public AiMoveDecision GetNextMove(State state, IServices services)
+        {
+            if (state.map.Sites.Length / state.punters < 150)
+                return Base.GetNextMove(state, services);
 
-            var nearMinesEdge = map.Mines
+            var graph = services.Get<GraphService>(state).Graph;
+
+            var nearMinesEdge = state.map.Mines
                 .Select(mine => new { mine, edges = graph.Vertexes[mine].Edges.Select(edge => edge.River).ToList() })
-                .Where(mine => mine.edges.Select(edge => edge.Owner).Distinct().Count() < puntersCount + 1)
+                .Where(mine => mine.edges.Select(edge => edge.Owner).Distinct().Count() < state.punters + 1)
                 .OrderBy(mine => Tuple.Create(mine.edges.Select(edge => edge.Owner).Distinct().Count(), rand.Next()))
                 .Where(mine => mine.edges.Count <= 100)
                 .SelectMany(mine => mine.edges)
                 .FirstOrDefault(edge => edge.Owner < 0);
             if (nearMinesEdge == null)
-                return Base.GetNextMove(prevMoves, map);
-            return Move.Claim(punterId, nearMinesEdge.Source, nearMinesEdge.Target);
-        }
-
-        public string SerializeGameState()
-        {
-            return Base.SerializeGameState();
-        }
-
-        public void DeserializeGameState(string gameState)
-        {
-            Base.DeserializeGameState(gameState);
+                return Base.GetNextMove(state, services);
+            return AiMoveDecision.Claim(state.punter, nearMinesEdge.Source, nearMinesEdge.Target);
         }
     }
 }

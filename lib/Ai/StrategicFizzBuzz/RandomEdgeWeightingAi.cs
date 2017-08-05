@@ -1,15 +1,11 @@
-using JetBrains.Annotations;
+using lib.StateImpl;
 using lib.Strategies.EdgeWeighting;
-using lib.Structures;
 
 namespace lib.Ai.StrategicFizzBuzz
 {
-    [UsedImplicitly]
     public class RandomEdgeWeightingAi : EdgeWeightingStrategicAi
     {
-        public override string Name => nameof(RandomEdgeWeightingAi);
-
-        protected override IEdgeWeighter CreateEdgeWeighter(int punterId, int puntersCount, Map map, Settings settings)
+        protected override IEdgeWeighter CreateEdgeWeighter(State state, IServices services)
         {
             return new RandomEdgeWeighter();
         }

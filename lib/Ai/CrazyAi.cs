@@ -5,6 +5,7 @@ using System.Linq;
 using System.Windows.Forms;
 using lib.GraphImpl;
 using lib.Scores.Simple;
+using lib.StateImpl;
 using lib.Structures;
 using lib.viz;
 using NUnit.Framework;
@@ -15,51 +16,38 @@ namespace lib.Ai
     {
         public string Name => nameof(CrazyAi);
         public string Version => "0.1";
-        private int punterId;
+        
         private readonly Random random = new Random(314);
-        private MineDistCalculator mineDistCalulator;
-        private GreedyAiHelper GreedyAiHelper { get; set; }
-
-        // ReSharper disable once ParameterHidesMember
-        public Future[] StartRound(int punterId, int puntersCount, Map map, Settings settings)
+        
+        public AiSetupDecision Setup(State state, IServices services)
         {
-            this.punterId = punterId;
-            this.mineDistCalulator = new MineDistCalculator(new Graph(map));
-            this.GreedyAiHelper = new GreedyAiHelper(punterId, mineDistCalulator);
-
-            return new Future[0];
+            services.Setup<GraphService>(state);
+            services.Setup<MineDistCalculator>(state);
+            return AiSetupDecision.Empty();
         }
 
-        public Move GetNextMove(Move[] prevMoves, Map map)
+        public AiMoveDecision GetNextMove(State state, IServices services)
         {
-            var graph = new Graph(map);
+            var graph = services.Get<GraphService>(state).Graph;
 
-            var mines = map.Mines.ToList();
-            for (int i = 0; i < mines.Count(); i++)
+            var mines = state.map.Mines.ToList();
+            for (int i = 0; i < mines.Count; i++)
             {
-                for (int j = i + 1; j < mines.Count(); j++)
+                for (int j = i + 1; j < mines.Count; j++)
                 {
-                    var denic = new Dinic(graph, punterId, mines[i], mines[j], out int flow);
+                    var denic = new Dinic(graph, state.punter, mines[i], mines[j], out int flow);
                     if (flow != 0 && flow != Dinic.INF)
                     {
                         var cut = denic.GetMinCut();
                         var edge = cut[random.Next(cut.Count)];
-                        return Move.Claim(punterId, edge.From, edge.To);
+                        return AiMoveDecision.Claim(state.punter, edge.From, edge.To);
                     }
                 }
             }
 
-            GreedyAiHelper.TryExtendAnything(graph, out Move nextMove);
-            return nextMove;
-        }
-
-        public string SerializeGameState()
-        {
-            return "";
-        }
-
-        public void DeserializeGameState(string gameState)
-        {
+            var connectedCalculator = new ConnectedCalculator(graph, state.punter);
+            GreedyAiHelper.TryExtendAnything(state.punter, graph, connectedCalculator, services.Get<MineDistCalculator>(state), out Move nextMove);
+            return AiMoveDecision.Move(nextMove);
         }
     }
 

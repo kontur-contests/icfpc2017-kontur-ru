@@ -8,9 +8,9 @@ namespace lib.Strategies.EdgeWeighting
 {
     public class MaxVertextWeighter : IEdgeWeighter
     {
-        public MaxVertextWeighter(Map map)
+        public MaxVertextWeighter(MineDistCalculator mineDistCalculator)
         {
-            MineDistCalculator = new MineDistCalculator(new Graph(map));
+            MineDistCalculator = mineDistCalculator;
         }
 
         private Graph Graph { get; set; }
