@@ -67,7 +67,7 @@ class Fluent:
         return self
 
     def run(self):
-        self.results = execute_tasks(self.tasks)
+        self.results = execute_tasks(self.tasks,self.token)
         return self
 
     def dump(self,dump_file = None):
