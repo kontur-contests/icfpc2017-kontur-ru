@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Net;
+using System.Net.Sockets;
 using System.Threading;
 using FluentAssertions;
 using NUnit.Framework;
@@ -12,7 +14,7 @@ namespace lib.Interaction
         [Explicit]
         public void DoHandshake()
         {
-            var client = new TcpTransport(9019);
+            var client = StreamTransport.TcpTransport(9019);
 
             client.Write("{\"me\":\"Ya\"}");
             client.Read().Should().BeEquivalentTo("{\"you\":\"Ya\"}");
