@@ -21,7 +21,7 @@ namespace punter
                 inputReader = Console.In;
             else
                 inputReader = new StreamReader(args[0]);
-            ai = new GreedyAi();
+            ai = new LochKillerAi();
 
             Write(new HandshakeOut {me = TeamName});
             var handshakeIn = Read<HandshakeIn>();
