@@ -31,7 +31,7 @@ namespace lib.Interaction
 
         public Tuple<ReplayMeta, ReplayData> RunGame(IAi ai)
         {
-            var setup = connection.ReadSetup(120000);
+            var setup = connection.ReadSetup();
 
             Future[] futures;
 
