@@ -136,6 +136,11 @@ namespace ProbabilityMethods
 			return new Probability(num < 1e-50 ? 0 : num * _logProbability);
 		}
 
+		public Probability NoisyOr(Probability probability)
+		{
+			return ~(~this * ~probability);
+		}
+
 		public override string ToString()
 		{
 			return GetProbability().ToString();
