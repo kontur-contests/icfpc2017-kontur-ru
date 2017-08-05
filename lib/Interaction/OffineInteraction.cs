@@ -13,7 +13,7 @@ namespace lib.Interaction
         public void Start(string name, GameState state)
         {
             var setup = transport.ReadSetup();
-            transport.WriteInitialState(setup.Id, state);
+            transport.WriteInitialState(setup.Id.ToString(), state);
             SetupRecieved?.Invoke(setup);
 
             while (true)
@@ -31,8 +31,12 @@ namespace lib.Interaction
 
         public event Action<Setup> SetupRecieved;
         public Func<Move[], GameState, Tuple<Move, GameState>> HandleMove { private get; set; }
-        public event Action<Move[], Score[], GameState> GameEnded;
+        public event Action<Move[], ScoreModel[], GameState> GameEnded;
 
         private readonly OfflineProtocol transport;
+        public void RunGame(IAi Ai)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

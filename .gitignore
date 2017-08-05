@@ -83,3 +83,5 @@ __pycache__
 /tools
 !/tools/packages.config
 .pack/
+
+submission.tar.gz

@@ -43,7 +43,7 @@ namespace lib.Interaction
             var gameTransport = new OnlineProtocol(transport);
             var setup = new Setup
             {
-                Id = "id"
+                Id = 1
             };
             var data = JsonConvert.SerializeObject(setup);
 

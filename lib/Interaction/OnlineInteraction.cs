@@ -1,40 +1,57 @@
 ﻿using System;
+using System.Diagnostics;
 using lib.Interaction.Internal;
+using NLog;
+using NUnit.Framework;
 
 namespace lib.Interaction
 {
     public class OnlineInteraction : IServerInteraction
     {
-        public OnlineInteraction(ITransport transport)
+        private readonly OnlineProtocol connection;
+        private Map map;
+
+        public OnlineInteraction(int port)
         {
-            this.transport = new OnlineProtocol(transport);
+            connection = new OnlineProtocol(new TcpTransport(port));
         }
 
-        public void Start(string name, GameState state)
+        public void RunGame(IAi ai)
         {
-            transport.HandShake(name);
+            connection.HandShake("rutnok bks");
 
-            var setup = transport.ReadSetup();
-            SetupRecieved?.Invoke(setup);
+            var setup = connection.ReadSetup();
+            ai.StartRound(setup.Id, setup.PunterCount, setup.Map);
+            map = setup.Map;
+            
+            var serverResponse = connection.ReadGameState();
 
-            while (true)
+            while (!connection.IsGameOver)
             {
-                var moves = transport.ReadMoves();
-                var result = HandleMove.Invoke(moves, state);
-                state = result.Item2;
-                transport.WriteMove(result.Item1);
-                if (moves.Length + 1 == setup.Map.Rivers.Length)
-                    break;
-            }
+                var moves = connection.GetMoves(serverResponse);
+                foreach (var move in moves)
+                    MapUpdater.ApplyMove(map, move);
 
-            var end = transport.ReadScore();
-            GameEnded?.Invoke(end.Item1, end.Item2, state);
+                var nextMove = ai.GetNextMove(moves, map);
+                connection.WriteMove(nextMove);
+
+                serverResponse = connection.ReadGameState();
+            }
+            var score = connection.GetScore(serverResponse);
+            Console.WriteLine(score);
+        }
+    }
+
+    [TestFixture]
+    public static class Program
+    {
+        [Test]
+        [Explicit]
+        public static  void Main()
+        {
+            var onlineInteraction = new OnlineInteraction(9008);
+            onlineInteraction.RunGame(new ConnectClosestMinesAi());
         }
 
-        public event Action<Setup> SetupRecieved;
-        public Func<Move[], GameState, Tuple<Move, GameState>> HandleMove { private get; set; }
-        public event Action<Move[], Score[], GameState> GameEnded;
-
-        private readonly OnlineProtocol transport;
     }
 }
