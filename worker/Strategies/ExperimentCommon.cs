@@ -15,7 +15,7 @@ namespace worker.Strategies
         {
             var ais = players.Select(selector).ToList();
             var gameSimulator = new GameSimulatorRunner(new SimpleScoreCalculator());
-            var results = gameSimulator.SimulateGame(ais, MapLoader.LoadMapByName(map).Map);
+            var results = gameSimulator.SimulateGame(ais, MapLoader.LoadMapByName(map).Map, new Settings());
             return results.Select(z => new PlayerResult { Scores = z.Score }).ToList();
         }
     }

@@ -19,11 +19,13 @@ namespace lib.Ai
         public string Name => nameof(ConnectClosestMinesAi);
 
         // ReSharper disable once ParameterHidesMember
-        public void StartRound(int punterId, int puntersCount, Map map)
+        public Future[] StartRound(int punterId, int puntersCount, Map map, Settings settings)
         {
             this.punterId = punterId;
             this.mineDistCalulator = new MineDistCalculator(new Graph(map));
             myMines.Clear();
+
+            return new Future[0];
         }
 
         public Move GetNextMove(Move[] prevMoves, Map map)
@@ -259,7 +261,7 @@ namespace lib.Ai
         {
             var map = MapLoader.LoadMap(Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\..\maps\sample.json")).Map;
             var ai = new ConnectClosestMinesAi();
-            ai.StartRound(0, 1, map);
+            ai.StartRound(0, 1, map, new Settings());
             var move = ai.GetNextMove(null, map);
             Assert.That(move, Is.EqualTo(new ClaimMove(0, 5, 7)).Or.EqualTo(new ClaimMove(0, 5, 3)));
         }
@@ -269,7 +271,7 @@ namespace lib.Ai
         {
             var map = MapLoader.LoadMap(Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\..\maps\sample.json")).Map;
             var ai = new ConnectClosestMinesAi();
-            var simulator = new GameSimulator(map);
+            var simulator = new GameSimulator(map, new Settings());
             simulator.StartGame(new List<IAi> {ai});
             var gameState = simulator.NextMove();
             var move = ai.GetNextMove(null, gameState.CurrentMap);
@@ -281,7 +283,7 @@ namespace lib.Ai
         {
             var map = MapLoader.LoadMap(Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\..\maps\sample.json")).Map;
             var ai = new ConnectClosestMinesAi();
-            var simulator = new GameSimulator(map);
+            var simulator = new GameSimulator(map, new Settings());
             simulator.StartGame(new List<IAi> {ai});
             simulator.NextMove();
             var gameState = simulator.NextMove();
@@ -299,7 +301,7 @@ namespace lib.Ai
             var map = MapLoader.LoadMap(Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\..\maps\sample.json"));
 
             var ai = new ConnectClosestMinesAi();
-            var simulator = new GameSimulator(map.Map);
+            var simulator = new GameSimulator(map.Map, new Settings());
             simulator.StartGame(new List<IAi> { ai });
             var gameState = simulator.NextMove();
             painter.Map = gameState.CurrentMap;

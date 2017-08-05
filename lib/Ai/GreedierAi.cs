@@ -13,10 +13,12 @@ namespace lib.Ai
 
         public string Name => nameof(GreedierAi);
 
-        public void StartRound(int punterId, int puntersCount, Map map)
+        public Future[] StartRound(int punterId, int puntersCount, Map map, Settings settings)
         {
             PunterId = punterId;
             Strategy = new GreedyStrategy(map, punterId);
+
+            return new Future[0];
         }
 
         public Move GetNextMove(Move[] prevMoves, Map map)

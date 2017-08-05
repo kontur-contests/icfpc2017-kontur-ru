@@ -23,7 +23,7 @@ namespace ConsoleApp
 
 
                 Console.WriteLine($"MAP: {map.Name}");
-                var results = gameSimulator.SimulateGame(gamers, map.Map)
+                var results = gameSimulator.SimulateGame(gamers, map.Map, new Settings())
                     .OrderByDescending(r => r.Score).ToList();
 
                 
