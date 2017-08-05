@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using Confluent.Kafka;
 using Confluent.Kafka.Serialization;
+using lib.Arena;
 using Newtonsoft.Json;
 using NLog;
 
@@ -18,6 +21,7 @@ namespace worker
         private readonly IExperiment experiment;
         private bool cancelled;
         private Thread workerThread;
+        private string commitHash;
 
         public WorkerService(Dictionary<string, object> conf, string input, string output, IExperiment experiment)
         {
@@ -25,12 +29,17 @@ namespace worker
             inputTopicName = input;
             outputTopicName = output;
             this.experiment = experiment;
+            commitHash = File.ReadAllLines("commit_hash.txt").FirstOrDefault();
         }
 
         public void Start()
         {
             workerThread = new Thread(() =>
             {
+                var timesSleeped = 0;
+                var rnd = new Random();
+                
+                
                 using (var consumer = new Consumer<Null, string>(config, null, new StringDeserializer(Encoding.UTF8)))
                 using (var producer = new Producer<Null, string>(config, null, new StringSerializer(Encoding.UTF8)))
                 {
@@ -58,7 +67,18 @@ namespace worker
                     while (!cancelled)
                     {
                         Message<Null, string> msg;
-                        if (!consumer.Consume(out msg, TimeSpan.FromSeconds(1))) continue;
+                
+                        if (timesSleeped >= rnd.Next(3, 10))
+                        {
+                            timesSleeped = 0;
+                            ArenaRunner.TryCompeteOnArena("TCWorker", commitHash);
+                        } 
+                        
+                        if (!consumer.Consume(out msg, TimeSpan.FromSeconds(1)))
+                        {
+                            timesSleeped++;
+                            continue;
+                        }
 
                         logger.Info($"Got message | Topic: {msg.Topic} Partition: {msg.Partition} Offset: {msg.Offset} {msg.Value}");
 

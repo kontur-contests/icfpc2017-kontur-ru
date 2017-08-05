@@ -28,9 +28,9 @@ namespace lib.Interaction.Internal
             }
         }
 
-        public Setup ReadSetup()
+        public Setup ReadSetup(int? timeout = null)
         {
-            return JsonConvert.DeserializeObject<Setup>(transport.Read());
+            return JsonConvert.DeserializeObject<Setup>(transport.Read(timeout));
         }
 
         public void WriteSetupReply(SetupReply reply)
