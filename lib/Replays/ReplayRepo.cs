@@ -62,12 +62,13 @@ namespace lib.Replays
 
         public ReplayMeta[] GetRecentMetas(int limit = 10)
         {
-            return metas
+            var items = metas
                 .OrderBy("timestamp")
                 .LimitToLast(limit)
                 .OnceAsync<ReplayMeta>()
                 .ConfigureAwait(false).GetAwaiter()
-                .GetResult()
+                .GetResult();
+            return items
                 .Select(x => x.Object)
                 .OrderByDescending(x => x.Timestamp)
                 .ToArray();
