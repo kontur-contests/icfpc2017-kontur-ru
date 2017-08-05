@@ -17,7 +17,7 @@ namespace lib
             var gameSimulator = new GameSimulatorRunner(new SimpleScoreCalculator());
 
             var results = gameSimulator.SimulateGame(
-                gamers, MapLoader.LoadMapByName("sample.json").Map);
+                gamers, MapLoader.LoadMapByName("sample.json").Map, new Settings());
 
             foreach (var gameSimulationResult in results)
             {

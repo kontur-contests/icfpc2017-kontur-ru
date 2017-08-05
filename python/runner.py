@@ -15,9 +15,8 @@ class Fluent:
         self.params = kwargs
         return self
 
-    def create_players_randomly(self, count, seed=42):
+    def create_random_players(self, count):
         players = []
-        np.random.seed(seed)
         for i in range(count):
             player = dict()
             for key in self.params:
@@ -28,21 +27,40 @@ class Fluent:
         self.players = players
         return self
 
-    def one_player_various_groupsize(self, *args):
+    def battling_in_pairs(self):
+        self.battles = [[self.players[first], self.players[second]]
+                        for second in range(len(self.players))
+                        for first in range(second - 1)]
+        return self
+
+    def first_against_himself(self, *args):
         self.battles = [[self.players[0] for _ in range(size)] for size in args]
         return self
 
-    def pair_battles(self):
-        self.battles = [ [self.players[first], self.players[second]]
-                         for second in range(len(self.players))
-                         for first in range(second-1)]
+    def on_maps(self, *args):
+        self.battles_on_maps = [(battle,map) for battle in self.battles for map in args]
         return self
 
-    def run_experiment(self, experiment_name):
-        self.tasks = [ {'Experiment' : experiment_name, 'Players' : battle } for battle in self.battles]
+
+
+    def experiment(self, experiment_name):
+        experiment_token = np.random.randint(1,100000)
+        self.tasks = [{'Experiment': experiment_name, 'Token' : experiment_token, 'Part' : index, 'Map': map, 'Players': battle}
+                      for index, (battle, map) in enumerate(self.battles_on_maps)]
+        return self
+
+    def preview(self):
+        print(json.dumps(self.tasks,indent=2))
+        return self
+
+    def run(self):
         self.results = execute_tasks(self.tasks)
         return self
 
+    def dump(self,dump_file):
+        with open(dump_file,'w') as file:
+            file.write(json.dumps(self.results,indent=2))
+        return self
 
     def store_pointwise(self, filename):
         keys = list(self.params)
@@ -52,18 +70,26 @@ class Fluent:
             file.write('\n')
             for game in self.results:
                 for player in game['Players']:
-                    file.write(','.join([str(player['Rank']),str(len(game['Players'])), '', player['Name'] ]))
+                    file.write(','.join([str(player['Rank']),str(len(game['Players'])), game['Map'], player['Name'] ]))
                     file.write(',')
                     file.write(','.join([str(player['Params'][key]) for key in keys]))
                     file.write('\n')
+        return self
 
 
-k= (Fluent()
-    .from_params(key_1 = Param(0,1), key_2 = Param(0,1), key_3 = Param(0,1))
-    .create_players_randomly(3)
-    .pair_battles()
-    .run_experiment('Test')
-    .store_pointwise('output.csv')
-    )
 
-print(k.results)
+def test_greedy_algorithms():
+    (Fluent()
+    .from_params()
+    .create_random_players(1)
+    .first_against_himself(1,2,4)
+    .on_maps('sample.json')
+    .experiment('Greedy')
+    .preview()
+    #.run()
+    #.dump('greedy_results')
+     )
+
+test_greedy_algorithms()
+
+#empty_queue()

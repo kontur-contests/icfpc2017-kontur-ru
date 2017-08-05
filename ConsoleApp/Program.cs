@@ -18,10 +18,12 @@ namespace ConsoleApp
 
             foreach (var map in maps)
             {
-                var gamers = new List<IAi> { new CrazyAi(), new ConnectClosestMinesAi() };
+                var gamers = new List<IAi> { new ConnectClosestMinesAi(), new GreedyAi() };
                 var gameSimulator = new GameSimulatorRunner(new SimpleScoreCalculator(), true);
 
-                var results = gameSimulator.SimulateGame(gamers, map.Map)
+
+                Console.WriteLine($"MAP: {map.Name}");
+                var results = gameSimulator.SimulateGame(gamers, map.Map, new Settings())
                     .OrderByDescending(r => r.Score).ToList();
 
                 

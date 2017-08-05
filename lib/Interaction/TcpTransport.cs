@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -23,7 +24,9 @@ namespace lib.Interaction
             var ipHostInfo = Dns.Resolve("punter.inf.ed.ac.uk");
             var ipAddress = ipHostInfo.AddressList[0];
 
+             
             client.Connect(ipAddress.ToString(), port);
+            log.Debug($"{client.Client.RemoteEndPoint}|Connect established");
             client.ReceiveTimeout = 10000;
             client.SendTimeout = 10000;
             networkStream = client.GetStream();
@@ -32,15 +35,16 @@ namespace lib.Interaction
         public void Write(string data)
         {
             var strToSend = data.Length + ":" + data;
-            log.Debug($"Write {strToSend}");
+            log.Debug($"{client.Client.RemoteEndPoint}|Write {strToSend}");
             var buffer = Encoding.ASCII.GetBytes(strToSend);
             networkStream.Write(buffer, 0, buffer.Length);
+            networkStream.Flush();
         }
 
 
-        public string Read()
+        public string Read(int timeout = 15000)
         {
-            var n = ReadN();
+            var n = ReadN(timeout);
             var sb = new StringBuilder();
 
             var myReadBuffer = new byte[1024];
@@ -57,18 +61,23 @@ namespace lib.Interaction
             }
 
             sb.Remove(sb.Length - 1, 1);
-            log.Debug($"Read {sb}");
+            log.Debug($"{client.Client.RemoteEndPoint}|Read {sb}");
             return sb.ToString();
         }
 
-        private int ReadN()
+        private int ReadN(int timeout)
         {
+            var sw = Stopwatch.StartNew();
             var nStr = new StringBuilder();
             var buffer = new byte[1];
             while (Convert.ToChar(buffer[0]) != ':')
             {
                 while (!networkStream.DataAvailable)
+                {
                     Thread.Sleep(20);
+                    if (sw.ElapsedMilliseconds > timeout)
+                        throw new TimeoutException();
+                }
                 networkStream.Read(buffer, 0, 1);
                 nStr.AppendFormat("{0}", Encoding.ASCII.GetString(buffer, 0, 1));
             }

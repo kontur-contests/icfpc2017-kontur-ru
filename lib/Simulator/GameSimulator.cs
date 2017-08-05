@@ -8,16 +8,21 @@ namespace lib
     public class GameSimulator : ISimulator
     {
         private Map map;
+        private readonly Settings settings;
         private List<IAi> punters;
         private int currentPunter = 0;
         private readonly List<Move> moves;
         private int turnsAmount;
 
-        public GameSimulator(Map map)
+        public IList<Future[]> Futures { get; }
+
+        public GameSimulator(Map map, Settings settings)
         {
             this.map = map;
+            this.settings = settings;
             punters = new List<IAi>();
             moves = new List<Move>();
+            Futures = new List<Future[]>();
         }
 
         public void StartGame(List<IAi> gamers)
@@ -25,7 +30,9 @@ namespace lib
             punters = gamers;
             for (int i = 0; i < punters.Count; i++)
             {
-                punters[i].StartRound(i, punters.Count, map);
+                var punterFutures = punters[i].StartRound(i, punters.Count, map, settings);
+
+                Futures.Add(ValidateFutures(punterFutures));
             }
 
             turnsAmount = map.Rivers.Length;
@@ -48,5 +55,12 @@ namespace lib
         {
             map = nextMove.Execute(map);
         }
+
+        private Future[] ValidateFutures(Future[] futures)
+            => futures
+                .Where(e => map.Mines.Contains(e.Source) && !map.Mines.Contains(e.Target))
+                .GroupBy(e => e.Source)
+                .Select(e => e.Last())
+                .ToArray();
     }
 }

@@ -124,7 +124,7 @@ namespace lib
         {
             public string Name => "Junk";
 
-            public void StartRound(int punterId, int puntersCount, Map map)
+            public Future[] StartRound(int punterId, int puntersCount, Map map, Settings settings)
             {
                 throw new NotImplementedException();
             }

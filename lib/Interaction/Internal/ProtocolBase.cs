@@ -7,6 +7,11 @@ namespace lib.Interaction.Internal
 {
     public abstract class ProtocolBase
     {
+        public static string Serialize(object obj)
+        {
+            return JsonConvert.SerializeObject(obj);
+        }
+
         public static string SerializeMove(Move move)
         {
             switch (move)

@@ -19,7 +19,7 @@ namespace lib
         public void SetUp()
         {
             map = MapLoader.LoadMapByName("sample.json");
-            simulator = new GameSimulator(map.Map);
+            simulator = new GameSimulator(map.Map, new Settings());
         }
 
         [Test]
@@ -49,8 +49,9 @@ namespace lib
         {
             public string Name { get; }
 
-            public void StartRound(int punterId, int puntersCount, Map map)
+            public Future[] StartRound(int punterId, int puntersCount, Map map, Settings settings)
             {
+                return new Future[0];
             }
 
             public Move GetNextMove(Move[] prevMoves, Map map)

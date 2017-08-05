@@ -26,7 +26,7 @@ namespace punter
             var @in = Read<In>();
             if (@in.IsSetup())
             {
-                Write(DoSetup(@in.punter.Value, @in.punters, @in.map));
+                Write(DoSetup(@in.punter.Value, @in.punters, @in.map, @in.settings));
             }
             else if (@in.IsGameplay())
             {
@@ -40,13 +40,14 @@ namespace punter
                 throw new InvalidOperationException($"Invalid input: {@in.line}");
         }
 
-        private static SetupOut DoSetup(int punter, int punters, Map map)
+        private static SetupOut DoSetup(int punter, int punters, Map map, Settings settings)
         {
             Console.Error.WriteLine($"punter={punter}/{punters}");
-            ai.StartRound(punter, punters, map);
+            var futures = ai.StartRound(punter, punters, map, settings);
             return new SetupOut
             {
                 ready = punter,
+                futures = futures,
                 state = new State
                 {
                     ai = ai.SerializeGameState(),
@@ -166,6 +167,7 @@ namespace punter
         public int? punter;
         public int punters;
         public Map map;
+        public Settings settings;
 
         public bool IsGameplay() => move != null;
         public MovesIn move;
@@ -201,6 +203,7 @@ namespace punter
     public class SetupOut
     {
         public int ready;
+        public Future[] futures;
         public State state;
     }
 

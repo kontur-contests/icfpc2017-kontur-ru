@@ -6,7 +6,7 @@ namespace lib.Interaction
 {
     public interface IServerInteraction
     {
-        void Start();
+        bool Start();
         Tuple<ReplayMeta, ReplayData> RunGame(IAi ai);
     }
 }

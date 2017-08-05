@@ -4,7 +4,7 @@ namespace lib.Scores.Simple
 {
     public class SimpleScoreCalculator : IScoreCalculator
     {
-        public long GetScore(int punter, Map map)
+        public long GetScore(int punter, Map map, Future[] futures)
         {
             var graph = new Graph(map);
             var distCalc = new MineDistCalculator(graph);
@@ -20,6 +20,22 @@ namespace lib.Scores.Simple
                     res += dist * dist;
                 }
             }
+
+            foreach (var future in futures)
+            {
+                var mines = minesCalc.GetConnectedMines(future.Target);
+
+                var dist = distCalc.GetDist(future.Source, future.Target);
+
+                var futureScoreValue = dist * dist * dist;
+
+                var futureScore = mines.Contains(future.Source)
+                    ? futureScoreValue
+                    : -futureScoreValue;
+
+                res += futureScore;
+            }
+
             return res;
         }
     }
