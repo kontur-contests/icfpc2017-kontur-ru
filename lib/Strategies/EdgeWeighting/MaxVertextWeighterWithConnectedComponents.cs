@@ -53,7 +53,8 @@ namespace lib.Strategies.EdgeWeighting
                 return weight;
             weight = CalcVertexScore(vertexId);
             foreach (var edge in SpGraph.Vertexes[vertexId].Edges)
-                weight = Math.Max((double) weight, CalcSubGraphWeight(edge.To));
+//                weight = weight + CalcSubGraphWeight(edge.To);
+                weight = Math.Max(weight, CalcSubGraphWeight(edge.To));
             SubGraphWeight[vertexId] = weight;
             return weight;
         }
@@ -68,11 +69,10 @@ namespace lib.Strategies.EdgeWeighting
                     weight = CalcMutualComponentWeight(component, CurrentComponent);
                 return weight;
             }
-            var multiplier = 1;
+            var vertexWeight = CalcProperVertexScore(vertexId, ClaimedMineIds);
             if (Graph.Mines.ContainsKey(vertexId))
-                multiplier = MineMultiplier;
-
-            return multiplier * CalcProperVertexScore(vertexId, ClaimedMineIds);
+                return MineMultiplier*vertexWeight + CurrentComponent.Vertices.Sum(v => CalcProperVertexScore(v, new [] {vertexId}));
+            return vertexWeight;
         }
 
         private int CalcProperVertexScore(int vertexId, ICollection<int> claimedMineIds)

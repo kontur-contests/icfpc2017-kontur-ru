@@ -19,7 +19,7 @@ namespace lib.Ai.StrategicFizzBuzz
         }
 
         public override string Name => nameof(MaxReachableVertexWeightAi);
-
+        public override string Version => "1.0";
         public int punterId { get; private set; }
 
         protected override IEdgeWeighter CreateEdgeWeighter(int punterId, int puntersCount, Map map, Settings settings)
