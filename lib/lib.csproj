@@ -1,9 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <OutputType>Library</OutputType>
   </PropertyGroup>
-
   <PropertyGroup>
     <TargetFramework>net461</TargetFramework>
     <AssemblyName>lib</AssemblyName>
@@ -12,18 +10,16 @@
     <OutputTypeEx>library</OutputTypeEx>
     <StartupObject />
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DebugType>pdbonly</DebugType>
     <DebugSymbols>True</DebugSymbols>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="FakeItEasy" Version="2.3.1" />
     <PackageReference Include="FluentAssertions" Version="4.19.3" />
     <PackageReference Include="JetBrains.Annotations" Version="11.0.0" />
     <PackageReference Include="morelinq" Version="2.6.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+    <PackageReference Include="Newtonsoft.Json" Version="9.0.0.0" />
     <PackageReference Include="NLog" Version="4.4.11" />
     <PackageReference Include="NUnit" Version="3.7.1" />
     <PackageReference Include="NUnit.ConsoleRunner" Version="3.7.0" />
@@ -35,7 +31,6 @@
     <PackageReference Include="NUnit.Runners" Version="3.7.0" />
     <PackageReference Include="Shouldly" Version="2.8.3" />
   </ItemGroup>
-
   <ItemGroup>
     <Reference Include="Firebase">
       <HintPath>..\externals\Firebase.dll</HintPath>
@@ -45,7 +40,6 @@
     </Reference>
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
-
   <ItemGroup>
     <Compile Update="viz\ScaledViewPanel.cs">
       <SubType>Component</SubType>
