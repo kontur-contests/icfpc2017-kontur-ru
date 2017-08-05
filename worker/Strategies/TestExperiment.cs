@@ -12,11 +12,10 @@ namespace worker
     
     public class TestExperiment : IExperiment
     {
-        public IEnumerable<Tuple<PlayerWithParams, long>> Play(Task task)
+        public List<PlayerResult> Play(Task task)
         {
-            return task.Players
-            .OrderBy(player => player.Params.Values.Sum())
-            .Select((player, i) => Tuple.Create(player, (long)i));
+            return task.Players.Select(z => new PlayerResult { Scores = (long)(z.Params.Values.Sum() * 10000) }).ToList();
+            
         }
     }
 }

@@ -147,9 +147,9 @@ namespace lib.viz
         {
             var gameState = mapPainter.GameState;
             if (gameState == null) return;
-            var simpleScoreCalculator = new SimpleScoreCalculator();
+            var scoreCalculator = new SimpleScoreCalculator();
             var scores = provider.PunterNames.Select(
-                (name, i) => simpleScoreCalculator.GetScore(i, gameState.CurrentMap));
+                (name, i) => scoreCalculator.GetScore(i, gameState.CurrentMap, provider.GetPunterFutures(i)));
             scorePanel.SetScores(scores.ToArray());
         }
     }

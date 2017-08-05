@@ -1,0 +1,91 @@
+[
+  {
+    "Results": [
+      {
+        "Scores": 32
+      }
+    ],
+    "Error": null,
+    "Task": {
+      "Map": "sample.json",
+      "Experiment": "Greedy",
+      "Players": [
+        {
+          "Name": "0",
+          "Params": {},
+          "Rank": 0
+        }
+      ]
+    }
+  },
+  {
+    "Results": [
+      {
+        "Scores": 27
+      },
+      {
+        "Scores": 22
+      }
+    ],
+    "Error": null,
+    "Task": {
+      "Map": "sample.json",
+      "Experiment": "Greedy",
+      "Players": [
+        {
+          "Name": "0",
+          "Params": {},
+          "Rank": 0
+        },
+        {
+          "Name": "0",
+          "Params": {},
+          "Rank": 0
+        }
+      ]
+    }
+  },
+  {
+    "Results": [
+      {
+        "Scores": 6
+      },
+      {
+        "Scores": 15
+      },
+      {
+        "Scores": 15
+      },
+      {
+        "Scores": 3
+      }
+    ],
+    "Error": null,
+    "Task": {
+      "Map": "sample.json",
+      "Experiment": "Greedy",
+      "Players": [
+        {
+          "Name": "0",
+          "Params": {},
+          "Rank": 0
+        },
+        {
+          "Name": "0",
+          "Params": {},
+          "Rank": 0
+        },
+        {
+          "Name": "0",
+          "Params": {},
+          "Rank": 0
+        },
+        {
+          "Name": "0",
+          "Params": {},
+          "Rank": 0
+        }
+      ]
+    }
+  }
+]

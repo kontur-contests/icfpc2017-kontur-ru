@@ -8,7 +8,7 @@ namespace worker.Strategies
 {
     class ExperimentSelector : IExperiment
     {
-        public IEnumerable<Tuple<PlayerWithParams, long>> Play(Task task)
+        public List<PlayerResult> Play(Task task)
         {
             switch (task.Experiment)
             {

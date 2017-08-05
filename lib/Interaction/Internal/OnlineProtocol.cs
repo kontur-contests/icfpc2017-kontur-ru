@@ -30,9 +30,12 @@ namespace lib.Interaction.Internal
 
         public Setup ReadSetup()
         {
-            var setup = JsonConvert.DeserializeObject<Setup>(transport.Read());
-            transport.Write($"{{\"ready\":{setup.Id}}}");
-            return setup;
+            return JsonConvert.DeserializeObject<Setup>(transport.Read());
+        }
+
+        public void WriteSetupReply(SetupReply reply)
+        {
+            transport.Write(Serialize(reply));
         }
 
         public void WriteMove(Move move)

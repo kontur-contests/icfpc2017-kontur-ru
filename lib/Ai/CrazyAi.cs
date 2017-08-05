@@ -19,11 +19,13 @@ namespace lib.Ai
         public GreedyAiHelper GreedyAiHelper { get; set; }
 
         // ReSharper disable once ParameterHidesMember
-        public void StartRound(int punterId, int puntersCount, Map map)
+        public Future[] StartRound(int punterId, int puntersCount, Map map, Settings settings)
         {
             this.punterId = punterId;
             this.mineDistCalulator = new MineDistCalculator(new Graph(map));
             this.GreedyAiHelper = new GreedyAiHelper(punterId, mineDistCalulator);
+
+            return new Future[0];
         }
 
         public Move GetNextMove(Move[] prevMoves, Map map)
@@ -74,7 +76,7 @@ namespace lib.Ai
                 Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\..\maps\sample.json"));
 
             var ai = new GreedyAi();
-            var simulator = new GameSimulator(map.Map);
+            var simulator = new GameSimulator(map.Map, new Settings());
             simulator.StartGame(new List<IAi> { ai });
 
             while (true)
@@ -98,7 +100,7 @@ namespace lib.Ai
             var gameSimulator = new GameSimulatorRunner(new SimpleScoreCalculator());
 
             var results = gameSimulator.SimulateGame(
-                gamers, MapLoader.LoadMapByName("edge.json").Map);
+                gamers, MapLoader.LoadMapByName("edge.json").Map, new Settings());
 
             foreach (var gameSimulationResult in results)
             {

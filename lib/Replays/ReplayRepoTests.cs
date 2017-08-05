@@ -20,7 +20,7 @@ namespace lib.Replays
             var sw1 = Stopwatch.StartNew();
             JsonConvert.SerializeObject(map).CalculateMd5();
             Console.WriteLine(sw1.Elapsed);
-            var data = new ReplayData(map, Enumerable.Range(0, map.Rivers.Length).Select(i => new ClaimMove(0, i, i + 1)).ToArray());
+            var data = new ReplayData(map, Enumerable.Range(0, map.Rivers.Length).Select(i => new ClaimMove(0, i, i + 1)).ToArray(), new Future[0]);
             var sw = Stopwatch.StartNew();
             repo.SaveReplay(meta, data);
             Console.WriteLine(sw.Elapsed);

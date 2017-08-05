@@ -31,9 +31,13 @@ namespace lib.Interaction
         public Tuple<ReplayMeta, ReplayData> RunGame(IAi ai)
         {
             var setup = connection.ReadSetup();
-            ai.StartRound(setup.Id, setup.PunterCount, setup.Map);
+
+            var futures = ai.StartRound(setup.Id, setup.PunterCount, setup.Map, setup.Settings);
+
+            connection.WriteSetupReply(new SetupReply(setup.Id, futures));
+
             map = setup.Map;
-            
+
             var serverResponse = connection.ReadGameState();
 
             var allMoves = new List<Move>();
@@ -57,7 +61,7 @@ namespace lib.Interaction
             allMoves.AddRange(score.MoveModels.Select(ProtocolBase.MoveModel.GetMove));
             
             var meta = new ReplayMeta(DateTime.UtcNow, ai.Name, setup.Id, setup.PunterCount, score.Scores);
-            var data = new ReplayData(setup.Map, allMoves);
+            var data = new ReplayData(setup.Map, allMoves, futures);
             
             return Tuple.Create(meta, data);
         }
@@ -70,7 +74,7 @@ namespace lib.Interaction
         [Explicit]
         public static void Main()
         {
-            var interaction = new OnlineInteraction(9011);
+            var interaction = new OnlineInteraction(9001);
             interaction.Start();
             interaction.RunGame(new ConnectClosestMinesAi());
         }
