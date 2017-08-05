@@ -14,6 +14,7 @@ namespace worker.Strategies
             {
                 case "DummyAI": return new DummyAIExperiment().Play(task);
                 case "Test": return new TestExperiment().Play(task);
+                case "Greedy": return new GreedyExperiment().Play(task);
                 default: throw new Exception("Experiment type '" + task.Experiment + "' is not recognized");
             }
         }
