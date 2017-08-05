@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using lib;
+using lib.Ai;
 using lib.Arena;
 using lib.Interaction;
 using lib.Replays;

@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
-using lib.Ai;
 using lib.GraphImpl;
 using lib.Scores.Simple;
 using lib.viz;
 using NUnit.Framework;
 
-namespace lib.Strategies
+namespace lib.Ai
 {
     public class GreedyAi : IAi
     {

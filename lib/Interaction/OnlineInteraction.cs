@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using lib.Ai;
 using lib.Interaction.Internal;
 using lib.Replays;
 using NUnit.Framework;

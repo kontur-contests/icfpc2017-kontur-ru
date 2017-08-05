@@ -3,6 +3,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using lib;
+using lib.Ai;
 using Newtonsoft.Json;
 
 namespace punter

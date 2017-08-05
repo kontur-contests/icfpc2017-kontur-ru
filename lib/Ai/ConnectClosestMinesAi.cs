@@ -8,7 +8,7 @@ using lib.viz;
 using NUnit.Framework;
 using Shouldly;
 
-namespace lib
+namespace lib.Ai
 {
     public class ConnectClosestMinesAi : IAi
     {

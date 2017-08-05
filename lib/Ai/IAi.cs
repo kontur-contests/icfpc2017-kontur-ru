@@ -1,6 +1,4 @@
-using Newtonsoft.Json.Linq;
-
-namespace lib
+namespace lib.Ai
 {
     public interface IAi
     {

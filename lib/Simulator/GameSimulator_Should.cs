@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using FluentAssertions;
+using lib.Ai;
 using NUnit.Framework;
 
 namespace lib
