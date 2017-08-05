@@ -1,23 +1,20 @@
-﻿using System;
+using System;
 using System.Linq;
 using lib.GraphImpl;
 using lib.Strategies;
 using MoreLinq;
 
-namespace lib.Ai
+namespace lib.Ai.StrategicFizzBuzz
 {
-    public class GreedierAi : IAi
+    public abstract class StrategicAi : IAi
     {
-        private GreedyStrategy Strategy { get; set; }
         private int PunterId { get; set; }
+        protected abstract IStrategy Strategy { get; }
+        public abstract string Name { get; }
 
-        public string Name => nameof(GreedierAi);
-
-        public Future[] StartRound(int punterId, int puntersCount, Map map, Settings settings)
+        public virtual Future[] StartRound(int punterId, int puntersCount, Map map, Settings settings)
         {
             PunterId = punterId;
-            Strategy = new GreedyStrategy(map, punterId);
-
             return new Future[0];
         }
 
