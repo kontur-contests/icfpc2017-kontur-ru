@@ -1,3 +1,9 @@
-scores,server_name,num_players,name,Age
-27,GreedyAi,2,sample.json,0,0.0
-22,Dummy,2,sample.json,1,1.0
+game_number,server_name,scores,ranking,tournament_scores,num_players,map,map_rivers_count,map_sites_count,name,Age
+0,GreedyAi,25,1,1,2,sample.json,12,8,Age1,1.0
+0,ConnectClosestMinesAi,27,0,2,2,sample.json,12,8,Age0,0.0
+1,ConnectClosestMinesAi,27,0,2,2,sample.json,12,8,Age0,0.0
+1,GreedyAi,25,1,1,2,sample.json,12,8,Age1,1.0
+2,ConnectClosestMinesAi,1879,1,1,2,Sierpinski-triangle.json,81,42,Age0,0.0
+2,GreedyAi,2071,0,2,2,Sierpinski-triangle.json,81,42,Age1,1.0
+3,GreedyAi,2071,0,2,2,Sierpinski-triangle.json,81,42,Age1,1.0
+3,ConnectClosestMinesAi,1879,1,1,2,Sierpinski-triangle.json,81,42,Age0,0.0
