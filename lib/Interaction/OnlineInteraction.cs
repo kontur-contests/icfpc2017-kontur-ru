@@ -15,7 +15,7 @@ namespace lib.Interaction
 
         public OnlineInteraction(int port)
         {
-            connection = new OnlineProtocol(StreamTransport.TcpTransport(port));
+            connection = new OnlineProtocol(new TcpTransport(port));
         }
 
         public void Start()
@@ -37,10 +37,11 @@ namespace lib.Interaction
             var serverResponse = connection.ReadGameState();
 
             var allMoves = new List<Move>();
-
+            
             while (!connection.IsGameOver)
             {
-                Move[] moves = connection.GetMoves(serverResponse);
+                var moves = connection.GetMoves(serverResponse);
+                
                 allMoves.AddRange(moves);
                 foreach (var move in moves)
                     map = move.Execute(map);
@@ -52,8 +53,9 @@ namespace lib.Interaction
                 serverResponse = connection.ReadGameState();
             }
             var score = connection.GetScore(serverResponse);
-            allMoves.AddRange(score.MoveModels.Select(ProtocolBase.MoveModel.GetMove).ToArray());
 
+            allMoves.AddRange(score.MoveModels.Select(ProtocolBase.MoveModel.GetMove));
+            
             var meta = new ReplayMeta(DateTime.UtcNow, ai.Name, setup.Id, setup.PunterCount, score.Scores);
             var data = new ReplayData(setup.Map, allMoves);
             
