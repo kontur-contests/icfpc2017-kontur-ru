@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using lib.GraphImpl;
+using MoreLinq;
 
 namespace lib.Strategies.EdgeWeighting
 {
@@ -28,10 +29,22 @@ namespace lib.Strategies.EdgeWeighting
                 .ToArray();
 
             if (claimedVertexes.Length == 0)
-                claimedVertexes = graph.Mines.Keys.ToArray();
+                return graph.Mines.Values
+                    .SelectMany(v => v.Edges)
+                    .Where(e => e.Owner == -1)
+                    .Select(
+                        e => new TurnResult
+                        {
+                            Estimation = 1,
+                            River = e.River
+                        })
+                    .ToList();
 
-            EdgeWeighter.Init(graph, claimedVertexes);
-            return claimedVertexes.SelectMany(v => graph.Vertexes[v].Edges)
+            var connectedComponents = ConnectedComponent.GetComponents(graph, PunterId);
+            EdgeWeighter.Init(graph, connectedComponents);
+            var maxComponent = connectedComponents.MaxBy(comp => comp.Vertices.Count);
+            return maxComponent.Vertices
+                .SelectMany(v => graph.Vertexes[v].Edges)
                 .Where(e => e.Owner == -1)
                 .Select(
                     e => new TurnResult

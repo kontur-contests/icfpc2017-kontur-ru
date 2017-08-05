@@ -40,6 +40,9 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Update="viz\FuturesPanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Update="viz\ReplayerPanel.cs">
       <SubType>Component</SubType>
     </Compile>

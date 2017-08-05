@@ -14,7 +14,7 @@ namespace lib.viz
             var buttonsPanel = new FlowLayoutPanel
             {
                 AutoSize = true,
-                Dock =DockStyle.Top
+                Dock = DockStyle.Top
             };
             var refreshButton = new Button()
             {
@@ -51,8 +51,8 @@ namespace lib.viz
 
 
             listView.ItemSelectionChanged += SelectedReplayChanged;
-            Controls.Add(debugTextArea);
             Controls.Add(listView);
+            Controls.Add(debugTextArea);
             Controls.Add(buttonsPanel);
         }
 
