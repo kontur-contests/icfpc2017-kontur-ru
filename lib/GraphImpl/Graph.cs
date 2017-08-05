@@ -24,9 +24,9 @@ namespace lib.GraphImpl
             }
             foreach (var river in map.Rivers)
             {
-                Vertexes[river.Source].Edges.Add(new Edge(river.Source, river.Target, river.Owner));
+                Vertexes[river.Source].Edges.Add(Edge.Forward(river));
                 if (river.Source != river.Target)
-                    Vertexes[river.Target].Edges.Add(new Edge(river.Target, river.Source, river.Owner));
+                    Vertexes[river.Target].Edges.Add(Edge.Forward(river));
             }
         }
 
@@ -41,8 +41,9 @@ namespace lib.GraphImpl
 
         public void AddEdge(int v, int u, int owner = -1)
         {
-            Vertexes[v].Edges.Add(new Edge(v, u, owner));
-            Vertexes[u].Edges.Add(new Edge(u, v, owner));
+            var river = new River(v, u, owner);
+            Vertexes[v].Edges.Add(Edge.Forward(river));
+            Vertexes[u].Edges.Add(Edge.Backward(river));
         }
     }
 }
