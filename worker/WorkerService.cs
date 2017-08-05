@@ -7,6 +7,7 @@ using System.Threading;
 using Confluent.Kafka;
 using Confluent.Kafka.Serialization;
 using lib.Arena;
+using lib.OnlineRunner;
 using Newtonsoft.Json;
 using NLog;
 
@@ -50,7 +51,7 @@ namespace worker
                 {
                     while (!cancelled)
                     {
-                        ArenaRunner.TryCompeteOnArena("TCWorker", commitHash);
+                        OnlineArenaRunner.TryCompeteOnArena("TCWorker", commitHash);
                     }
                 });
             arenaThread.Start();

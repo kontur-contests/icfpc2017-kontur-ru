@@ -2,15 +2,16 @@
 using System.Diagnostics;
 using System.Net.Sockets;
 using lib.Ai;
+using lib.Arena;
 using lib.Interaction;
 using lib.Replays;
 using lib.viz;
 using MoreLinq;
 using NLog;
 
-namespace lib.Arena
+namespace lib.OnlineRunner
 {
-    public class ArenaRunner
+    public static class OnlineArenaRunner
     {
         private static readonly object Locker = new object();
         private static readonly ILogger log = LogManager.GetCurrentClassLogger();
@@ -18,6 +19,11 @@ namespace lib.Arena
 
         public static bool TryCompeteOnArena(string collectorId, string commitHash = "manualRun")
         {
+            var portLocker = new PortLocker();
+            var id = Guid.NewGuid();
+            var match = ArenaMatch.EmptyMatch;
+
+
             try
             {
                 var sw = Stopwatch.StartNew();
@@ -26,10 +32,20 @@ namespace lib.Arena
 
                 lock (Locker)
                 {
-                    var match = ArenaApi.GetNextMatch();
-                    ai = AiFactoryRegistry.GetNextAi();
+                    var isPortOpen = false;
+                    do
+                    {
+                        match = ArenaApi.GetNextMatch();
+                        if (match == null)
+                            continue;
+                        isPortOpen = portLocker.TryAcquire(match.Port, id);
+                        if (!isPortOpen)
+                            log.Warn($"{match.Port} taken");
+                    } while (!isPortOpen);
 
-                    if (match == null) return false;
+                    log.Info($"Take {match.Port}");
+
+                    ai = AiFactoryRegistry.GetNextAi();
 
                     log.Info($"Collector {collectorId}: Match on port {match.Port} for {ai.Name}");
 
@@ -40,9 +56,14 @@ namespace lib.Arena
                     catch (SocketException e)
                     {
                         log.Error(e);
+                        portLocker.Free(match.Port);
                         return false;
                     }
-                    if (!interaction.Start()) return false;
+                    if (!interaction.Start())
+                    {
+                        portLocker.Free(match.Port);
+                        return false;
+                    }
                 }
 
                 log.Info($"Collector {collectorId}: Running game");
@@ -58,8 +79,9 @@ namespace lib.Arena
             {
                 log.Error(e, $"Collector {collectorId} failed: {e}");
             }
+            
+            portLocker.Free(match.Port);
             return true;
         }
-
     }
 }

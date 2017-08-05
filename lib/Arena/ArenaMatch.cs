@@ -2,6 +2,8 @@
 {
     public class ArenaMatch
     {
+        public static readonly ArenaMatch EmptyMatch = new ArenaMatch();
+        
         public enum MatchStatus
         {
             Waiting,
