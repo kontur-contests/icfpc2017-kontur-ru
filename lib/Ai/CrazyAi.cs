@@ -10,35 +10,33 @@ using NUnit.Framework;
 
 namespace lib.Ai
 {
-    public class CrazyAi : IAi
+    public class CrazyAi : GreedyAi
     {
-        public string Name => nameof(CrazyAi);
+        public new string Name => nameof(CrazyAi);
         private int punterId;
         
         // ReSharper disable once ParameterHidesMember
-        public void StartRound(int punterId, int puntersCount, Map map)
+        public new void StartRound(int punterId, int puntersCount, Map map)
         {
             this.punterId = punterId;
+            base.StartRound(punterId, puntersCount, map);
         }
 
-        public Move GetNextMove(Move[] prevMoves, Map map)
+        public new Move GetNextMove(Move[] prevMoves, Map map)
         {
             var graph = new Graph(map);
 
-            while (graph.Vertexes.Count > 2)
-            {
-                var edges = new HashSet<Tuple<int, int>>();
-
-            }
+            if (TryExtendAnything(graph, out Move nextMove))
+                return nextMove;
             return new PassMove(punterId);
         }
 
-        public string SerializeGameState()
+        public new string SerializeGameState()
         {
             throw new System.NotImplementedException();
         }
 
-        public void DeserializeGameState(string gameState)
+        public new void DeserializeGameState(string gameState)
         {
             throw new System.NotImplementedException();
         }
@@ -82,7 +80,7 @@ namespace lib.Ai
             var gameSimulator = new GameSimulatorRunner(new SimpleScoreCalculator());
 
             var results = gameSimulator.SimulateGame(
-                gamers, MapLoader.LoadMapByName("gen1.json").Map);
+                gamers, MapLoader.LoadMapByName("sample.json").Map);
 
             foreach (var gameSimulationResult in results)
             {

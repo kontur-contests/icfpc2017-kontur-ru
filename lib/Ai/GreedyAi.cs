@@ -34,7 +34,7 @@ namespace lib.Ai
             return new PassMove(punterId);
         }
 
-        private bool TryExtendAnything(Graph graph, out Move nextMove)
+        protected bool TryExtendAnything(Graph graph, out Move nextMove)
         {
             var calculator = new ConnectedCalculator(graph, punterId);
             var maxAddScore = long.MinValue;
