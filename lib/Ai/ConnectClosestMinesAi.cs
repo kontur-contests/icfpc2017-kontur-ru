@@ -12,7 +12,14 @@ namespace lib.Ai
 {
     public class ConnectClosestMinesAi : IAi
     {
+        private const int FindNewComponent = 0;
+        private const int ExtendComponent = 1;
+        private const int ExtendAnything = 2;
+
         private readonly HashSet<int> myMines = new HashSet<int>();
+
+        private int stage = FindNewComponent;
+
         private int punterId;
         private MineDistCalculator mineDistCalulator;
 
@@ -36,12 +43,20 @@ namespace lib.Ai
 
             Move move;
 
-            if (TryExtendComponent(graph, out move))
-                return move;
+            if (stage == ExtendComponent)
+            {
+                if (TryExtendComponent(graph, out move))
+                    return move;
+                stage = FindNewComponent;
+            }
 
-            if (TryBuildNewComponent(graph, out move))
+            if (stage == FindNewComponent && TryBuildNewComponent(graph, out move))
+            {
+                stage = ExtendComponent;
                 return move;
+            }
 
+            stage = ExtendAnything;
             if (TryExtendAnything(graph, out move))
                 return move;
 
@@ -91,11 +106,6 @@ namespace lib.Ai
 
         private bool TryExtendComponent(Graph graph, out Move move)
         {
-            if (myMines.Count == 0)
-            {
-                move = null;
-                return false;
-            }
             var queue = new Queue<ExtendQueueItem>();
             var used = new HashSet<int>();
             foreach (var mineId in graph.Mines.Keys.Where(id => !myMines.Contains(id)))
@@ -228,15 +238,16 @@ namespace lib.Ai
 
         public string SerializeGameState()
         {
-            return $"{punterId};{string.Join(";", myMines)}";
+            return $"{punterId};{stage};{string.Join(";", myMines)}";
     }
 
         public void DeserializeGameState(string gameState)
         {
             var split = gameState.Split(new[]{';'}, StringSplitOptions.RemoveEmptyEntries);
             punterId = int.Parse(split[0]);
+            stage = int.Parse(split[1]);
             myMines.Clear();
-            myMines.UnionWith(split.Skip(1).Select(int.Parse));
+            myMines.UnionWith(split.Skip(2).Select(int.Parse));
         }
 
         private class BuildQueueItem

@@ -86,3 +86,4 @@ __pycache__
 
 icfp-*.tar.gz
 .ipynb_checkpoints
+punter/Properties/launchSettings.json
