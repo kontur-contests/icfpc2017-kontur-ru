@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Net.Sockets;
 using lib.Ai;
 using lib.Arena;
@@ -20,9 +21,7 @@ namespace lib.OnlineRunner
         public static bool TryCompeteOnArena(string collectorId, string commitHash = "manualRun")
         {
             var portLocker = new PortLocker();
-            var id = Guid.NewGuid();
             var match = ArenaMatch.EmptyMatch;
-
 
             try
             {
@@ -38,20 +37,20 @@ namespace lib.OnlineRunner
                         match = ArenaApi.GetNextMatch();
                         if (match == null)
                             continue;
-                        isPortOpen = portLocker.TryAcquire(match.Port, id);
+                        isPortOpen = portLocker.TryAcquire(match.Port);
                         if (!isPortOpen)
-                            log.Warn($"{match.Port} taken");
+                            log.Warn($"Collector {collectorId}: {match.Port} taken");
                     } while (!isPortOpen);
 
-                    log.Info($"Take {match.Port}");
+                    log.Info($"Collector {collectorId}: Take {match.Port}");
 
                     ai = AiFactoryRegistry.GetNextAi();
 
-                    log.Info($"Collector {collectorId}: Match on port {match.Port} for {ai.Name}");
-
+                    log.Info($"Collector {collectorId}: Match on port {match.Port} for {GetBotName(ai.Name)}");
+                    
                     try
                     {
-                        interaction = new OnlineInteraction(match.Port);
+                        interaction = new OnlineInteraction(match.Port, GetBotName(ai.Name));
                     }
                     catch (SocketException e)
                     {
@@ -82,6 +81,11 @@ namespace lib.OnlineRunner
             
             portLocker.Free(match.Port);
             return true;
+        }
+
+        private static string GetBotName(string botTypeName)
+        {
+            return $"kontur.ru_{string.Join("", botTypeName.Where(char.IsUpper).ToArray())}";
         }
     }
 }

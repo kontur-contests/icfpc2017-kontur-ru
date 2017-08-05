@@ -5,7 +5,6 @@ using Firebase.Auth;
 using Firebase.Database;
 using Firebase.Database.Query;
 using FluentAssertions;
-using Newtonsoft.Json;
 using NUnit.Framework;
 
 namespace lib.OnlineRunner
@@ -18,10 +17,10 @@ namespace lib.OnlineRunner
         public PortLocker()
         {
             fb = Connect().ConfigureAwait(false).GetAwaiter().GetResult();
-            rootQuery = fb.Child("portLocks");
+            rootQuery = fb.Child("portLocks_new");
         }
 
-        private static async Task<FirebaseClient> Connect()
+        public static async Task<FirebaseClient> Connect()
         {
             var auth = new FirebaseAuthProvider(new FirebaseConfig("AIzaSyBRYZvtAg1Vm5fZZ-r80vCISm0A8IhA7vM"));
             var link = await auth.SignInWithEmailAndPasswordAsync("pe@kontur.ru", "W1nnerzz");
@@ -33,16 +32,30 @@ namespace lib.OnlineRunner
                 });
         }
 
-        public bool TryAcquire(int portNumber, Guid workerId)
+        public bool TryAcquire(int portNumber)
         {
-            var port = portNumber.ToString();
-            var ids = rootQuery.Child(port).OnceAsync<Guid>().ConfigureAwait(false).GetAwaiter().GetResult()
-                .Select(o => o.Object).ToList();
+            var portChild = rootQuery.Child(portNumber.ToString());
+            var resp = portChild.PostAsync(GetValidToTimestamp()).ConfigureAwait(false)
+                .GetAwaiter().GetResult();
 
-            if (ids.Count != 0)
-                return false;
-            rootQuery.Child(portNumber.ToString()).PostAsync(workerId).GetAwaiter().GetResult();
-            return true;
+            var dateTimes = portChild.OnceAsync<DateTime>().ConfigureAwait(false).GetAwaiter().GetResult();
+
+            var now = DateTime.UtcNow;
+            var firebaseObject = dateTimes.First(x => x.Object >= now);
+            if (firebaseObject.Key == resp.Key)
+            {
+                portChild.DeleteAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+                portChild.PostAsync(GetValidToTimestamp()).ConfigureAwait(false).GetAwaiter().GetResult();
+                return true;
+            }
+            
+            portChild.Child(resp.Key).DeleteAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+            return false;
+        }
+
+        private static DateTime GetValidToTimestamp()
+        {
+            return DateTime.UtcNow + TimeSpan.FromMinutes(5);
         }
 
         public void Free(int portNumber)
@@ -60,22 +73,21 @@ namespace lib.OnlineRunner
     [TestFixture]
     public class PortLocker_Should
     {
-        private Guid g = Guid.Parse("d9abfe09-b31a-4dbf-9e8b-fb8dddc77ada");
         private readonly PortLocker pl = new PortLocker();
-        private const int portNumber = 1000;
 
         [Test]
         [Explicit]
         public void TryAcquire()
         {
-            pl.TryAcquire(portNumber, g).Should().BeTrue();
-            pl.TryAcquire(portNumber, g).Should().BeFalse();
-            pl.TryAcquire(portNumber, Guid.NewGuid()).Should().BeFalse();
-            pl.Free(portNumber);
-            pl.TryAcquire(portNumber, Guid.NewGuid()).Should().BeTrue();
-            pl.Free(portNumber);            
+            var fb = PortLocker.Connect().ConfigureAwait(false).GetAwaiter().GetResult();
+            var root = fb.Child("portLocks_new").Child("1000");
+            pl.Clear();
+            root.PostAsync(new DateTime(1900)).ConfigureAwait(false).GetAwaiter().GetResult();
+            pl.TryAcquire(1000).Should().BeTrue();
+            pl.TryAcquire(1000).Should().BeFalse();
+            pl.Clear();
         }
-
+        
         [Test, Explicit]
         public void ClearLocks()
         {

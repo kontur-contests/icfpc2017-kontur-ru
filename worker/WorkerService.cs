@@ -52,9 +52,7 @@ namespace worker
                         System.Threading.Tasks.Task.Run(() =>
                         {
                             while (!cancelled)
-                            {
                                 OnlineArenaRunner.TryCompeteOnArena("TCWorker", commitHash);
-                            }
                         });
                 });
             arenaThread.Start();
@@ -143,7 +141,7 @@ namespace worker
 
         public void Stop()
         {
-            cancelled = true;
+            cancelled = true;  
             workerThread.Join();
             arenaThread.Join();
         }
