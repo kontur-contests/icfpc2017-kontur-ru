@@ -9,11 +9,13 @@ namespace lib.Strategies.EdgeWeighting
 {
     public class MaxVertextWeighterWithConnectedComponents : IEdgeWeighter
     {
-        public MaxVertextWeighterWithConnectedComponents(Map map)
+        public MaxVertextWeighterWithConnectedComponents(Map map, double mineMultiplier)
         {
             MineDistCalculator = new MineDistCalculator(new Graph(map));
+            MineMultiplier = mineMultiplier;
         }
 
+        private double MineMultiplier { get; }
         private Graph Graph { get; set; }
         private MineDistCalculator MineDistCalculator { get; }
         private ShortestPathGraph SpGraph { get; set; }
@@ -68,7 +70,7 @@ namespace lib.Strategies.EdgeWeighting
             }
             var multiplier = 1;
             if (Graph.Mines.ContainsKey(vertexId))
-                multiplier = 100;
+                multiplier = MineMultiplier;
 
             return multiplier * CalcProperVertexScore(vertexId, ClaimedMineIds);
         }
