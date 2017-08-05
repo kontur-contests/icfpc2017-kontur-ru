@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using lib.GraphImpl;
+using ProbabilityMethods;
 
 namespace lib.Strategies
 {
@@ -11,7 +12,6 @@ namespace lib.Strategies
 	{
 		public Graph Graph;
 		public Dictionary<int, Dictionary<int, MineNodeCharacteristic>> DistanceFromMine = new Dictionary<int, Dictionary<int, MineNodeCharacteristic>>();
-
 
 		public SimpleScoreBuilder(Graph graph)
 		{
@@ -31,22 +31,33 @@ namespace lib.Strategies
 			Dictionary<int, MineNodeCharacteristic> used = new Dictionary<int, MineNodeCharacteristic>();
 			Queue<int> vertices = new Queue<int>();
 			vertices.Enqueue(mine);
-			used.Add(mine, new MineNodeCharacteristic{Vertex = mine, Mine = mine});
+			used.Add(mine, new MineNodeCharacteristic{Vertex = mine, Mine = mine, ChainProbability = Probability.One});
 			while (vertices.Count > 0)
 			{
 				var vertex = vertices.Dequeue();
 				var vertexNode = Graph.Vertexes[vertex];
 				var vertexCharct = used[vertex];
 
+				const double saveProbability = 0.99;
+
 				foreach (var edge in vertexNode.Edges)
 				{
-					if (used.ContainsKey(edge.To))
+					if (used.TryGetValue(edge.To, out var nextChrct))
 					{
-						if(used[edge.To].Distance == vertexCharct.Distance + 1)
-							used[edge.To].PreviousOptimalEdges.Add(vertex);
+						if (nextChrct.Distance == vertexCharct.Distance + 1)
+						{
+							nextChrct.PreviousOptimalEdges.Add(vertex);
+							nextChrct.ChainProbability = Probability.From(1-(1-nextChrct.ChainProbability.GetProbability())*(1-vertexCharct.ChainProbability.GetProbability()* saveProbability));
+						}
 						continue;
 					}
-					used[edge.To] = new MineNodeCharacteristic{Vertex = edge.To, Mine = mine, Distance = vertexCharct.Distance + 1};
+					used[edge.To] = new MineNodeCharacteristic
+					{
+						Vertex = edge.To,
+						Mine = mine,
+						Distance = vertexCharct.Distance + 1,
+						ChainProbability = saveProbability * vertexCharct.ChainProbability
+					};
 					used[edge.To].PreviousOptimalEdges.Add(vertex);
 				}
 			}
@@ -61,5 +72,6 @@ namespace lib.Strategies
 		public int Vertex;
 		public int Distance;
 		public List<int> PreviousOptimalEdges = new List<int>();
+		public Probability ChainProbability = Probability.Zero;
 	}
 }
