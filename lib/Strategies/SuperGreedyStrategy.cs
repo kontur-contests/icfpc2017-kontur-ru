@@ -28,34 +28,46 @@ namespace lib.Strategies
         public HashSet<int> Vertices = new HashSet<int>();
         public HashSet<int> Mines = new HashSet<int>();
 
-        public ConnectedComponent(Graph graph, int owner)
+        public static List<ConnectedComponent> GetComponents(Graph graph, int owner)
         {
             var queue = new Queue<Vertex>();
 
+            HashSet<int> usedMines = new HashSet<int>();
+
+            var result = new List<ConnectedComponent>();
+
             foreach (var mine in graph.Mines)
             {
-                if(mine.Value.Edges.All(edge => edge.Owner == owner))
-                    break;
+                if(mine.Value.Edges.All(edge => edge.Owner == owner) || usedMines.Contains(mine.Key))
+                    continue;
+                
+                var component = new ConnectedComponent();
 
                 queue.Clear();
 
-                Vertices.Add(mine.Key);
-                Mines.Add(mine.Key);
+                component.Vertices.Add(mine.Key);
+                component.Mines.Add(mine.Key);
+                usedMines.Add(mine.Key);
                 queue.Enqueue(mine.Value);
 
                 while (queue.Count > 0)
                 {
                     var node = queue.Dequeue();
-                    foreach (var edge in node.Edges.Where(edge => edge.Owner == owner).Where(edge => !Vertices.Contains(edge.To)))
+                    foreach (var edge in node.Edges.Where(edge => edge.Owner == owner).Where(edge => !component.Vertices.Contains(edge.To)))
                     {
                         var edgeNode = graph.Vertexes[edge.To];
                         if (edgeNode.IsMine)
-                            Mines.Add(edgeNode.Id);
-                        Vertices.Add(edgeNode.Id);
+                        {
+                            component.Mines.Add(edgeNode.Id);
+                            usedMines.Add(edgeNode.Id);
+                        }
+                        component.Vertices.Add(edgeNode.Id);
                         queue.Enqueue(edgeNode);
                     }
                 }
+                result.Add(component);
             }
+            return result;
         }
     }
 }

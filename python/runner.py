@@ -21,7 +21,9 @@ def test_historical_algorithms():
      )
     print (runner.token)
 
-test_historical_algorithms()
+#test_historical_algorithms()
+
+magic.Fluent().restore_dump('dumps\\result_dump_33915.json').store_pointwise('test.csv')
 
 #Fluent().restore_dump('result_dump_93839.json').store_pointwise('test.csv')
 
