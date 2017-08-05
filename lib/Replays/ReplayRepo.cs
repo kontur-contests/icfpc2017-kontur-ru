@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Firebase.Auth;
@@ -14,34 +15,35 @@ namespace lib.Replays
         void SaveReplay(ReplayMeta meta, ReplayData data);
 
         ReplayMeta[] GetRecentMetas(int limit = 10);
-        ReplayData GetData(string dataId);
+        ReplayData GetData(ReplayMeta meta);
     }
 
-    public class ReplayRepo : IReplayRepo
+    [Obsolete]
+    public class ReplayRepoOld : IReplayRepo
     {
         private readonly FirebaseClient fb;
 
         private ChildQuery metas;
         private ChildQuery datas;
 
-        public ReplayRepo(bool test = false)
+        public ReplayRepoOld(bool test = false)
         {
             fb = Connect().ConfigureAwait(false).GetAwaiter().GetResult();
             metas = test ? fb.Child("test").Child("replays").Child("metas") : fb.Child("replays").Child("metas");
             datas = test ? fb.Child("test").Child("replays").Child("datas") : fb.Child("replays").Child("datas");
         }
-        
+
         private static async Task<FirebaseClient> Connect()
         {
             var auth = new FirebaseAuthProvider(new FirebaseConfig("AIzaSyBRYZvtAg1Vm5fZZ-r80vCISm0A8IhA7vM"));
             var link = await auth.SignInWithEmailAndPasswordAsync("pe@kontur.ru", "W1nnerzz");
-            
+
             return new FirebaseClient("https://icfpc2017.firebaseio.com", new FirebaseOptions
             {
                 AuthTokenAsyncFactory = () => Task.FromResult(link.FirebaseToken)
             });
         }
-        
+
         public void SaveReplay(ReplayMeta meta, ReplayData data)
         {
             var result = datas
@@ -50,7 +52,7 @@ namespace lib.Replays
                 .GetResult();
 
             meta.DataId = result.Key;
-            
+
             metas
                 .PostAsync(meta)
                 .ConfigureAwait(false).GetAwaiter()
@@ -71,10 +73,10 @@ namespace lib.Replays
                 .ToArray();
         }
 
-        public ReplayData GetData(string dataId)
+        public ReplayData GetData(ReplayMeta meta)
         {
             return datas
-                .Child(dataId)
+                .Child(meta.DataId)
                 .OnceSingleAsync<ReplayData>()
                 .ConfigureAwait(false).GetAwaiter()
                 .GetResult();

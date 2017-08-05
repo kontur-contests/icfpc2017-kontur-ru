@@ -61,7 +61,7 @@ namespace lib.viz
             if (repo == null || listView.SelectedItems.Count == 0) return;
             var lvItem = listView.SelectedItems[0];
             var meta = (ReplayMeta)lvItem.Tag;
-            var data = repo.GetData(meta.DataId);
+            var data = repo.GetData(meta);
             debugTextArea.Text = meta.ToString() + "\r\n\r\n" + data.Moves.ToDelimitedString("\r\n");
             SelectedReplay = new ReplayFullData(meta, data);
             ReplayChanged?.Invoke();

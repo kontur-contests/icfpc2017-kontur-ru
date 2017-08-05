@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Security.Claims;
+using System.Text;
 using MoreLinq;
 using Newtonsoft.Json;
 
@@ -10,6 +13,7 @@ namespace lib.Replays
     {
         public DateTime Timestamp;
         public string AiName;
+        public string MapHash;
         public int OurPunter;
         public int PunterCount;
         public ScoreModel[] Scores;
@@ -64,6 +68,49 @@ namespace lib.Replays
             Moves = moves.Select(move => new MoveJson(move)).ToArray();
             Futures = futures;
         }
+
+        public string Encode()
+        {
+            var s = new MemoryStream();
+            var w = new BinaryWriter(s);
+            EncodeTo(w);
+            return Convert.ToBase64String(s.ToArray());
+        }
+        public static ReplayData Decode(string data)
+        {
+            var s = new MemoryStream(Convert.FromBase64String(data));
+            var r = new BinaryReader(s);
+            return DecodeFrom(r);
+        }
+        public void EncodeTo(BinaryWriter writer)
+        {
+            foreach (var future in Futures)
+                future.EncodeTo(writer);
+            writer.Write((byte)0);
+            foreach (var move in Moves)
+                move.EncodeTo(writer);
+            writer.Write((byte)0);
+        }
+
+        public static ReplayData DecodeFrom(BinaryReader reader)
+        {
+            var futures = new List<Future>();
+            while (true)
+            {
+                var future = Future.DecodeFrom(reader);
+                if (future == null) break;
+                futures.Add(future);
+            }
+            var moves = new List<MoveJson>();
+            while (true)
+            {
+                var move = MoveJson.DecodeFrom(reader);
+                if (move == null) break;
+                moves.Add(move);
+            }
+            return new ReplayData(){Futures = futures.ToArray(), Moves = moves.ToArray()};
+
+        }
     }
 
     public class MoveJson
@@ -93,6 +140,32 @@ namespace lib.Replays
                 case PassMove passMove: Pass = passMove; break;
                 default: throw new NotImplementedException();
             }
+        }
+
+        public static MoveJson Parse(string arg)
+        {
+            var args = arg.Substring(1).Split('|');
+            return new MoveJson(new ClaimMove(int.Parse(args[0]), int.Parse(args[1]), int.Parse(args[2])));
+
+        }
+
+        public static MoveJson DecodeFrom(BinaryReader reader)
+        {
+            byte marker = reader.ReadByte();
+            if (marker == 0) return null;
+            int punterId = reader.ReadInt32();
+            int source = reader.ReadInt32();
+            int target = reader.ReadInt32();
+            return new MoveJson(new ClaimMove(punterId, source, target));
+        }
+
+        public void EncodeTo(BinaryWriter w)
+        {
+            if (Claim == null) return;
+            w.Write((byte) 1);
+            w.Write(Claim.PunterId);
+            w.Write(Claim.Source);
+            w.Write(Claim.Target);
         }
     }
 }
