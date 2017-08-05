@@ -1,0 +1,123 @@
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using FluentAssertions;
+using NUnit.Framework;
+
+namespace lib.GraphImpl.ShortestPath
+{
+    [TestFixture]
+    public class ShortestPathGraph_Should
+    {
+        private class TestGraph : Graph, IEnumerable<int>
+        {
+            public TestGraph(params int[] vertices)
+            {
+                foreach (var vertex in vertices)
+                    AddVertex(vertex);
+            }
+
+            public IEnumerator<int> GetEnumerator() => Enumerable.Select<Vertex, int>(Vertexes.Values, x => x.Id).GetEnumerator();
+            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+            public void Add(int vertexId, int[] neighborIds = null)
+            {
+                foreach (var neighborId in neighborIds ?? new int[0])
+                    AddEdge(vertexId, neighborId);
+            }
+        }
+
+        private class TestShortestPathGraph : ShortestPathGraph, IEnumerable<int>
+        {
+            public IEnumerator<int> GetEnumerator() => Enumerable.Select<ShortestPathVertex, int>(Vertexes.Values, x => x.Id).GetEnumerator();
+            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+            public void Add(int vertexId, int distance, int[] neighborIds = null, int[] sameLevelNeighborIds = null)
+            {
+                AddVertex(vertexId, distance);
+                foreach (var neighborId in neighborIds ?? new int[0])
+                    AddEdge(Edge.Forward(new River(vertexId, neighborId)));
+                foreach (var neighborId in sameLevelNeighborIds ?? new int[0])
+                    AddSameLayerEdge(Edge.Forward(new River(neighborId, vertexId)));
+            }
+        }
+
+        [Test]
+        public void Simple()
+        {
+            var g = new TestGraph(1, 2, 3, 4)
+            {
+                {1, new[] {2, 3}},
+                {2, new[] {3, 4}},
+                {3, new[] {4}},
+                {4}
+            };
+
+            var spGraph = ShortestPathGraph.Build(g, 1);
+            spGraph.ShouldBeEquivalentTo(
+                new TestShortestPathGraph
+                {
+                    {1, 0, new[] {2, 3}},
+                    {2, 1, new[] {4}},
+                    {3, 1, new[] {4}, new[] {2}},
+                    {4, 2}
+                }, config => config.Using<River>(ctx => ctx.Subject.Should().Be(ctx.Expectation)).WhenTypeIs<River>());
+        }
+
+        [Test]
+        public void SimpleTwoSources()
+        {
+            var g = new TestGraph(1, 2, 3, 4)
+            {
+                {1, new[] {2, 3}},
+                {2, new[] {3, 4}},
+                {3, new[] {4}},
+                {4}
+            };
+
+            var spGraph = ShortestPathGraph.Build(g, 1, 4);
+            spGraph.ShouldBeEquivalentTo(
+                new TestShortestPathGraph
+                {
+                    {1, 0, new[] {2, 3}},
+                    {2, 1},
+                    {3, 1, null, new[] {2}},
+                    {4, 0, new[] {2, 3}}
+                }, config => config.Using<River>(ctx => ctx.Subject.Should().Be(ctx.Expectation)).WhenTypeIs<River>());
+        }
+
+        [Test]
+        public void TriangularGrid()
+        {
+            var g = new TestGraph(Enumerable.Range(1, 10).ToArray())
+            {
+                {1, new[] {2, 3}},
+                {2, new[] {3, 4, 5}},
+                {3, new[] {5, 6}},
+                {4, new[] {5, 7, 8}},
+                {5, new[] {6, 8, 9}},
+                {6, new[] {9, 10}},
+                {7, new[] {8}},
+                {8, new[] {9}},
+                {9, new[] {10}},
+                {10},
+            };
+
+            var spGraph = ShortestPathGraph.Build(g, 1);
+            spGraph.ShouldBeEquivalentTo(
+                new TestShortestPathGraph
+                {
+                    {1, 0, new[] {2, 3}},
+                    {2, 1, new[] {4, 5}},
+                    {3, 1, new[] {5, 6}, new[] {2}},
+                    {4, 2, new[] {7, 8}},
+                    {5, 2, new[] {8, 9}, new[] {4}},
+                    {6, 2, new[] {9, 10}, new[] {5}},
+                    {7, 3},
+                    {8, 3, null, new[] {7}},
+                    {9, 3, null, new[] {8}},
+                    {10, 3, null, new[] {9}},
+                }, config => config.Using<River>(ctx => ctx.Subject.Should().Be(ctx.Expectation)).WhenTypeIs<River>());
+        }
+    }
+}
