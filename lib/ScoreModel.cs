@@ -7,6 +7,6 @@ namespace lib
 		[JsonProperty("punter")]
 		public int Punter { get; set; }
 		[JsonProperty("score")]
-		public int Score { get; set; }
+		public long Score { get; set; }
 	}
 }
