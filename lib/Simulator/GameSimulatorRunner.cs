@@ -37,7 +37,7 @@ namespace lib
             var results = new List<GameSimulationResult>();
             for (int i = 0; i < gamers.Count; i++)
             {
-                results.Add(new GameSimulationResult(gamers[i], scoreCalculator.GetScore(i, map)));
+                results.Add(new GameSimulationResult(gamers[i], scoreCalculator.GetScore(i, state.CurrentMap)));
             }
 
             return results;
