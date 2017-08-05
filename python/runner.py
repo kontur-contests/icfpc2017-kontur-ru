@@ -20,13 +20,15 @@ def test_greedy_algorithms():
 
 def test_historical_algorithms():
     (Fluent()
-     .create_historical_players(5)
+     .create_historical_players(3)
      .battling_in_pairs()
      .on_maps('sample.json')
      .experiment('Historical')
      .preview())
 
-test_historical_algorithms()
+#test_historical_algorithms()
+
+#Fluent().restore_dump('result_dump_2247.json')
 
 #test_greedy_algorithms()
 

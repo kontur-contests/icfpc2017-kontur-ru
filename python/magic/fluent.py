@@ -39,7 +39,7 @@ class Fluent:
     def battling_in_pairs(self):
         self.battles = [[self.players[first], self.players[second]]
                         for second in range(len(self.players))
-                        for first in range(second - 1)]
+                        for first in range(second)]
         return self
 
     def first_against_himself(self, *args):
@@ -65,15 +65,15 @@ class Fluent:
         return self
 
     def dump(self,dump_file = None):
-        dump_file = dump_file or ('result_dump_'+str(self.token)+'.json')
-        with open(dump_file,'w') as file:
+        self.result_dump_file = dump_file or ('result_dump_'+str(self.token)+'.json')
+        with open(self.result_dump_file,'w') as file:
             file.write(json.dumps(self.results,indent=2))
         return self
 
     def restore_dump(self, dump_file):
         with open(dump_file,'r') as file:
             self.results = json.loads(file.read())
-        self.param_names = list(self.results[0]['Task']['Players'][0]['Params'])
+        self.param_names = list()
         return self
 
     def store_pointwise(self, filename):
