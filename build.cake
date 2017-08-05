@@ -3,8 +3,8 @@
 // ARGUMENTS
 //////////////////////////////////////////////////////////////////////
 
-var target = Argument("target", "Default");
-var configuration = Argument("configuration", "Release");
+var target = Argument("Target", "Default");
+var configuration = Argument("BuildConfig", "Release");
 
 //////////////////////////////////////////////////////////////////////
 // PREPARATION
@@ -13,9 +13,9 @@ var configuration = Argument("configuration", "Release");
 // Define directories.
 var solutionDir = Directory("./");
 var solution = solutionDir + File("icfpc2017.sln");
-var buildLibDir = Directory("./lib/bin") + Directory(configuration);
-var buildWorkerDir = Directory("./worker/bin") + Directory(configuration);
-var buildPunterDir = Directory("./punter/bin") + Directory(configuration);
+var buildLibDir = Directory("./lib/bin");
+var buildWorkerDir = Directory("./worker/bin");
+var buildPunterDir = Directory("./punter/bin");
 var buildSettings = new DotNetCoreBuildSettings
 {
     Configuration = configuration
