@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using lib.Ai.StrategicFizzBuzz;
 using lib.GraphImpl;
+using lib.Strategies;
 using lib.Structures;
 
 namespace lib.Ai
@@ -16,6 +18,7 @@ namespace lib.Ai
         private Random rand = new Random();
         public string Name => nameof(LochMaxVertexWeighterKillerAi);
         public string Version => "0.2";
+
 
         public Future[] StartRound(int punterId, int puntersCount, Map map, Settings settings)
         {

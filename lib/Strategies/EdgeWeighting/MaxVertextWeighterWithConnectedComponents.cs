@@ -40,6 +40,7 @@ namespace lib.Strategies.EdgeWeighting
             ClaimedMineIds = maxComponent.Mines;
             foreach (var vertex in maxComponent.Vertices)
                 SubGraphWeight[vertex] = CalcSubGraphWeight(vertex);
+
         }
 
         public double EstimateWeight(Edge edge)
