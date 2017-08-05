@@ -10,7 +10,7 @@ def execute_tasks(tasks_to_do):
     num_tasks = len(tasks_to_do)
 
     consumer = results.get_balanced_consumer(
-        consumer_group="icfpc2017-foreman-%s" % uuid4().hex,
+        consumer_group=("icfpc2017-foreman-%s" % uuid4().hex).encode('utf-8'),
         auto_commit_enable=True,
         auto_offset_reset=OffsetType.LATEST,
         zookeeper_connect='icfpc-broker.dev.kontur.ru:2181'
