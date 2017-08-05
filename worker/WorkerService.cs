@@ -47,7 +47,7 @@ namespace worker
             {
                 var timesSleeped = 0;
                 var rnd = new Random();
-                
+                var idleThresholdSecs = rnd.Next(60, 120);
                 
                 using (var consumer = new Consumer<Null, string>(config, null, new StringDeserializer(Encoding.UTF8)))
                 using (var producer = new Producer<Null, string>(config, null, new StringSerializer(Encoding.UTF8)))
@@ -77,10 +77,12 @@ namespace worker
                     {
                         Message<Null, string> msg;
                 
-                        if (timesSleeped >= rnd.Next(3, 10))
+                        if (timesSleeped >= idleThresholdSecs)
                         {
                             timesSleeped = 0;
-                            ArenaRunner.TryCompeteOnArena("TCWorker", commitHash);
+                            idleThresholdSecs = rnd.Next(60, 120);
+                            //TODO this interferes with queue operation
+                            //ArenaRunner.TryCompeteOnArena("TCWorker", commitHash);
                         } 
                         
                         if (!consumer.Consume(out msg, TimeSpan.FromSeconds(1)))
