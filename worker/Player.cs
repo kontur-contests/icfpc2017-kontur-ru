@@ -19,11 +19,17 @@ namespace worker
         public List<PlayerWithParams> Players { get; set; }
     }
 
+    public class PlayerResult
+    {
+        public long Scores { get; set; }
+    }
+    
+
     public class Result
     {
-        public List<PlayerWithParams> Players { get; set; }
+        public List<PlayerResult> Results { get; set; }
         public string Error { get; set; }
-        public string Map { get; set; }
+        public Task Task { get; set; }
     }
 
     public interface IPlayer
@@ -44,16 +50,12 @@ namespace worker
         {
             var players = playerStrategy
                 .Play(task)
-                .Select(pair => new PlayerWithParams
-                {
-                    Name = pair.Item1.Name,
-                    Params = pair.Item1.Params,
-                    Rank = pair.Item2
-                });
+                .ToList();
 
             return new Result
             {
-                Players = players.ToList()
+                Task = task,
+                Results = players
             };
         }
     }

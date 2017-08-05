@@ -28,3 +28,20 @@ def execute_tasks(tasks_to_do):
             break
 
     return results
+
+
+def empty_queue():
+    client = KafkaClient(hosts="icfpc-broker.dev.kontur.ru:9092")
+    results = client.topics[b'results']
+
+    consumer = results.get_balanced_consumer(
+        consumer_group=b'icfpc2017-foreman',
+        auto_commit_enable=True,
+        zookeeper_connect='icfpc-broker.dev.kontur.ru:2181'
+    )
+
+    for message in consumer:
+        if message is not None:
+            print(message.value)
+
+    return results

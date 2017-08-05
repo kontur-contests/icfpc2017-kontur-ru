@@ -74,7 +74,6 @@ namespace worker
                             {
                                 result = new Result { Error = exception.Message };
                             }
-                            result.Map = task.Map;
                             var resultString = JsonConvert.SerializeObject(result);
 
                             var deliveryReport = producer.ProduceAsync(outputTopicName, null, resultString);
