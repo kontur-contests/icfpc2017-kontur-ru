@@ -51,14 +51,9 @@ namespace lib.OnlineRunner
             rootQuery.Child(port).DeleteAsync().ConfigureAwait(false).GetAwaiter().GetResult();
         }
 
-        private static string Encode<T>(T data)
+        public void Clear()
         {
-            return JsonConvert.SerializeObject(data);
-        }
-
-        private static T Decode<T>(string data)
-        {
-            return JsonConvert.DeserializeObject<T>(data);
+            rootQuery.DeleteAsync().ConfigureAwait(false).GetAwaiter().GetResult();
         }
     }
 
@@ -81,12 +76,10 @@ namespace lib.OnlineRunner
             pl.Free(portNumber);            
         }
 
-
-        [TearDown]
-        public void TearDown()
+        [Test, Explicit]
+        public void ClearLocks()
         {
-            pl.Free(portNumber);
+            pl.Clear();
         }
-        
     }
 }
