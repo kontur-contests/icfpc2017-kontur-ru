@@ -13,7 +13,7 @@ namespace lib.Interaction
 
         public OnlineInteraction(int port)
         {
-            connection = new OnlineProtocol(new TcpTransport(port));
+            connection = new OnlineProtocol(StreamTransport.TcpTransport(port));
         }
 
         public void Start()

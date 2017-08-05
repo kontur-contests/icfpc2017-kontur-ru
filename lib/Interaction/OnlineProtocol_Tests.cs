@@ -27,7 +27,7 @@ namespace lib.Interaction
         [Explicit]
         public void TestHandShakeWithoutMock()
         {
-            var transport = new TcpTransport(9011);
+            var transport = StreamTransport.TcpTransport(9011);
             var gameTransport = new OnlineProtocol(transport);
 
             gameTransport.HandShake("playёr");
