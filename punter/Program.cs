@@ -20,21 +20,26 @@ namespace punter
             var handshakeIn = Read<HandshakeIn>();
             if (handshakeIn.you != TeamName)
                 throw new InvalidOperationException($"Couldn't pass handshake. handshakeIn.You = {handshakeIn.you}");
-            var @in = Read<In>();
-            if (@in.IsSetup())
+
+            while (true)
             {
-                Write(DoSetup(@in.punter.Value, @in.punters, @in.map));
+                var @in = Read<In>();
+                if (@in.IsSetup())
+                {
+                    Write(DoSetup(@in.punter.Value, @in.punters, @in.map));
+                }
+                else if (@in.IsGameplay())
+                {
+                    Write(DoGameplay(@in.move.moves, @in.state));
+                }
+                else if (@in.IsScoring())
+                {
+                    DoScoring(@in.stop.moves, @in.stop.scores, @in.state);
+                    return;
+                }
+                else
+                    throw new InvalidOperationException($"Invalid input: {@in.line}");
             }
-            else if (@in.IsGameplay())
-            {
-                Write(DoGameplay(@in.move.moves, @in.state));
-            }
-            else if (@in.IsScoring())
-            {
-                DoScoring(@in.stop.moves, @in.stop.scores, @in.state);
-            }
-            else
-                throw new InvalidOperationException($"Invalid input: {@in.line}");
         }
 
         private static SetupOut DoSetup(int punter, int punters, Map map)
@@ -46,6 +51,8 @@ namespace punter
                 state = new State
                 {
                     ai = ai.SerializeGameState(),
+                    punter = punter,
+                    punters = punters,
                     map = map
                 }
             };
@@ -65,6 +72,8 @@ namespace punter
                 state = new State
                 {
                     ai = ai.SerializeGameState(),
+                    punter = state.punter,
+                    punters = state.punters,
                     map = map
                 }
             };
@@ -72,6 +81,8 @@ namespace punter
 
         private static void DoScoring(MoveIn[] moves, ScoreModel[] scores, State state)
         {
+            foreach (var scoreModel in scores)
+                Console.Error.WriteLine($"{(scoreModel.Punter == state.punter ? "*" : "")}{scoreModel.Punter}={scoreModel.Score}");
         }
 
         private static void ApplyMove(Map map, MoveIn moveIn)
@@ -126,6 +137,8 @@ namespace punter
     public class State
     {
         public string ai;
+        public int punter;
+        public int punters;
         public Map map;
     }
 
