@@ -1,7 +1,7 @@
 from pykafka import KafkaClient
 import json
 
-def execute_tasks(tasks_to_do):
+def execute_tasks(tasks_to_do, consumer_group):
     client = KafkaClient(hosts="icfpc-broker.dev.kontur.ru:9092")
     tasks = client.topics[b'tasks']
     results = client.topics[b'results']
@@ -12,7 +12,7 @@ def execute_tasks(tasks_to_do):
             producer.produce(json.dumps(task).encode('utf-8'))
 
     consumer = results.get_balanced_consumer(
-        consumer_group=b'icfpc2017-foreman',
+        consumer_group=consumer_group,
         auto_commit_enable=True,
         zookeeper_connect='icfpc-broker.dev.kontur.ru:2181'
     )
