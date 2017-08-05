@@ -5,6 +5,6 @@ namespace lib.Strategies
 {
     public interface IStrategy
     {
-        List<TurnResult> Turn(Graph graph, IList<int> activePositions);
+        List<TurnResult> Turn(Graph graph);
     }
 }
