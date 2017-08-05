@@ -17,7 +17,7 @@ namespace worker
         {
             return ExperimentCommon.Run(task.Players,
                 player => new DummyAi(player.Params["Param"]) { Name = player.Name },
-                "sample.json");
+                task.Map??"sample.json");
         }
     }
 }

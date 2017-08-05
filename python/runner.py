@@ -58,12 +58,7 @@ class Fluent:
                     file.write('\n')
 
 
-k= (Fluent()
-    .from_params(key_1 = Param(0,1), key_2 = Param(0,1), key_3 = Param(0,1))
-    .create_players_randomly(3)
-    .pair_battles()
-    .run_experiment('Test')
-    .store_pointwise('output.csv')
-    )
+#k= (Fluent().from_params(key_1 = Param(0,1), key_2 = Param(0,1), key_3 = Param(0,1)).create_players_randomly(3).pair_battles().run_experiment('Test').store_pointwise('output.csv'))
 
-print(k.results)
+k = Fluent().from_params().create_players_randomly(1).one_player_various_groupsize(1,2,4,8)
+print (k.battles)

@@ -16,7 +16,7 @@ namespace worker.Strategies
             return ExperimentCommon.Run(
                 task.Players,
                 player => new GreedyAi(),
-                "sample.json");
+                task.Map??"sample.json");
         }
     }
 }
