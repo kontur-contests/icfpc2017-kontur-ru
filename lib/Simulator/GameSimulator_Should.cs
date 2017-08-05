@@ -4,6 +4,7 @@ using System.Linq;
 using FluentAssertions;
 using lib.Ai;
 using lib.Structures;
+using lib.viz;
 using NUnit.Framework;
 
 namespace lib
@@ -45,9 +46,11 @@ namespace lib
             a.ShouldNotThrow();
         }
 
+        [ShoulNotRunOnline]
         private class Ai : IAi
         {
             public string Name { get; }
+            public string Version { get; }
 
             public Future[] StartRound(int punterId, int puntersCount, Map map, Settings settings)
             {

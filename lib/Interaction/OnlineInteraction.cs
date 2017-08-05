@@ -86,7 +86,7 @@ namespace lib.Interaction
 
             allMoves.AddRange(stopIn.moves);
             
-            var meta = new ReplayMeta(DateTime.UtcNow, ai.Name, setup.punter, setup.punters, stopIn.scores);
+            var meta = new ReplayMeta(DateTime.UtcNow, ai.Name, ai.Version, "", setup.punter, setup.punters, stopIn.scores);
             var data = new ReplayData(setup.map, allMoves, futures);
             
             return Tuple.Create(meta, data);

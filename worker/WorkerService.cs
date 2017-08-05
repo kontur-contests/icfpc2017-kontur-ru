@@ -15,16 +15,16 @@ namespace worker
         private readonly Dictionary<string, object> config;
         private readonly string inputTopicName;
         private readonly string outputTopicName;
-        private readonly IPlayer player;
+        private readonly IExperiment experiment;
         private bool cancelled;
         private Thread workerThread;
 
-        public WorkerService(Dictionary<string, object> conf, string input, string output, IPlayer player)
+        public WorkerService(Dictionary<string, object> conf, string input, string output, IExperiment experiment)
         {
             config = conf;
             inputTopicName = input;
             outputTopicName = output;
-            this.player = player;
+            this.experiment = experiment;
         }
 
         public void Start()
@@ -68,7 +68,7 @@ namespace worker
                             Result result = null;
                             try
                             {
-                                result = player.Play(task);
+                                result = experiment.Play(task);
                             }
                             catch(Exception exception)
                             {

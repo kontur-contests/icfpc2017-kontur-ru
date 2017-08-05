@@ -25,6 +25,7 @@ namespace lib.Ai
         private MineDistCalculator mineDistCalulator;
 
         public string Name => nameof(ConnectClosestMinesAi);
+        public string Version => "0.1";
 
         // ReSharper disable once ParameterHidesMember
         public Future[] StartRound(int punterId, int puntersCount, Map map, Settings settings)

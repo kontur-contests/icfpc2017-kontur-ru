@@ -1,4 +1,4 @@
-from magic import *
+import magic
 import json
 import numpy as np
 
@@ -6,27 +6,37 @@ import numpy as np
 
 
 
-def test_greedy_algorithms():
-    (Fluent()
-    .from_params()
-    .create_random_players(1)
-    .first_against_himself(1,2,4)
-    .on_maps('sample.json')
-    .experiment('Greedy')
-    .preview()
-    .run()
-    .dump('greedy_results')
-     )
 
-def test_historical_algorithms():
-    (Fluent()
-     .create_historical_players(3)
+def test_historical_algorithms_1():
+    runner = magic.Fluent()
+    (runner
+     .create_historical_players(2)
      .battling_in_pairs()
-     .on_maps('sample.json')
+     .on_maps('sample.json', 'Sierpinski-triangle.json')
+     .repeating(1)
      .experiment('Historical')
-     .preview())
+     # .preview()
+     .run().dump()
+     #.store_pointwise('historical.csv')
+     )
+    print (runner.token)
+
+def test_historical_2():
+    runner = magic.Fluent()
+    (runner
+    .create_historical_players(5)
+    .battles_on_map('sample.json', 2, 3)
+    .battles_on_map('Sierpinski-triangle.json', 3, 4)
+    .battles_on_map('gothenburg-sparse.json', 8, 6)
+    .experiment('Historical')
+    .preview())
+
+test_historical_2()
+
 
 #test_historical_algorithms()
+
+#magic.Fluent().restore_dump('dumps\\result_dump_33915.json').store_pointwise('test.csv')
 
 #Fluent().restore_dump('result_dump_93839.json').store_pointwise('test.csv')
 
@@ -36,5 +46,3 @@ def test_historical_algorithms():
 #Fluent().restore_dump('greedy_results').store_pointwise('test.csv')
 
 
-
-empty_queue()

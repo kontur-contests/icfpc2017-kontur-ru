@@ -34,7 +34,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="MoreLinq, Version=2.6.20831.0, Culture=neutral, PublicKeyToken=384d532d7e88985d">
-      <HintPath>..\packages\morelinq\2.6.0\lib\net40\MoreLinq.dll</HintPath>
+      <HintPath>..\..\..\.nuget\packages\morelinq\2.6.0\lib\net40\MoreLinq.dll</HintPath>
     </Reference>
     <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c">
       <HintPath>..\packages\nlog\4.4.11\lib\net45\NLog.dll</HintPath>

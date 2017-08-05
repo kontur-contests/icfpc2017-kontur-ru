@@ -1,5 +1,7 @@
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Linq;
 using lib.Structures;
 using lib.viz.Detalization;
@@ -38,6 +40,13 @@ namespace lib.viz
         private static SizeF Padding => new SizeF(30, 30);
         public SizeF Size => new SizeF(600, 600);
         private GameState gameState;
+        private Dictionary<int, Future[]> futures;
+
+        public Dictionary<int, Future[]> Futures
+        {
+            get => futures ?? new Dictionary<int, Future[]>();
+            set => futures = value;
+        }
 
         public GameState GameState
         {
@@ -59,6 +68,10 @@ namespace lib.viz
                 DrawRiver(g, river);
             foreach (var site in map.Sites)
                 DrawSite(g, site);
+            if (PainterAugmentor.ShowFutures)
+                foreach (var futuresGroup in Futures)
+                    foreach (var future in futuresGroup.Value)
+                        DrawFuture(g, futuresGroup.Key, future);
             DrawRiverText(g, map.Rivers.MinBy(r => DistanceTo(mouseLogicalPos, r)));
             g.DrawString(sw.Elapsed.TotalMilliseconds.ToString("0ms"), SystemFonts.DefaultFont, Brushes.Black, PointF.Empty);
         }
@@ -84,7 +97,7 @@ namespace lib.viz
             var data = PainterAugmentor.GetData(river);
             var source = map.SiteById[river.Source];
             var target = map.SiteById[river.Target];
-            using (var pen = new Pen(data.Color, data.PenWidth))
+            using (var pen = new Pen(data.Color, data.PenWidth){DashStyle = data.DashStyle})
             {
                 g.DrawLine(pen, source.Point(), target.Point());
             }
@@ -102,6 +115,20 @@ namespace lib.viz
                 else
                     g.FillEllipse(brush, rectangle);
             }
+        }
+
+        private void DrawFuture(Graphics g, int punderId, Future future)
+        {
+            var data = PainterAugmentor.GetData(punderId, future);
+            var source = map.SiteById[future.Source];
+            var target = map.SiteById[future.Target];
+            var pen = new Pen(data.Color, data.PenWidth)
+            {
+                StartCap = LineCap.ArrowAnchor,
+                EndCap = LineCap.RoundAnchor
+            };
+            using (pen)
+                g.DrawLine(pen, source.Point(), target.Point());
         }
 
         private void DrawSiteText(Graphics g, Site site)

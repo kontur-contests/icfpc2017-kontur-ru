@@ -12,6 +12,8 @@ namespace lib.Replays
     {
         public DateTime Timestamp;
         public string AiName;
+        public string AiVersion;
+        public string CommitHash;
         public string MapHash;
         public int OurPunter;
         public int PunterCount;
@@ -23,10 +25,12 @@ namespace lib.Replays
         {
         }
 
-        public ReplayMeta(DateTime timestamp, string aiName, int ourPunter, int punterCount, Score[] scores)
+        public ReplayMeta(DateTime timestamp, string aiName, string aiVersion, string commitHash, int ourPunter, int punterCount, Score[] scores)
         {
             Timestamp = timestamp;
             AiName = aiName;
+            AiVersion = aiVersion;
+            CommitHash = commitHash;
             OurPunter = ourPunter;
             PunterCount = punterCount;
             Scores = scores;

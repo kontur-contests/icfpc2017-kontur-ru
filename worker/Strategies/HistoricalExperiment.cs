@@ -9,14 +9,13 @@ namespace worker.Strategies
 {
     class HistoricalExperiment : IExperiment
     {
-        public List<PlayerResult> Play(Task task)
+        public Result Play(Task task)
         {
             var ages = AiByGeneration.Generations.ToList();
 
             return ExperimentCommon.Run(
-                task.Players,
-                player => ages[ages.Count - 1 - (int)Math.Round(player.Params["Age"])](),
-                task.Map
+                task,
+                player => ages[ages.Count - 1 - (int)Math.Round(player.Params["Age"])]()
                 );
         }
     }

@@ -14,6 +14,7 @@ namespace lib.Ai
     public class GreedyAi : IAi
     {
         public string Name { get; set; } = nameof(GreedyAi);
+        public string Version => "0.1";
         public int punterId { get; private set; }
         private GreedyAiHelper GreedyAiHelper;
 
@@ -43,7 +44,6 @@ namespace lib.Ai
 
         public void DeserializeGameState(string gameState)
         {
-            
         }
     }
 
@@ -102,9 +102,9 @@ namespace lib.Ai
 
             foreach (var map in maps)
             {
-                var gamers = new List<IAi> { new GreedyAi(),  };
+                var gamers = new List<IAi> {new GreedyAi(),};
                 var gameSimulator = new GameSimulatorRunner(new SimpleScoreCalculator());
-                
+
 
                 Console.WriteLine($"MAP: {map.Name}");
                 var results = gameSimulator.SimulateGame(
