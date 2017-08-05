@@ -9,34 +9,9 @@
     "Task": {
       "Map": "sample.json",
       "Experiment": "Greedy",
+      "Token": 32315,
+      "Part": 0,
       "Players": [
-        {
-          "Name": "0",
-          "Params": {},
-          "Rank": 0
-        }
-      ]
-    }
-  },
-  {
-    "Results": [
-      {
-        "Scores": 27
-      },
-      {
-        "Scores": 22
-      }
-    ],
-    "Error": null,
-    "Task": {
-      "Map": "sample.json",
-      "Experiment": "Greedy",
-      "Players": [
-        {
-          "Name": "0",
-          "Params": {},
-          "Rank": 0
-        },
         {
           "Name": "0",
           "Params": {},
@@ -64,6 +39,8 @@
     "Task": {
       "Map": "sample.json",
       "Experiment": "Greedy",
+      "Token": 32315,
+      "Part": 2,
       "Players": [
         {
           "Name": "0",
@@ -75,6 +52,35 @@
           "Params": {},
           "Rank": 0
         },
+        {
+          "Name": "0",
+          "Params": {},
+          "Rank": 0
+        },
+        {
+          "Name": "0",
+          "Params": {},
+          "Rank": 0
+        }
+      ]
+    }
+  },
+  {
+    "Results": [
+      {
+        "Scores": 27
+      },
+      {
+        "Scores": 22
+      }
+    ],
+    "Error": null,
+    "Task": {
+      "Map": "sample.json",
+      "Experiment": "Greedy",
+      "Token": 32315,
+      "Part": 1,
+      "Players": [
         {
           "Name": "0",
           "Params": {},
