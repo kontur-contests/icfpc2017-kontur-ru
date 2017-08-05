@@ -12,6 +12,7 @@ namespace lib.Ai
         private int PunterId { get; set; }
 
         public string Name => nameof(GreedierAi);
+
         public void StartRound(int punterId, int puntersCount, Map map)
         {
             PunterId = punterId;
@@ -21,9 +22,9 @@ namespace lib.Ai
         public Move GetNextMove(Move[] prevMoves, Map map)
         {
             var turns = Strategy.Turn(new Graph(map));
-            if (!Enumerable.Any<TurnResult>(turns))
+            if (!turns.Any())
                 return new PassMove(PunterId);
-            var bestTurn = MoreEnumerable.MaxBy<TurnResult, double>(turns, x => x.Estimation);
+            var bestTurn = turns.MaxBy(x => x.Estimation);
             return new ClaimMove(PunterId, bestTurn.River.Source, bestTurn.River.Target);
         }
 
