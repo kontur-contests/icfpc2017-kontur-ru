@@ -40,7 +40,7 @@ namespace lib.Interaction
             networkStream.Flush();
         }
 
-        public T Read<T>(int? timeout = 15000) where T : InBase
+        public T Read<T>(int? timeout = null) where T : InBase
         {
             var n = ReadN(timeout);
             var sb = new StringBuilder();
