@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Immutable;
 using System.Linq;
 using Newtonsoft.Json;
@@ -48,6 +49,11 @@ namespace lib
         {
         }
 
+        public string Md5Hash()
+        {
+            return JsonConvert.SerializeObject(this, Formatting.None).CalculateMd5();
+        }
+
         public Map(Site[] sites, River[] rivers, int[] mines)
             :this(sites, rivers.ToImmutableHashSet(), mines)
         {
@@ -60,7 +66,7 @@ namespace lib
         }
     }
 
-    public class River
+    public class River : IEquatable<River>
     {
         [JsonProperty("source", Order = 1)] public readonly int Source;
 
@@ -79,7 +85,7 @@ namespace lib
             Owner = owner;
         }
 
-        protected bool Equals(River other)
+        public bool Equals(River other)
         {
             return Source == other.Source && Target == other.Target 
                 || Source == other.Target && Target == other.Source;

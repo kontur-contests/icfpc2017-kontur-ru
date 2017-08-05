@@ -24,6 +24,7 @@ namespace worker
     public class PlayerResult
     {
         public long Scores { get; set; }
+        public string ServerName { get; set; }
     }
     
 

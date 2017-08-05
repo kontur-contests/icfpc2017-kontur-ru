@@ -20,8 +20,8 @@ namespace lib.viz
         {
             return Factories
                 .Where(x =>
-                    //x.Name.Equals("GreedyAi") || 
-                    x.Name.Equals("ConnectClosestMinesAi")
+                    x.Name.Equals("GreedyAi") 
+                    //|| x.Name.Equals("ConnectClosestMinesAi")
                     )
                 .OrderBy(x => Guid.NewGuid()).First().Create();
         }

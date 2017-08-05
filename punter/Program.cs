@@ -1,9 +1,11 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using lib;
 using lib.Ai;
+using lib.viz;
 using Newtonsoft.Json;
 
 namespace punter
@@ -11,11 +13,16 @@ namespace punter
     class Program
     {
         private static ConnectClosestMinesAi ai;
+        private static TextReader inputReader;
 
         private const string TeamName = "kontur.ru";
 
-        static void Main()
+        static void Main(string[] args)
         {
+            if (!args.Any())
+                inputReader = Console.In;
+            else
+                inputReader = new StreamReader(args[0]);
             ai = new ConnectClosestMinesAi();
 
             Write(new HandshakeOut {me = TeamName});
@@ -119,7 +126,7 @@ namespace punter
             var nBuilder = new StringBuilder();
             while (true)
             {
-                var charCode = Console.In.Read();
+                var charCode = inputReader.Read();
                 if (charCode == -1)
                     continue;
                 var ch = Convert.ToChar(charCode);
@@ -132,7 +139,7 @@ namespace punter
             var buffer = new char[1024];
             while (message.Length < n)
             {
-                var charsRead = Console.In.Read(buffer, 0, Math.Min(buffer.Length, n - message.Length));
+                var charsRead = inputReader.Read(buffer, 0, Math.Min(buffer.Length, n - message.Length));
                 message.Append(buffer, 0, charsRead);
             }
             var line = message.ToString();
