@@ -33,10 +33,11 @@ namespace worker
             {
                 commitHash = File.ReadAllLines("commit_hash.txt").FirstOrDefault();
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 commitHash = "Unknown";
                 logger.Warn("Can't read commit_hash.txt");
+                logger.Error(e);
             }
         }
 
