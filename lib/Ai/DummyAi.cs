@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using lib.Structures;
 
 namespace lib.Ai
 {
@@ -34,10 +35,10 @@ namespace lib.Ai
                     .FirstOrDefault();
 
                 if (river != null)
-                    return new ClaimMove(myPunterId, river.Source, river.Target);
+                    return Move.Claim(myPunterId, river.Source, river.Target);
             }
 
-            return new PassMove(myPunterId);
+            return Move.Pass(myPunterId);
         }
 
         public string SerializeGameState()

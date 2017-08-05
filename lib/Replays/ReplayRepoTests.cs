@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using lib.Structures;
 using Newtonsoft.Json;
 using NUnit.Framework;
 
@@ -26,7 +27,7 @@ namespace lib.Replays
             var meta = CreateReplayMeta();
             var map = MapLoader.LoadMap(Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\..\maps\oxford2.json")).Map;
             JsonConvert.SerializeObject(map).CalculateMd5();
-            var data = new ReplayData(map, Enumerable.Range(0, map.Rivers.Length).Select(i => new ClaimMove(0, i, i + 1)).ToArray(), new Future[0]);
+            var data = new ReplayData(map, Enumerable.Range(0, map.Rivers.Length).Select(i => Move.Claim(0, i, i + 1)).ToArray(), new Future[0]);
             var sw = Stopwatch.StartNew();
             repo.SaveReplay(meta, data);
             Console.WriteLine(sw.Elapsed);
@@ -45,10 +46,10 @@ namespace lib.Replays
                 1,
                 new[]
                 {
-                    new ScoreModel
+                    new Score
                     {
-                        Punter = 0,
-                        Score = 42
+                        punter = 0,
+                        score = 42
                     }
                 }
             );

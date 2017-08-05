@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using lib.Ai;
 using lib.Scores.Simple;
+using lib.Structures;
 using NUnit.Framework;
 
 namespace lib

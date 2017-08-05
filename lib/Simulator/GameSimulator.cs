@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using lib.Ai;
+using lib.Structures;
 using MoreLinq;
 
 namespace lib
@@ -44,22 +45,17 @@ namespace lib
                 return new GameState(map, moves.TakeLast(punters.Count).ToList(), true);
 
             var nextMove = punters[currentPunter].GetNextMove(moves.ToArray(), map);
-            ApplyMove(nextMove);
+            map = map.ApplyMove(nextMove);
             moves.Add(nextMove);
             currentPunter = (currentPunter + 1) % punters.Count;
             turnsAmount--;
             return new GameState(map, moves.TakeLast(punters.Count).ToList(), false);
         }
 
-        private void ApplyMove(Move nextMove)
-        {
-            map = nextMove.Execute(map);
-        }
-
         private Future[] ValidateFutures(Future[] futures)
             => futures
-                .Where(e => map.Mines.Contains(e.Source) && !map.Mines.Contains(e.Target))
-                .GroupBy(e => e.Source)
+                .Where(e => map.Mines.Contains(e.source) && !map.Mines.Contains(e.target))
+                .GroupBy(e => e.source)
                 .Select(e => e.Last())
                 .ToArray();
     }

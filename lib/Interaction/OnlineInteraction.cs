@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using lib.Ai;
 using lib.Interaction.Internal;
 using lib.Replays;
-using lib.viz;
+using lib.Structures;
 using Newtonsoft.Json;
 using NUnit.Framework;
 
@@ -38,55 +37,32 @@ namespace lib.Interaction
 
             try
             {
-                futures = ai.StartRound(setup.Id, setup.PunterCount, setup.Map, setup.Settings);
+                futures = ai.StartRound(setup.punter, setup.punters, setup.map, setup.settings);
             }
             catch
             {
-                var handshake = JsonConvert.SerializeObject(new { you = CreateBotName() });
-                var input = JsonConvert.SerializeObject(new
-                {
-                    punter = setup.Id,
-                    punters = setup.PunterCount,
-                    map = setup.Map,
-                    settings = setup.Settings
-                });
+                var handshake = JsonConvert.SerializeObject(new HandshakeIn { you = CreateBotName() });
+                var input = JsonConvert.SerializeObject(setup, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
                 File.WriteAllText($@"error-setup-{DateTime.UtcNow.ToString("O").Replace(":", "_")}.json", $@"{handshake.Length}:{handshake}{input.Length}:{input}");
                 throw;
             }
 
-            connection.WriteSetupReply(new SetupReply(setup.Id, futures));
+            connection.WriteSetupReply(new SetupOut { ready = setup.punter, futures = futures });
 
-            var map = setup.Map;
-
-            var serverResponse = connection.ReadGameState();
+            var map = setup.map;
 
             var allMoves = new List<Move>();
-            
-            while (!connection.IsGameOver)
+
+            var serverResponse = connection.ReadNextTurn();
+
+            while (!serverResponse.IsScoring())
             {
-                var moves = connection.GetMoves(serverResponse);
-                var gameplay = JsonConvert.SerializeObject(new
-                {
-                    move = new
-                    {
-                        moves = moves.Select(x => new
-                        {
-                            claim = x as ClaimMove,
-                            pass = x as PassMove
-                        }).ToArray()
-                    },
-                    state = new
-                    {
-                        ai = ai.SerializeGameState(),
-                        punter = setup.Id,
-                        punters = setup.PunterCount,
-                        map
-                    }
-                }, new JsonSerializerSettings{NullValueHandling = NullValueHandling.Ignore});
+                var moves = serverResponse.move.moves;
+                var gameplay = JsonConvert.SerializeObject(serverResponse, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore});
 
                 allMoves.AddRange(moves);
                 foreach (var move in moves)
-                    map = move.Execute(map);
+                    map = map.ApplyMove(move);
 
                 Move nextMove;
                 try
@@ -102,15 +78,16 @@ namespace lib.Interaction
 
                 allMoves.Add(nextMove);
                 connection.WriteMove(nextMove);
+                serverResponse = connection.ReadNextTurn();
 
-                serverResponse = connection.ReadGameState();
             }
-            var score = connection.GetScore(serverResponse);
 
-            allMoves.AddRange(score.MoveModels.Select(ProtocolBase.MoveModel.GetMove));
+            var stopIn = serverResponse.stop;
+
+            allMoves.AddRange(stopIn.moves);
             
-            var meta = new ReplayMeta(DateTime.UtcNow, ai.Name, setup.Id, setup.PunterCount, score.Scores);
-            var data = new ReplayData(setup.Map, allMoves, futures);
+            var meta = new ReplayMeta(DateTime.UtcNow, ai.Name, setup.punter, setup.punters, stopIn.scores);
+            var data = new ReplayData(setup.map, allMoves, futures);
             
             return Tuple.Create(meta, data);
         }

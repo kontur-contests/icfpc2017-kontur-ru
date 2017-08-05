@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using lib.GraphImpl;
+using lib.Structures;
 
 namespace lib.Ai
 {
@@ -33,7 +34,7 @@ namespace lib.Ai
                     .FirstOrDefault(edge => edge.Owner < 0);
                 if (nearMinesEdge == null)
                     return Base.GetNextMove(prevMoves, map);
-                return new ClaimMove(Base.punterId, nearMinesEdge.Source, nearMinesEdge.Target);
+                return Move.Claim(Base.punterId, nearMinesEdge.Source, nearMinesEdge.Target);
 
 
             }

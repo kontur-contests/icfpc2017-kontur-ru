@@ -1,3 +1,5 @@
+using lib.Structures;
+
 namespace lib.Ai
 {
     public interface IAi

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using lib;
 using lib.Ai;
+using lib.Structures;
 using Newtonsoft.Json;
 
 namespace punter
@@ -30,17 +31,11 @@ namespace punter
 
             var @in = Read<In>();
             if (@in.IsSetup())
-            {
-                Write(DoSetup(@in.punter.Value, @in.punters, @in.map, @in.settings));
-            }
+                Write(DoSetup(@in.punter, @in.punters, @in.map, @in.settings));
             else if (@in.IsGameplay())
-            {
                 Write(DoGameplay(@in.move.moves, @in.state));
-            }
             else if (@in.IsScoring())
-            {
-                DoScoring(@in.stop.moves, @in.stop.scores, @in.state);
-            }
+                DoScoring(@in.stop.moves, @in.stop.scores);
             else
                 throw new InvalidOperationException($"Invalid input: {@in.line}");
         }
@@ -63,7 +58,7 @@ namespace punter
             };
         }
 
-        private static GameplayOut DoGameplay(MoveIn[] moves, State state)
+        private static GameplayOut DoGameplay(Move[] moves, State state)
         {
             var map = state.map;
             foreach (var moveIn in moves)
@@ -71,56 +66,46 @@ namespace punter
             ai.DeserializeGameState(state.ai);
             try
             {
-                var nextMove = ai.GetNextMove(moves.Select(m => (Move) m.claim ?? m.pass).ToArray(), map);
-                return new GameplayOut
+                var nextMove = ai.GetNextMove(moves, map);
+                return new GameplayOut(nextMove, new State
                 {
-                    claim = nextMove as ClaimMove,
-                    pass = nextMove as PassMove,
-                    state = new State
-                    {
-                        ai = ai.SerializeGameState(),
-                        punter = state.punter,
-                        punters = state.punters,
-                        map = map
-                    }
-                };
+                    ai = ai.SerializeGameState(),
+                    punter = state.punter,
+                    punters = state.punters,
+                    map = map
+                });
             }
             catch (Exception e)
             {
                 Console.Error.WriteLine(e);
-                return new GameplayOut
+                return new GameplayOut(Move.Pass(state.punter), new State
                 {
-                    pass = new PassMove(state.punter),
-                    state = new State
-                    {
-                        ai = state.ai,
-                        punter = state.punter,
-                        punters = state.punters,
-                        map = map
-                    }
-                };
+                    ai = state.ai,
+                    punter = state.punter,
+                    punters = state.punters,
+                    map = map
+                });
             }
         }
 
-        private static void DoScoring(MoveIn[] moves, ScoreModel[] scores, State state)
+        private static void DoScoring(Move[] moves, Score[] scores)
         {
             foreach (var scoreModel in scores)
-                Console.Error.WriteLine($"{scoreModel.Punter}={scoreModel.Score}");
+                Console.Error.WriteLine($"{scoreModel.punter}={scoreModel.score}");
         }
 
-        private static void ApplyMove(Map map, MoveIn moveIn)
+        private static void ApplyMove(Map map, Move move)
         {
-            if (moveIn.claim == null)
+            if (move.claim == null)
                 return;
 
-            var move = moveIn.claim;
             foreach (var river in map.Rivers)
             {
-                if (river.Source == move.Source && river.Target == move.Target || river.Target == move.Source && river.Source == move.Target)
+                if (river.Source == move.claim.source && river.Target == move.claim.target || river.Target == move.claim.source && river.Source == move.claim.target)
                 {
                     if (river.Owner != -1)
                         throw new InvalidOperationException($"river.Owner != -1 for move: {move}");
-                    river.Owner = move.PunterId;
+                    river.Owner = move.claim.punter;
                     return;
                 }
             }
@@ -164,76 +149,5 @@ namespace punter
             result.line = line;
             return result;
         }
-    }
-
-    public class State
-    {
-        public string ai;
-        public int punter;
-        public int punters;
-        public Map map;
-    }
-
-    public abstract class InBase
-    {
-        [JsonIgnore] public string line;
-    }
-
-    public class HandshakeIn : InBase
-    {
-        public string you;
-    }
-
-    public class In : InBase
-    {
-        public bool IsSetup() => punter.HasValue;
-        public int? punter;
-        public int punters;
-        public Map map;
-        public Settings settings;
-
-        public bool IsGameplay() => move != null;
-        public MovesIn move;
-
-        public bool IsScoring() => stop != null;
-        public StopIn stop;
-
-        public State state;
-    }
-
-    public class StopIn
-    {
-        public MoveIn[] moves;
-        public ScoreModel[] scores;
-    }
-
-    public class MovesIn
-    {
-        public MoveIn[] moves;
-    }
-
-    public class MoveIn
-    {
-        public ClaimMove claim;
-        public PassMove pass;
-    }
-
-    public class HandshakeOut
-    {
-        public string me;
-    }
-
-    public class SetupOut
-    {
-        public int ready;
-        public Future[] futures;
-        public State state;
-    }
-
-    public class GameplayOut
-    {
-        public ClaimMove claim;
-        public PassMove pass;
-        public State state;
     }
 }

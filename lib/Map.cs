@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Immutable;
 using System.Linq;
+using lib.Structures;
 using Newtonsoft.Json;
 
 namespace lib
@@ -47,6 +48,14 @@ namespace lib
 
         public Map()
         {
+        }
+
+        public Map ApplyMove(Move move)
+        {
+            if (move.claim == null)
+                return this;
+            var mapRivers = RiversList.Remove(new River(move.claim.source, move.claim.target)).Add(new River(move.claim.source, move.claim.target, move.claim.punter));
+            return new Map(Sites, mapRivers, Mines);
         }
 
         public string Md5Hash()

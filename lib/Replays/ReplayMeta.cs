@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Security.Claims;
-using System.Text;
+using lib.Structures;
 using MoreLinq;
 using Newtonsoft.Json;
 
@@ -16,7 +15,7 @@ namespace lib.Replays
         public string MapHash;
         public int OurPunter;
         public int PunterCount;
-        public ScoreModel[] Scores;
+        public Score[] Scores;
         
         public string DataId;
 
@@ -24,7 +23,7 @@ namespace lib.Replays
         {
         }
 
-        public ReplayMeta(DateTime timestamp, string aiName, int ourPunter, int punterCount, ScoreModel[] scores)
+        public ReplayMeta(DateTime timestamp, string aiName, int ourPunter, int punterCount, Score[] scores)
         {
             Timestamp = timestamp;
             AiName = aiName;
@@ -42,7 +41,7 @@ namespace lib.Replays
     public class ReplayData
     {
         public Map Map;
-        public MoveJson[] Moves;
+        public Move[] Moves;
         public Future[] Futures;
 
         public override string ToString()
@@ -55,7 +54,7 @@ namespace lib.Replays
         }
         
         [JsonConstructor]
-        public ReplayData(Map map, MoveJson[] moves, Future[] futures)
+        public ReplayData(Map map, Move[] moves, Future[] futures)
         {
             Map = map;
             Moves = moves;
@@ -65,7 +64,7 @@ namespace lib.Replays
         public ReplayData(Map map, IEnumerable<Move> moves, Future[] futures)
         {
             Map = map;
-            Moves = moves.Select(move => new MoveJson(move)).ToArray();
+            Moves = moves.ToArray();
             Futures = futures;
         }
 
@@ -101,71 +100,15 @@ namespace lib.Replays
                 if (future == null) break;
                 futures.Add(future);
             }
-            var moves = new List<MoveJson>();
+            var moves = new List<Move>();
             while (true)
             {
-                var move = MoveJson.DecodeFrom(reader);
+                var move = Move.DecodeFrom(reader);
                 if (move == null) break;
                 moves.Add(move);
             }
-            return new ReplayData(){Futures = futures.ToArray(), Moves = moves.ToArray()};
+            return new ReplayData {Futures = futures.ToArray(), Moves = moves.ToArray()};
 
-        }
-    }
-
-    public class MoveJson
-    {
-        public PassMove Pass;
-        public ClaimMove Claim;
-
-        public override string ToString()
-        {
-            return ToMove().ToString();
-        }
-
-        public Move ToMove()
-        {
-            return (Move) Pass ?? Claim;
-        }
-
-        public MoveJson()
-        {
-        }
-
-        public MoveJson(Move move)
-        {
-            switch (move)
-            {
-                case ClaimMove claimMove: Claim = claimMove; break;
-                case PassMove passMove: Pass = passMove; break;
-                default: throw new NotImplementedException();
-            }
-        }
-
-        public static MoveJson Parse(string arg)
-        {
-            var args = arg.Substring(1).Split('|');
-            return new MoveJson(new ClaimMove(int.Parse(args[0]), int.Parse(args[1]), int.Parse(args[2])));
-
-        }
-
-        public static MoveJson DecodeFrom(BinaryReader reader)
-        {
-            byte marker = reader.ReadByte();
-            if (marker == 0) return null;
-            int punterId = reader.ReadInt32();
-            int source = reader.ReadInt32();
-            int target = reader.ReadInt32();
-            return new MoveJson(new ClaimMove(punterId, source, target));
-        }
-
-        public void EncodeTo(BinaryWriter w)
-        {
-            if (Claim == null) return;
-            w.Write((byte) 1);
-            w.Write(Claim.PunterId);
-            w.Write(Claim.Source);
-            w.Write(Claim.Target);
         }
     }
 }

@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using lib.Ai;
+using lib.Structures;
 using NUnit.Framework;
 
 namespace lib
