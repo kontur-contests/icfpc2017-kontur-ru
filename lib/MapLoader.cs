@@ -11,9 +11,9 @@ namespace lib
 {
     public static class MapLoader
     {
-        private static string LocateMapsFolder()
+        private static string LocateMapsFolder(string startDir = null)
         {
-            var dir = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
+            var dir = new DirectoryInfo(startDir ?? AppDomain.CurrentDomain.BaseDirectory);
             while (dir != null && !dir.HasSubdir("maps"))
             {
                 dir = dir.Parent;
@@ -37,6 +37,12 @@ namespace lib
         public static NamedMap LoadMapByName([NotNull] string filenameWithoutPath)
         {
             var fn = Path.Combine(LocateMapsFolder(), filenameWithoutPath);
+            return LoadMap(fn);
+        }
+        [NotNull]
+        public static NamedMap LoadMapByNameInTests([NotNull] string filenameWithoutPath)
+        {
+            var fn = Path.Combine(LocateMapsFolder(TestContext.CurrentContext.TestDirectory), filenameWithoutPath);
             return LoadMap(fn);
         }
 
