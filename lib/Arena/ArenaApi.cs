@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using AngleSharp;
@@ -15,7 +14,6 @@ namespace lib.Arena
             var config = Configuration.Default.WithDefaultLoader();
             var document = await BrowsingContext.New(config).OpenAsync(Address);
 
-            var matches = new List<ArenaMatch>();
             return document.QuerySelectorAll("tr").Skip(1).Select(
                 x =>
                 {
