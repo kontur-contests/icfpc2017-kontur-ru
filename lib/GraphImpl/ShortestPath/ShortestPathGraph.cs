@@ -13,6 +13,11 @@ namespace lib.GraphImpl.ShortestPath
 
         public static ShortestPathGraph Build(Graph graph, params int[] sourceVertexes)
         {
+            return Build(graph, (ICollection<int>)sourceVertexes);
+        }
+
+        public static ShortestPathGraph Build(Graph graph, ICollection<int> sourceVertexes)
+        {
             var spGraph = new ShortestPathGraph();
             var queue = new Queue<ShortestPathVertex>();
             foreach (var sourceVertex in sourceVertexes)

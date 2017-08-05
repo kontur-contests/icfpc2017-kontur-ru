@@ -13,6 +13,7 @@ class Fluent:
     def __init__(self):
         self.params = dict()
         self.param_names = list()
+        self.battles_on_maps = []
 
     def from_params(self, **kwargs):
         self.params = kwargs
@@ -55,6 +56,14 @@ class Fluent:
     def repeating(self, count):
         self.battles_on_maps = [x for x in self.battles_on_maps for _ in range(count)]
         return self
+
+
+    def battles_on_map(self, map, player_count, battles_count):
+        for _ in range(battles_count):
+            players = [ self.players[np.random.randint(0,len(self.players))] for __ in range(player_count)]
+            self.battles_on_maps.append((players,map))
+        return self
+
 
     def experiment(self, experiment_name):
         self.token = np.random.randint(1,100000)

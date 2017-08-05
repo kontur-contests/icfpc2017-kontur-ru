@@ -19,7 +19,7 @@ namespace lib.Strategies.EdgeWeighting
         private Dictionary<int, double> SubGraphWeight { get; set; }
         private int[] ClaimedMineIds { get; set; }
 
-        public void Init(Graph graph, int[] claimedVertexIds)
+        public void Init(Graph graph, int[] claimedVertexIds, int ownerId)
         {
             Graph = graph;
             SpGraph = ShortestPathGraph.Build(graph, claimedVertexIds);

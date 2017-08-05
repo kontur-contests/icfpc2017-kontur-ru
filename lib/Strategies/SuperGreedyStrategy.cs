@@ -27,6 +27,12 @@ namespace lib.Strategies
     {
         public HashSet<int> Vertices = new HashSet<int>();
         public HashSet<int> Mines = new HashSet<int>();
+        public int Id { get; }
+
+        public ConnectedComponent(int id)
+        {
+            Id = id;
+        }
 
         public static List<ConnectedComponent> GetComponents(Graph graph, int owner)
         {
@@ -36,12 +42,15 @@ namespace lib.Strategies
 
             var result = new List<ConnectedComponent>();
 
+            int componentIndexer = 0;
+
             foreach (var mine in graph.Mines)
             {
                 if(mine.Value.Edges.All(edge => edge.Owner == owner) || usedMines.Contains(mine.Key))
                     continue;
                 
-                var component = new ConnectedComponent();
+                var component = new ConnectedComponent(componentIndexer);
+                componentIndexer++;
 
                 queue.Clear();
 
