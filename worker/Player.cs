@@ -16,6 +16,8 @@ namespace worker
     {
         public string Map { get; set; }
         public string Experiment { get; set; }
+        public int Token { get; set; }
+        public int Part { get; set; }
         public List<PlayerWithParams> Players { get; set; }
     }
 

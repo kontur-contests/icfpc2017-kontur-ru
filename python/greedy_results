@@ -1,45 +1,91 @@
 [
   {
-    "Players": [
+    "Results": [
       {
-        "Name": "0",
-        "Params": {},
-        "Rank": 32
+        "Scores": 32
       }
     ],
     "Error": null,
-    "Map": "sample.json"
+    "Task": {
+      "Map": "sample.json",
+      "Experiment": "Greedy",
+      "Players": [
+        {
+          "Name": "0",
+          "Params": {},
+          "Rank": 0
+        }
+      ]
+    }
   },
   {
-    "Players": [
+    "Results": [
       {
-        "Name": "0",
-        "Params": {},
-        "Rank": 27
+        "Scores": 27
       },
       {
-        "Name": "0",
-        "Params": {},
-        "Rank": 22
+        "Scores": 22
       }
     ],
     "Error": null,
-    "Map": "sample.json"
+    "Task": {
+      "Map": "sample.json",
+      "Experiment": "Greedy",
+      "Players": [
+        {
+          "Name": "0",
+          "Params": {},
+          "Rank": 0
+        },
+        {
+          "Name": "0",
+          "Params": {},
+          "Rank": 0
+        }
+      ]
+    }
   },
   {
-    "Players": [
+    "Results": [
       {
-        "Name": "0",
-        "Params": {},
-        "Rank": 27
+        "Scores": 6
       },
       {
-        "Name": "0",
-        "Params": {},
-        "Rank": 22
+        "Scores": 15
+      },
+      {
+        "Scores": 15
+      },
+      {
+        "Scores": 3
       }
     ],
     "Error": null,
-    "Map": "sample.json"
+    "Task": {
+      "Map": "sample.json",
+      "Experiment": "Greedy",
+      "Players": [
+        {
+          "Name": "0",
+          "Params": {},
+          "Rank": 0
+        },
+        {
+          "Name": "0",
+          "Params": {},
+          "Rank": 0
+        },
+        {
+          "Name": "0",
+          "Params": {},
+          "Rank": 0
+        },
+        {
+          "Name": "0",
+          "Params": {},
+          "Rank": 0
+        }
+      ]
+    }
   }
 ]

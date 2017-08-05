@@ -15,9 +15,8 @@ class Fluent:
         self.params = kwargs
         return self
 
-    def create_random_players(self, count, seed=42):
+    def create_random_players(self, count):
         players = []
-        np.random.seed(seed)
         for i in range(count):
             player = dict()
             for key in self.params:
