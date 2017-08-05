@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using lib.GraphImpl;
 using lib.Strategies;
@@ -8,13 +9,20 @@ namespace lib.Ai.StrategicFizzBuzz
 {
     public abstract class StrategicAi : IAi
     {
+        protected StrategicAi(Func<SuperSettings, IStrategy> strategyProvider)
+        {
+            StrategyProvider = strategyProvider;
+        }
+
         private int PunterId { get; set; }
-        protected abstract IStrategy Strategy { get; }
+        private IStrategy Strategy { get; set; }
         public abstract string Name { get; }
         public abstract string Version { get; }
+        private Func<SuperSettings, IStrategy> StrategyProvider { get; }
 
         public virtual Future[] StartRound(int punterId, int puntersCount, Map map, Settings settings)
         {
+            Strategy = StrategyProvider(new SuperSettings(punterId, puntersCount, map, settings));
             PunterId = punterId;
             return new Future[0];
         }

@@ -9,9 +9,9 @@ namespace lib.Strategies.EdgeWeighting
 {
     public class MaxVertextWeighterWithConnectedComponents : IEdgeWeighter
     {
-        public MaxVertextWeighterWithConnectedComponents(Map map, double mineMultiplier)
+        public MaxVertextWeighterWithConnectedComponents(Graph graph, double mineMultiplier)
         {
-            MineDistCalculator = new MineDistCalculator(new Graph(map));
+            MineDistCalculator = new MineDistCalculator(graph);
             MineMultiplier = mineMultiplier;
         }
 

@@ -7,9 +7,12 @@ namespace lib.Ai.StrategicFizzBuzz
     {
         private IStrategy strategy;
 
+        public GreedierAi() : base(s => new GreedyStrategy(s.Map, s.PunterId))
+        {
+        }
+
         public override string Name => nameof(GreedierAi);
         public override string Version => "1.0";
-        protected override IStrategy Strategy => strategy;
 
         public override Future[] StartRound(int punterId, int puntersCount, Map map, Settings settings)
         {

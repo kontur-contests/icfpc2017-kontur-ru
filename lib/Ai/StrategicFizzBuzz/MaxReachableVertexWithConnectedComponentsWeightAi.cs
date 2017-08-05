@@ -1,6 +1,6 @@
 using JetBrains.Annotations;
+using lib.GraphImpl;
 using lib.Strategies.EdgeWeighting;
-using lib.Structures;
 
 namespace lib.Ai.StrategicFizzBuzz
 {
@@ -12,18 +12,11 @@ namespace lib.Ai.StrategicFizzBuzz
         }
 
         public MaxReachableVertexWithConnectedComponentsWeightAi(double mineWeight)
+            : base(s => new MaxVertextWeighterWithConnectedComponents(new Graph(s.Map), mineWeight))
         {
-            MineWeight = mineWeight;
         }
 
         public override string Name => nameof(MaxReachableVertexWithConnectedComponentsWeightAi);
         public override string Version => "1.0";
-
-        private double MineWeight { get; }
-
-        protected override IEdgeWeighter CreateEdgeWeighter(int punterId, int puntersCount, Map map, Settings settings)
-        {
-            return new MaxVertextWeighterWithConnectedComponents(map, MineWeight);
-        }
     }
 }
