@@ -28,11 +28,13 @@ def test_historical_algorithms():
 
 #test_historical_algorithms()
 
-Fluent().restore_dump('result_dump_93839.json').store_pointwise('test.csv')
+#Fluent().restore_dump('result_dump_93839.json').store_pointwise('test.csv')
 
 
 #test_greedy_algorithms()
 
 #Fluent().restore_dump('greedy_results').store_pointwise('test.csv')
 
-#empty_queue()
+
+
+empty_queue()
