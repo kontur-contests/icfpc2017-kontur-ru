@@ -45,11 +45,7 @@ namespace lib.viz
             var map = startGameConfigPanel.SelectedMap.Map;
             rightPanel.SetDataProvider(map, new SimulatorReplayDataProvider(startGameConfigPanel.SelectedAis, map));
         }
-
-        public static IAi GetNextAi()
-        {
-            return Factories.OrderBy(x => Guid.NewGuid()).First().Create();
-        }
+        
     }
 
     [TestFixture]

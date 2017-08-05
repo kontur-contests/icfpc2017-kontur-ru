@@ -14,5 +14,10 @@ namespace lib.viz
             Factories = types.Select(type => new AiFactory(type.Name, () => (IAi) Activator.CreateInstance(type)))
                 .ToArray();
         }
+
+        public static IAi GetNextAi()
+        {
+            return Factories.OrderBy(x => Guid.NewGuid()).First().Create();
+        }
     }
 }

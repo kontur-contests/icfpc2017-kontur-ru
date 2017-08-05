@@ -28,11 +28,14 @@ namespace ReplayCollector
                         {
                             var match = ArenaApi.GetNextMatch();
                             var ai = AiFactoryRegistry.GetNextAi();
+
+                            if (match != null)
+                            {
+                                Console.WriteLine("Collector " + index + ": Found match on port " + match.Port + " for " + ai.Name + " AI");
                             
-                            Console.WriteLine("Collector " + index + ": Found match on port " + match.Port + " for " + ai.Name + " AI");
-                            
-//                            var onlineInteraction = new OnlineInteraction(match.Port);
-//                            onlineInteraction.RunGame();
+//                                var onlineInteraction = new OnlineInteraction(match.Port);
+//                                onlineInteraction.RunGame();
+                            }
                         }
 
                         ++completedTasksCount;
