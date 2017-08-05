@@ -88,7 +88,7 @@ namespace lib.Ai
                 .FirstOrDefault(edge => edge.Owner < 0);
             if (nearMinesEdge == null)
                 return Base.GetNextMove(prevMoves, map);
-            return new ClaimMove(punterId, nearMinesEdge.Source, nearMinesEdge.Target);
+            return Move.Claim(punterId, nearMinesEdge.Source, nearMinesEdge.Target);
         }
 
         public string SerializeGameState()

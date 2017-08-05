@@ -1,5 +1,6 @@
 using JetBrains.Annotations;
 using lib.Strategies.EdgeWeighting;
+using lib.Structures;
 
 namespace lib.Ai.StrategicFizzBuzz
 {

@@ -120,8 +120,8 @@ namespace lib.viz
         private void DrawFuture(Graphics g, int punderId, Future future)
         {
             var data = PainterAugmentor.GetData(punderId, future);
-            var source = map.SiteById[future.Source];
-            var target = map.SiteById[future.Target];
+            var source = map.SiteById[future.source];
+            var target = map.SiteById[future.target];
             var pen = new Pen(data.Color, data.PenWidth)
             {
                 StartCap = LineCap.ArrowAnchor,

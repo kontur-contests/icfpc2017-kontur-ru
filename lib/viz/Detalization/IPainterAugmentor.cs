@@ -1,3 +1,5 @@
+using lib.Structures;
+
 namespace lib.viz.Detalization
 {
     public interface IPainterAugmentor
