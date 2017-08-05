@@ -18,7 +18,7 @@ namespace ConsoleApp
 
             foreach (var map in maps)
             {
-                var gamers = new List<IAi> { new ConnectClosestMinesAi(), new GreedyAi() };
+                var gamers = new List<IAi> { new ConnectClosestMinesAi(), new CrazyAi() };
                 var gameSimulator = new GameSimulatorRunner(new SimpleScoreCalculator(), true);
 
 
@@ -30,6 +30,7 @@ namespace ConsoleApp
                 Console.Write($"WIN {results[0].Gamer.Name}");
                 if (results.Count > 1)
                     Console.Write($" (+{results[0].Score - results[1].Score})");
+                Console.Write($" {map.Name}");
                 Console.WriteLine();
 
                 //foreach (var gameSimulationResult in results)

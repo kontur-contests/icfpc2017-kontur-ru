@@ -19,7 +19,7 @@ namespace lib.viz
                 Repo = repo
             };
 
-            var rightPanel = new ReplayerPanel()
+            var rightPanel = new ReplayerPanel
             {
                 Dock = DockStyle.Fill,
                 LiveScoreUpdate = true
