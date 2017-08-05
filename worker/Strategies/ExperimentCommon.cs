@@ -11,12 +11,23 @@ namespace worker.Strategies
 {
     class ExperimentCommon
     {
-        public static List<PlayerResult> Run(List<PlayerWithParams> players, Func<PlayerWithParams,IAi> selector, string map)
+        public static Result Run(Task task, Func<PlayerWithParams,IAi> selector)
         {
-            var ais = players.Select(selector).ToList();
+            var ais = task.Players.Select(selector).ToList();
             var gameSimulator = new GameSimulatorRunner(new SimpleScoreCalculator());
-            var results = gameSimulator.SimulateGame(ais, MapLoader.LoadMapByName(map).Map, new Settings());
-            return results.Select(z => new PlayerResult { Scores = z.Score, ServerName = z.Gamer.Name }).ToList();
+            var map = MapLoader.LoadMapByName(task.Map).Map;
+            
+            var results = gameSimulator.SimulateGame(ais, map, new Settings());
+            var playerResults =  results.Select(z => new PlayerResult { Scores = z.Score, ServerName = z.Gamer.Name }).ToList();
+            var result = new Result
+            {
+                Task = task,
+                Results = playerResults,
+                 RiversCount = map.Rivers.Length,
+                  SitesCount = map.Sites.Length
+            };
+            return result;
+
         }
     }
 }
