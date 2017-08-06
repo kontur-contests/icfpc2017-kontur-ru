@@ -17,11 +17,12 @@ namespace lib.Ai
         public string Name => nameof(LochDinicKiller);
         public string Version => "0.3";
 
-        DinicWeighter dinicWeighter = new DinicWeighter();
+        DinicWeighter dinicWeighter;
 
         public AiSetupDecision Setup(State state, IServices services)
         {
             services.Setup<Graph>();
+            new DinicWeighter(state, services);
             return Base.Setup(state, services);
         }
 
@@ -32,9 +33,10 @@ namespace lib.Ai
 
         public AiMoveDecision GetNextMove(State state, IServices services)
         {
-            dinicWeighter.Init(state, services, null, null);
+            dinicWeighter = new DinicWeighter(state, services);
+            dinicWeighter.Init(null, null);
 
-            var graph = services.Get<GraphService>(state).Graph;
+            var graph = services.Get<Graph>();
 
             int maxCount = 10;
             Dictionary<Tuple<int, int>, double> edgesToBlock = new Dictionary<Tuple<int, int>, double>();
