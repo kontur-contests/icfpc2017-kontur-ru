@@ -84,7 +84,7 @@ namespace lib
                 move = moveDecision.move,
                 reason = moveDecision.reason
             };
-
+            state.ValidateMove(state.lastAiMoveDecision);
             map = state.map.ApplyMove(state.lastAiMoveDecision);
             turnMoves[currentPunter] = moveDecision.move;
             moves.Add(moveDecision.move);
