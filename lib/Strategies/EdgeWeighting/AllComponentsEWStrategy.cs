@@ -26,19 +26,19 @@ namespace lib.Strategies.EdgeWeighting
         public List<TurnResult> NextTurns()
         {
             var graph = GraphService.Graph;
-            var allComponents = GetAllComponents(graph).ToArray();
-            return allComponents.SelectMany(x => GetTurnsForComponents(graph, allComponents, x)).ToList();
+            var connectedComponents = ConnectedComponentsService.For(PunterId);
+            var allComponents = GetAllComponents(graph, connectedComponents).ToArray();
+            return allComponents.SelectMany(x => GetTurnsForComponents(graph, connectedComponents, x)).ToList();
         }
 
-        private IEnumerable<ConnectedComponent> GetAllComponents(Graph graph)
+        private IEnumerable<ConnectedComponent> GetAllComponents(Graph graph, ConnectedComponent[] connectedComponents)
         {
-            var connectedComponents = ConnectedComponentsService.For(PunterId);
             foreach (var connectedComponent in connectedComponents)
                 yield return connectedComponent;
             var notConnectedMines = graph.Mines.Keys.Except(connectedComponents.SelectMany(x => x.Mines));
             foreach (var mine in notConnectedMines)
             {
-                var connectedComponent = new ConnectedComponent(connectedComponents.Length, PunterId);
+                var connectedComponent = new ConnectedComponent(-1, PunterId);
                 connectedComponent.Mines.Add(mine);
                 connectedComponent.Vertices.Add(mine);
                 yield return connectedComponent;

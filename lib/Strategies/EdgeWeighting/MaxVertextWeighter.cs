@@ -39,7 +39,10 @@ namespace lib.Strategies.EdgeWeighting
                 .ToDictionary(x => x.vertex, x => x.component);
             MutualComponentWeights = new Dictionary<Tuple<int, int>, long>();
 
-            SpGraph = SpGraphService.For(CurrentComponent.OwnerPunterId, CurrentComponent.Id);
+            SpGraph = currentComponent.Id == -1
+                ? SpGraphService.ForVertex(currentComponent.Vertices.Single())
+                : SpGraphService.ForComponent(CurrentComponent.OwnerPunterId, CurrentComponent.Id);
+
             ClaimedMineIds = CurrentComponent.Mines;
             foreach (var vertex in CurrentComponent.Vertices)
                 SubGraphWeight[vertex] = CalcSubGraphWeight(vertex);
