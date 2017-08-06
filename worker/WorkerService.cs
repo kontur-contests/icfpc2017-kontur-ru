@@ -111,7 +111,7 @@ namespace worker
                                         }
                                         catch (Exception exception)
                                         {
-                                            result = new Result {Error = exception.Message};
+                                            result = new Result {Error = exception.Message + "\n\n" + exception.StackTrace };
                                         }
                                         result.Task = task;
                                         result.Token = task.Token;
