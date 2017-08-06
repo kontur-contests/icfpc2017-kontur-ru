@@ -54,11 +54,13 @@ namespace lib.viz
         public void UpdateMetas(ReplayMeta[] metas)
         {
             this.metas = metas;
-            var wasSelected = aiFilter.SelectedText;
+            var selectedItem = aiFilter.SelectedItem;
             aiFilter.Items.Clear();
             aiFilter.Items.Add("*");
             aiFilter.Items.AddRange(metas.Select(m => $"{m.AiName}").Distinct().OrderBy(s => s).Cast<object>().ToArray());
-            if (!aiFilter.Items.Contains(wasSelected))
+            if (selectedItem != null && aiFilter.Items.Contains(selectedItem))
+                aiFilter.SelectedItem = selectedItem;
+            else
                 aiFilter.SelectedIndex = 0; 
 
             ApplyFilters();
