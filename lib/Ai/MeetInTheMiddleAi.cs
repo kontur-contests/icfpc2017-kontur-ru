@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using lib.GraphImpl;
 using lib.StateImpl;
+using lib.Structures;
 
 namespace lib.Ai
 {
@@ -15,11 +14,24 @@ namespace lib.Ai
         {
             services.Setup<GraphService>(state);
             services.Setup<MineDistCalculator>(state);
-            return AiSetupDecision.Empty();
+            services.Setup<MeetingPointService>(state);
+
+            var meetingPoint = state.mps.meetingPoint;
+
+            var graph = services.Get<GraphService>(state).Graph;
+            var futures = new List<Future>();
+            foreach (var mine in graph.Mines.Keys)
+            {
+                futures.Add(new Future(mine, meetingPoint));
+            }
+
+            return AiSetupDecision.Create(futures.ToArray(), $"meet in {meetingPoint}");
         }
 
         public AiMoveDecision GetNextMove(State state, IServices services)
         {
+            var meetingPoint = state.mps.meetingPoint;
+
             AiMoveDecision move;
             if (ConnectClosestMinesAi.TryExtendComponent(state, services, out move))
                 return move;

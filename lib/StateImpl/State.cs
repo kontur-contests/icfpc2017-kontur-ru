@@ -18,5 +18,6 @@ namespace lib.StateImpl
         public List<TurnState> turns = new List<TurnState>();
 
         public MineDistCalculator.ServiceState mdc;
+        public MeetingPointService.ServiceState mps;
     }
 }
