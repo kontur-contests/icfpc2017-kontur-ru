@@ -23,7 +23,7 @@ namespace lib.Ai
                 new MaxReachableVertexWeightAi(),
                 new LochMaxVertexWeighterKillerAi(),
                 new Podnaserator2000Ai(),
-                new FutureIsNow(),
+                new FutureIsNowAi(),
                 new LochDinicKillerAi(),
             };
         

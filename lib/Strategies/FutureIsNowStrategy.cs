@@ -1,54 +1,52 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using lib.Ai.StrategicFizzBuzz;
+using lib.Ai;
 using lib.GraphImpl;
 using lib.StateImpl;
-using lib.Structures;
 using MoreLinq;
 
-namespace lib.Ai
+namespace lib.Strategies
 {
-    public class FutureIsNow : IAi
+    public class FutureIsNowStrategy : IStrategy
     {
         private readonly double pathMultiplier;
-        public string Name => "Futurer";
-        public string Version => "1";
+        private readonly State state;
+        private readonly Graph graph;
+        private readonly MineDistCalculator mineDistCalculator;
 
-        public FutureIsNow()
-            :this(0.2)
-        {
-        }
-        public FutureIsNow(double pathMultiplier)
+        public FutureIsNowStrategy(double pathMultiplier, State state, Graph graph, MineDistCalculator mineDistCalculator)
         {
             this.pathMultiplier = pathMultiplier;
+            this.state = state;
+            this.graph = graph;
+            this.mineDistCalculator = mineDistCalculator;
         }
-                
-        public AiSetupDecision Setup(State state, IServices services)
+
+        public AiSetupDecision Setup()
         {
-            var graph = services.Get<Graph>();
-            var mineDists = services.Get<MineDistCalculator>();
-
-            if (!state.settings.futures)
-                return AiSetupDecision.Create(new Future[0]);
-
             var graphDiameterEstimation = (int)Math.Round(pathMultiplier * Math.Sqrt(state.map.Sites.Length));
             var length = graphDiameterEstimation;
-            var path = new PathSelector(state.map, mineDists, length).SelectPath();
-            var futures = new FuturesPositioner(state.map, graph, path, mineDists).GetFutures();
+            var path = new PathSelector(state.map, mineDistCalculator, length).SelectPath();
+            var futures = new FuturesPositioner(state.map, graph, path, mineDistCalculator).GetFutures();
             return AiSetupDecision.Create(futures);
         }
 
-        public AiMoveDecision GetNextMove(State state, IServices services)
+        public List<TurnResult> NextTurns()
         {
-            var graph = services.Get<Graph>();
-            var sitesToDefend = state.aiSetupDecision.futures.SelectMany(f => new[]{f.source, f.target}).ToArray();
+            var decision = TryGetNextMove();
+            if (decision != null)
+                return new List<TurnResult> { new TurnResult { Move = decision, Estimation = 1 } };
+            return new List<TurnResult>();
+        }
+
+        private AiMoveDecision TryGetNextMove()
+        {
+            var sitesToDefend = state.aiSetupDecision.futures.SelectMany(f => new[] { f.source, f.target }).ToArray();
             var edge = new MovesSelector(state.map, graph, sitesToDefend, state.punter).GetNeighbourToGo();
-            if (edge == null)
-            {
-                return new MaxReachableVertexWeightAi().GetNextMove(state, services);
-            }
-            return AiMoveDecision.Claim(state.punter, edge.From, edge.To, "futures cant wait!!1");
+            if (edge != null)
+                return AiMoveDecision.Claim(state.punter, edge.From, edge.To, "futures cant wait!!1");
+            return null;
         }
     }
 
@@ -75,7 +73,7 @@ namespace lib.Ai
             var q =
                 from c in components
                 let neighbours = GetFreeNeighbours(c)
-                select new{c, neighbours};
+                select new { c, neighbours };
 
             var weakComponents = q.OrderBy(t => t.neighbours.Count - MinesToDefendablesRatio(t.c));
 
@@ -134,7 +132,7 @@ namespace lib.Ai
                     int currentInitiator = initiator[currentId];
                     if (destinationSiteIds.Contains(edge.To))
                     {
-                        distanceToDestination[currentInitiator] = dist[currentId]+1;
+                        distanceToDestination[currentInitiator] = dist[currentId] + 1;
                         break;
                     }
                     if (!initiator.ContainsKey(edge.To))
@@ -159,10 +157,10 @@ namespace lib.Ai
         {
             var q = new Queue<int>();
             var used = new HashSet<int>();
-            var component = new HashSet<int>{siteId};
+            var component = new HashSet<int> { siteId };
             q.Enqueue(siteId);
             used.Add(siteId);
-            while(q.Count > 0)
+            while (q.Count > 0)
             {
                 var currentId = q.Dequeue();
                 var currentVertex = graph.Vertexes[currentId];
@@ -180,4 +178,5 @@ namespace lib.Ai
             return component;
         }
     }
+
 }

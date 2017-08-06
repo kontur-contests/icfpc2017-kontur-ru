@@ -30,7 +30,7 @@ namespace BrutalTesterApp
             //var ais = AiFactoryRegistry.Factories
             var ais = new List<AiFactory>()
             {
-                AiFactoryRegistry.CreateFactory<FutureIsNow>(),
+                AiFactoryRegistry.CreateFactory<FutureIsNowAi>(),
             //    AiFactoryRegistry.CreateFactory<ConnectClosestMinesAi>(),
                 AiFactoryRegistry.CreateFactory<LochDinicKillerAi>(),
                 //AiFactoryRegistry.CreateFactory<AgileMaxVertexWeighterAi>(),
