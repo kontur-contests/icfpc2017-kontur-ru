@@ -45,6 +45,7 @@ namespace lib
                     current = current.ApplyClaim(move.splurge.punter, old, step, move);
                     old = step;
                 }
+                return current;
             }
             return current;
         }

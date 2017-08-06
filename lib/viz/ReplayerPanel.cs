@@ -3,6 +3,7 @@ using System.Linq;
 using System.Windows.Forms;
 using lib.GraphImpl;
 using lib.Scores.Simple;
+using lib.StateImpl;
 using lib.viz.Detalization;
 
 namespace lib.viz
@@ -106,7 +107,7 @@ namespace lib.viz
             var scoreCalculator = new SimpleScoreCalculator();
             var scores = provider.PunterNames.Select(
                 (name, i) => scoreCalculator.GetScore(i, gameState.CurrentMap, provider.GetPunterFutures(i)));
-            scorePanel.SetScores(scores.ToArray());
+            scorePanel.SetScores(scores.ToArray(), gameState.SplurgePoints);
         }
     }
 }

@@ -51,7 +51,6 @@ namespace lib.Ai
         }
     }
 
-
     public class MovesSelector
     {
         private readonly Map map;

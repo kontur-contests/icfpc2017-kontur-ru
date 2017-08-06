@@ -1,8 +1,7 @@
 ﻿using JetBrains.Annotations;
-using lib.Ai.StrategicFizzBuzz;
 using lib.Strategies.EdgeWeighting;
 
-namespace lib.Ai
+namespace lib.Ai.StrategicFizzBuzz
 {
     [UsedImplicitly]
     public class AgileMaxVertexWeighterAi : AllComponentsEWStrategicAi

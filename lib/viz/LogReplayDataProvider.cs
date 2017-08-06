@@ -12,6 +12,7 @@ namespace lib.viz
         private Map map;
         private readonly int ourPunterIndex;
         private readonly Future[] futures;
+        private readonly long[] splurges;
 
         public LogReplayDataProvider(ReplayFullData data)
         {
@@ -21,6 +22,7 @@ namespace lib.viz
                 .Select((s, i) => i == data.Meta.OurPunter ? data.Meta.AiName : i.ToString())
                 .ToArray();
             ourPunterIndex = data.Meta.OurPunter;
+            splurges = new long[PunterNames.Length];
             futures = data.Data.Futures ?? new Future[0];
         }
 
@@ -38,8 +40,9 @@ namespace lib.viz
                 var move = data.Data.Moves[nextMoveIndex++];
                 map = map.ApplyMove(move);
                 prevMoves.Add(move);
+                splurges.Update(move);
             }
-            return new GameState(map, prevMoves, nextMoveIndex >= data.Data.Moves.Length);
+            return new GameState(map, prevMoves, nextMoveIndex >= data.Data.Moves.Length, splurges);
         }
     }
 }
