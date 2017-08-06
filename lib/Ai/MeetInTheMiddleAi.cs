@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using lib.GraphImpl;
+using lib.GraphImpl.ShortestPath;
 using lib.StateImpl;
 using lib.Structures;
 
@@ -33,11 +35,24 @@ namespace lib.Ai
             var meetingPoint = state.mps.meetingPoint;
 
             var graph = services.Get<GraphService>(state).Graph;
-            var toDo = ConnectClosestMinesAi.GetNotMyMines(state, graph);
+            var toDo = ConnectClosestMinesAi.GetNotMyMines(state, graph)
+                .Select(x => x.Id);
+
+            var myVerts = graph.Vertexes.Values
+                .Where(v => v.Edges.Any(e => e.Owner == state.punter))
+                .Select(x => x.Id)
+                .ToArray();
+            var shortest = ShortestPathGraph.Build(graph, myVerts);
 
             foreach (var mine in toDo)
             {
-                
+                var len = shortest[mine].Distance;
+                //if len < ...
+                var path = shortest[mine].Edges;
+                foreach (var edge in path)
+                {
+                    
+                }
             }
 
             AiMoveDecision move;
