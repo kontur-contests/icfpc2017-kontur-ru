@@ -38,6 +38,7 @@ namespace lib.Ai
             
             var edgeToBlock = state.map.Rivers
                 .Select(river => new{river, weight = dinicWeighter.EstimateWeight(new Edge(river.Source, river.Target, river.Owner)) })
+                .Where(river => river.weight > 0)
                 .ToList();
 
             if (edgeToBlock.Count == 0)
