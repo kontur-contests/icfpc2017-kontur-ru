@@ -23,6 +23,11 @@ namespace lib.Ai
             return Move(Structures.Move.Claim(punter, source, target), reason);
         }
 
+        public static AiMoveDecision Splurge(int punter, int[] siteIds, string reason = null)
+        {
+            return Move(Structures.Move.Splurge(punter, siteIds), reason);
+        }
+
         public static AiMoveDecision Pass(int punter, string reason = null)
         {
             return Move(Structures.Move.Pass(punter), reason);
