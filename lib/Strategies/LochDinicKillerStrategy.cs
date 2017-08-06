@@ -24,7 +24,7 @@ namespace lib.Strategies
 
         public AiSetupDecision Setup()
         {
-            return AiSetupDecision.Empty();
+            return null;
         }
 
         public List<TurnResult> NextTurns()
