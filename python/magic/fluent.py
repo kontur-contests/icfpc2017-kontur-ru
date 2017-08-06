@@ -52,6 +52,19 @@ class Fluent:
         self.battles_on_maps = [(battle,map) for battle in self.battles for map in args]
         return self
 
+    def add_dummies(self, dummies):
+        bs = []
+        for battle, map in self.battles_on_maps:
+            place = np.random.randint(0,len(battle))
+            for i in range(len(battle)):
+                if i!=place:
+                    battle[i]=dummies[np.random.randint(0,len(dummies))]
+
+
+            bs.append((battle,map))
+        self.battles_on_maps = bs
+        return self
+
     def repeating(self, count):
         self.battles_on_maps = [x for x in self.battles_on_maps for _ in range(count)]
         return self
@@ -119,9 +132,8 @@ class Fluent:
                     'map_rivers_count',
                     'map_sites_count',
                     'map_mines_count',
-                    'name'
-                ]))
-            file.write(",".join(keys))
+                    'name'] + keys
+                ))
             file.write('\n')
             for game_number, game in enumerate(self.results):
                 for player_index in range(len(game['Results'])):
