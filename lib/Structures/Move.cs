@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace lib.Structures
@@ -7,6 +8,7 @@ namespace lib.Structures
     {
         public ClaimMove claim;
         public PassMove pass;
+        public SplurgerMove splurger;
 
         public static Move Claim(int punter, int source, int target)
         {
@@ -18,12 +20,19 @@ namespace lib.Structures
             return new Move {pass = new PassMove {punter = punter}};
         }
 
+        public static Move Splurge(int punter, int[] siteIds)
+        {
+            return new Move {splurger = new SplurgerMove{punter = punter, route = siteIds}};
+        }
+
         public override string ToString()
         {
             if (claim != null)
                 return claim.ToString();
             if (pass != null)
                 return pass.ToString();
+            if (splurger != null)
+                return splurger.ToString();
             return "Invalid move";
         }
 

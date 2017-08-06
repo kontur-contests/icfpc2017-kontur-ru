@@ -21,7 +21,7 @@ class Fluent:
                 value = np.random.random_sample(1)[0]
                 value = value * (limit[1] - limit[0]) + limit[0]
                 player[key] = value
-            self.players.append({'Name': str(i), 'Params': player, 'ClassName' : class_name})
+            self.players.append({'Name': uuid4().hex, 'Params': player, 'ClassName' : class_name})
         return self
 
 
@@ -30,8 +30,10 @@ class Fluent:
         self.param_names = ['Age']
         return self;
 
-    def create_nigga_players(self, mine_weight, others_mine_weight=100):
-        self.players = [{ 'Name' : 'xxx', 'Params': {'MineWeight': others_mine_weight}}]
+    def create_nigga_players(self, mine_weight, players_number, default_mine_weight=100):
+        self.players = [{ 'Name' : player_index, 'Params': {'MineWeight': default_mine_weight}}
+                        for player_index
+                        in range(players_number)]
         self.players[-1]['Params']['MineWeight'] = mine_weight
         return self
 
@@ -57,7 +59,7 @@ class Fluent:
 
     def battles_on_map(self, map, player_count, battles_count):
         for _ in range(battles_count):
-            players = [ self.players[np.random.randint(0,len(self.players))] for __ in range(player_count)]
+            players = [np.random.choice(self.players) for _ in range(player_count)]
             self.battles_on_maps.append((players,map))
         return self
 
@@ -81,6 +83,8 @@ class Fluent:
         self.results = execute_tasks(self.tasks,self.token)
         return self
 
+
+
     def dump(self,dump_file = None):
         self.result_dump_file = dump_file or os.path.join('dumps',
                                                      'result_dump_' + str(self.token) + '.json')
@@ -88,16 +92,35 @@ class Fluent:
             file.write(json.dumps(self.results,indent=2))
         return self
 
-    def restore_dump(self, dump_file):
-        with open(dump_file,'r') as file:
-            self.results = json.loads(file.read())
+    def restore_dump(self, *tokens):
+        self.results=[]
+        for token in tokens:
+            dump_file = os.path.join('dumps','result_dump_' + str(token) + '.json')
+            with open(dump_file,'r') as file:
+                results = json.loads(file.read())
+                for r in results:
+                    self.results.append(r)
         self.param_names = list(self.results[0]['Task']['Players'][0]['Params'])
         return self
 
     def store_pointwise(self, filename, mode='w'):
         keys = self.param_names
         with open(filename, mode) as file:
-            file.write('game_number,server_name,scores,ranking,tournament_scores,num_players,map,map_rivers_count,map_sites_count,map_mines_count,name,')
+            if mode == 'w':
+                # file.write('game_number,server_name,scores,ranking,tournament_scores,num_players,map,map_rivers_count,map_sites_count,map_mines_count,name,')
+                file.write(','.join([
+                    'game_number',
+                    'server_name',
+                    'scores',
+                    'ranking',
+                    'tournament_scores',
+                    'num_players',
+                    'map',
+                    'map_rivers_count',
+                    'map_sites_count',
+                    'map_mines_count',
+                    'name'
+                ]))
             file.write(",".join(keys))
             file.write('\n')
             for game_number, game in enumerate(self.results):

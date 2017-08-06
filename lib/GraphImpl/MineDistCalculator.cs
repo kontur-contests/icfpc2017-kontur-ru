@@ -3,34 +3,48 @@ using System.Collections.Generic;
 using System.Linq;
 using lib.StateImpl;
 using NUnit.Framework;
+using Shouldly;
+#pragma warning disable 618
 
 namespace lib.GraphImpl
 {
+    public class MineDistanceInfo
+    {
+        public MineDistanceInfo(int distance, int prevSiteId)
+        {
+            Distance = distance;
+            PrevSiteId = prevSiteId;
+        }
+
+        public int Distance;
+        public int PrevSiteId;
+    }
+
     public class MineDistCalculator : IService
     {
         public Impl impl;
 
         public class ServiceState
         {
-            public Dictionary<int, Dictionary<int, int[]>> distFromMines;
+            public Dictionary<int, Dictionary<int, MineDistanceInfo>> distFromMines;
         }
 
         public class Impl
         {
             private readonly Graph graph;
-            public readonly Dictionary<int, Dictionary<int, SingleLinkedList<int>>> distFromMines;
+            public readonly Dictionary<int, Dictionary<int, MineDistanceInfo>> distFromMines;
 
-            public Impl(Graph graph, Dictionary<int, Dictionary<int, int[]>> distFromMines)
+            public Impl(Graph graph, Dictionary<int, Dictionary<int, MineDistanceInfo>> distFromMines)
             {
                 this.graph = graph;
-                this.distFromMines = distFromMines.ToDictionary(x => x.Key, x => x.Value.ToDictionary(t => t.Key, t => new SingleLinkedList<int>(t.Value)));
+                this.distFromMines = distFromMines;
             }
 
             public Impl(Graph graph)
             {
                 this.graph = graph;
 
-                distFromMines = new Dictionary<int, Dictionary<int, SingleLinkedList<int>>>();
+                distFromMines = new Dictionary<int, Dictionary<int, MineDistanceInfo>>();
                 foreach (var vertex in graph.Vertexes.Values)
                 {
                     if (vertex.IsMine)
@@ -47,10 +61,22 @@ namespace lib.GraphImpl
                     throw new InvalidOperationException();
                 if (!distFromMines[mineId].ContainsKey(vertexId))
                     return -1;
-                return distFromMines[mineId][vertexId].Length - 1;
+                return distFromMines[mineId][vertexId].Distance;
             }
 
-            public SingleLinkedList<int> GetPath(int mineId, int vertexId)
+            public IEnumerable<int> GetReversedPath(int mineId, int vertexId)
+            {
+                var current = vertexId;
+                while (current >= 0)
+                {
+                    var info = GetInfo(mineId, current);
+                    if (info == null) yield break;
+                    yield return current;
+                    current = info.PrevSiteId;
+                }
+            }
+
+            public MineDistanceInfo GetInfo(int mineId, int vertexId)
             {
                 if (!distFromMines.ContainsKey(mineId))
                     throw new InvalidOperationException();
@@ -61,12 +87,12 @@ namespace lib.GraphImpl
 
             //(v, dist)
 
-            private Dictionary<int, SingleLinkedList<int>> CalcDist(int start)
+            private Dictionary<int, MineDistanceInfo> CalcDist(int start)
             {
-                var dist = new Dictionary<int, SingleLinkedList<int>>();
+                var dist = new Dictionary<int, MineDistanceInfo>();
                 var queue = new Queue<int>();
 
-                dist[start] = new SingleLinkedList<int>(start);
+                dist[start] = new MineDistanceInfo(0, -1);
                 queue.Enqueue(start);
 
                 while (queue.Any())
@@ -77,7 +103,7 @@ namespace lib.GraphImpl
                         int u = edge.To;
                         if (dist.ContainsKey(u))
                             continue;
-                        dist.Add(u, new SingleLinkedList<int>(u, dist[v]));
+                        dist.Add(u, new MineDistanceInfo(dist[v].Distance + 1, v));
                         queue.Enqueue(u);
                     }
                 }
@@ -90,7 +116,7 @@ namespace lib.GraphImpl
         {
             var graph = services.Get<GraphService>(state).Graph;
             impl = new Impl(graph);
-            state.mdc = new ServiceState { distFromMines = impl.distFromMines.ToDictionary(x => x.Key, x => x.Value.ToDictionary(t => t.Key, t => t.Value.Enumerate().ToArray())) };
+            state.mdc = new ServiceState { distFromMines = impl.distFromMines };
         }
 
         public void ApplyNextState(State state, IServices services)
@@ -104,53 +130,16 @@ namespace lib.GraphImpl
             return impl.GetDist(mineId, vertexId);
         }
 
-        public SingleLinkedList<int> GetPath(int mineId, int vertexId)
+        public IEnumerable<int> GetReversedPath(int mineId, int vertexId)
         {
-            return impl.GetPath(mineId, vertexId);
+            return impl.GetReversedPath(mineId, vertexId);
         }
-    }
-
-    public class SingleLinkedList<T>
-    {
-        public SingleLinkedList(T[] values, int i = 0)
-        {
-            Value = values[i];
-            Length = values.Length - i;
-            if (i + 1 < values.Length)
-                Prev = new SingleLinkedList<T>(values, i + 1);
-        }
-
-        public SingleLinkedList(T value)
-        {
-            Value = value;
-            Length = 1;
-        }
-
-        public SingleLinkedList(T value, SingleLinkedList<T> prev)
-        {
-            Value = value;
-            Prev = prev;
-            Length = prev.Length + 1;
-        }
-
-        public IEnumerable<T> Enumerate()
-        {
-            yield return Value;
-            if (Prev == null) yield break;
-            foreach (var v in Prev.Enumerate())
-            {
-                yield return v;
-            }
-        }
-
-        public T Value;
-        public int Length;
-        public SingleLinkedList<T> Prev;
     }
 
     [TestFixture]
     public class MineDistCalculator_Tests
     {
+
         [Test]
         public void TestDisjoint()
         {
@@ -173,6 +162,7 @@ namespace lib.GraphImpl
             graph.AddVertex(3, true);
             graph.AddVertex(4, true);
             graph.AddVertex(5);
+            graph.AddVertex(100);
 
             graph.AddEdge(1, 4);
             graph.AddEdge(1, 2);
@@ -181,7 +171,7 @@ namespace lib.GraphImpl
             graph.AddEdge(3, 5);
 
             var calculator = new MineDistCalculator.Impl(graph);
-            
+
             Assert.AreEqual(1, calculator.GetDist(3, 1));
             Assert.AreEqual(1, calculator.GetDist(3, 2));
             Assert.AreEqual(0, calculator.GetDist(3, 3));
@@ -193,6 +183,10 @@ namespace lib.GraphImpl
             Assert.AreEqual(2, calculator.GetDist(4, 3));
             Assert.AreEqual(0, calculator.GetDist(4, 4));
             Assert.AreEqual(3, calculator.GetDist(4, 5));
+            calculator.GetReversedPath(4, 5).ShouldBe(new[] { 5, 3, 1, 4 });
+            calculator.GetReversedPath(3, 2).ShouldBe(new[] { 2, 3 });
+            calculator.GetReversedPath(3, 3).ShouldBe(new[] { 3 });
+            calculator.GetReversedPath(4, 100).ShouldBeEmpty();
         }
     }
 }

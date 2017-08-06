@@ -225,19 +225,16 @@ namespace lib.Ai
         {
             var ai = new ConnectClosestMinesAi();
             var state = new State{punter = 0, punters = 1, map = MapLoader.LoadMap(Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\..\maps\sample.json")).Map };
-            var services = new Services();
-            ai.Setup(state, services);
-            var moveDecision = ai.GetNextMove(state, services);
+            ai.Setup(state, new Services());
+            var moveDecision = ai.GetNextMove(state, new Services());
             Assert.That(moveDecision.move, Is.EqualTo(Move.Claim(0, 5, 3)));
             state.map = state.map.ApplyMove(moveDecision.move);
             state.turns.Add(new TurnState());
-            services.ApplyNextState(state);
-            moveDecision = ai.GetNextMove(state, services);
+            moveDecision = ai.GetNextMove(state, new Services());
             Assert.That(moveDecision.move, Is.EqualTo(Move.Claim(0, 1, 3)));
             state.map = state.map.ApplyMove(moveDecision.move);
             state.turns.Add(new TurnState());
-            services.ApplyNextState(state);
-            moveDecision = ai.GetNextMove(state, services);
+            moveDecision = ai.GetNextMove(state, new Services());
             Assert.That(moveDecision.move, Is.EqualTo(Move.Claim(0, 0, 1)));
         }
         
