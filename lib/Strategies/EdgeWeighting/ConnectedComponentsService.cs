@@ -7,7 +7,7 @@ namespace lib.Strategies.EdgeWeighting
     public class ConnectedComponentsService : IService
     {
         private Graph Graph { get; set; }
-        private IDictionary<int, List<ConnectedComponent>> Cache { get; } = new Dictionary<int, List<ConnectedComponent>>();
+        private IDictionary<int, ConnectedComponent[]> Cache { get; } = new Dictionary<int, ConnectedComponent[]>();
 
         public void Setup(State state, IServices services)
         {
@@ -19,9 +19,9 @@ namespace lib.Strategies.EdgeWeighting
             Graph = services.Get<GraphService>(state).Graph;
         }
 
-        public List<ConnectedComponent> For(int punterId)
+        public ConnectedComponent[] For(int punterId)
         {
-            return Cache.GetOrCreate(punterId, key => ConnectedComponent.GetComponents(Graph, punterId));
+            return Cache.GetOrCreate(punterId, key => ConnectedComponent.GetComponents(Graph, punterId).ToArray());
         }
     }
 }
