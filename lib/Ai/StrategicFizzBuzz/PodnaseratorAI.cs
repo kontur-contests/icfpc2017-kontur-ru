@@ -4,7 +4,6 @@ using lib.GraphImpl;
 using lib.StateImpl;
 using lib.Strategies;
 using lib.Strategies.EdgeWeighting;
-using lib.Structures;
 using MoreLinq;
 
 namespace lib.Ai.StrategicFizzBuzz
@@ -36,7 +35,7 @@ namespace lib.Ai.StrategicFizzBuzz
 
         public AiSetupDecision Setup(State state, IServices services)
         {
-            services.Setup<GraphService>(state);
+            services.Setup<Graph>();
             Enumerable.Range(0, state.punters)
                 .Select(punterId => StrategyProvider(punterId, state, services))
                 .Consume();

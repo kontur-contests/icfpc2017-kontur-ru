@@ -34,7 +34,7 @@ namespace lib.Ai
         {
             var meetingPoint = state.mps.meetingPoint;
 
-            var graph = services.Get<GraphService>(state).Graph;
+            var graph = services.Get<Graph>();
             var toDo = ConnectClosestMinesAi.GetNotMyMines(state, graph)
                 .Select(x => x.Id);
 

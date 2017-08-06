@@ -21,7 +21,7 @@ namespace lib.Ai.StrategicFizzBuzz
 
         public AiSetupDecision Setup(State state, IServices services)
         {
-            services.Setup<GraphService>(state);
+            services.Setup<Graph>();
             StrategyProvider(state, services);
             return AiSetupDecision.Empty();
         }

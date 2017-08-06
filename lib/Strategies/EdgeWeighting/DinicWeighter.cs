@@ -12,22 +12,21 @@ namespace lib.Strategies.EdgeWeighting
     public class DinicWeighter : IEdgeWeighter
     {
         private Random rand = new Random();
-        private GraphService GraphService { get; }
-        private int PunterId { get;  }
+        private Graph Graph { get; }
+        private int PunterId { get; }
 
         public DinicWeighter(State state, IServices services)
         {
-            GraphService = services.Get<GraphService>(state);
+            Graph = services.Get<Graph>();
             PunterId = state.punter;
         }
         
         public void Init(ConnectedComponent[] connectedComponents, ConnectedComponent currentComponent)
         {
-            var graph = GraphService.Graph;
             int maxCount = 10;
             Dictionary<Tuple<int, int>, double> edgesToBlock = new Dictionary<Tuple<int, int>, double>();
 
-            var mineToSave = graph.Mines
+            var mineToSave = Graph.Mines
                 .Where(mine => mine.Value.Edges.All(edge => edge.Owner != PunterId))
                 .FirstOrDefault(mine => mine.Value.Edges.Count(edge => edge.Owner < 0) < PunterId).Value;
             if (mineToSave != null)
@@ -37,7 +36,7 @@ namespace lib.Strategies.EdgeWeighting
                 //    return AiMoveDecision.Claim(state.punter, edgeToSave.From, edgeToSave.To);
             }
 
-            var bannedMines = graph.Mines
+            var bannedMines = Graph.Mines
                 .Where(mine => mine.Value.Edges.Select(edge => edge.Owner).Distinct().Count() == PunterId + 1)
                 .Select(mine => mine.Key)
                 .ToHashSet();
