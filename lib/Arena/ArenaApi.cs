@@ -43,8 +43,8 @@ namespace lib.Arena
                         match.Status = ArenaMatch.MatchStatus.Unknown;
                     }
 
-                    match.Players = cells[1].TextContent.Split(',');
-                    match.Extensions = cells[2].TextContent.Split(',');
+                    match.Players = cells[1].TextContent.Split(',').Select(y => y.Trim()).ToArray();
+                    match.Extensions = cells[2].TextContent.Split(',').Select(y => y.Trim()).ToArray();
                     int.TryParse(cells[3].TextContent, out match.Port);
                     match.MapName = cells[4].QuerySelector("a").TextContent;
 
