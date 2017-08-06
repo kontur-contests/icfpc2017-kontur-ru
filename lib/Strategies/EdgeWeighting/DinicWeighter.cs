@@ -16,6 +16,14 @@ namespace lib.Strategies.EdgeWeighting
         private int PunterId { get; }
 
         public DinicWeighter(State state, IServices services)
+        Dictionary<Tuple<int, int>, double> EdgesToBlock = new Dictionary<Tuple<int, int>, double>();
+
+        private Tuple<int, int> ConvertToTuple(Edge edge)
+        {
+            return edge.From > edge.To ? Tuple.Create(edge.To, edge.From) : Tuple.Create(edge.From, edge.To);
+        }
+
+        public void Init(State state, IServices services, List<ConnectedComponent> connectedComponents, ConnectedComponent currentComponent)
         {
             Graph = services.Get<Graph>();
             PunterId = state.punter;
@@ -24,27 +32,48 @@ namespace lib.Strategies.EdgeWeighting
         public void Init(ConnectedComponent[] connectedComponents, ConnectedComponent currentComponent)
         {
             int maxCount = 10;
-            Dictionary<Tuple<int, int>, double> edgesToBlock = new Dictionary<Tuple<int, int>, double>();
-
+            EdgesToBlock.Clear();
+            
             var mineToSave = Graph.Mines
                 .Where(mine => mine.Value.Edges.All(edge => edge.Owner != PunterId))
                 .FirstOrDefault(mine => mine.Value.Edges.Count(edge => edge.Owner < 0) < PunterId).Value;
             if (mineToSave != null)
             {
                 var edgeToSave = mineToSave.Edges.OrderBy(_ => rand.Next()).FirstOrDefault(edge => edge.Owner < 0);
-                //if (edgeToSave != null)
-                //    return AiMoveDecision.Claim(state.punter, edgeToSave.From, edgeToSave.To);
+                if (edgeToSave != null)
+                    EdgesToBlock[ConvertToTuple(edgeToSave)] = 10;
             }
 
             var bannedMines = Graph.Mines
                 .Where(mine => mine.Value.Edges.Select(edge => edge.Owner).Distinct().Count() == PunterId + 1)
                 .Select(mine => mine.Key)
                 .ToHashSet();
+            
+            var mines = graph.Mines.Where(mine => mine.Value.Edges.Any(edge => edge.Owner < 0)).ToList();
+            for (int i = 0; i < Math.Min(10, mines.Count * (mines.Count - 1)); i++)
+            {
+                var mine1 = mines[Math.Min(rand.Next(mines.Count), mines.Count - 1)];
+                var mine2 = mines[Math.Min(rand.Next(mines.Count), mines.Count - 1)];
+                while (mine2.Key == mine1.Key) mine2 = mines[Math.Min(rand.Next(mines.Count), mines.Count - 1)];
+
+                var dinic = new Dinic(graph, state.punter, mine1.Key, mine2.Key, out var flow);
+                if (flow == 0)
+                    continue;
+                if (flow > maxCount)
+                    continue;
+
+                foreach (var edge in dinic.GetMinCut().Select(ConvertToTuple))
+                {
+                    if (bannedMines.Contains(edge.Item1) || bannedMines.Contains(edge.Item2))
+                        continue;
+                    EdgesToBlock[edge] = EdgesToBlock.GetOrDefault(edge, 0) + 1.0 / flow;
+                }
+            }
         }
 
         public double EstimateWeight(Edge edge)
         {
-            throw new NotImplementedException();
+            return EdgesToBlock.GetOrDefault(ConvertToTuple(edge), 0);
         }
     }
 }
