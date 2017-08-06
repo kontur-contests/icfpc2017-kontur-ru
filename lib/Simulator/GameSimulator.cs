@@ -75,10 +75,8 @@ namespace lib
 
             var ai = punters[currentPunter].Item1;
             var state = punters[currentPunter].Item2;
-            state.map = map;
-            state.turns.Add(new TurnState{moves = turnMoves.ToArray(), aiMoveDecision = state.lastAiMoveDecision});
-            var services = new Services(state);
-            var moveDecision = GetNextMove(ai, state, services, eatExceptions, lastException);
+            state.ApplyMoves(turnMoves);
+            var moveDecision = GetNextMove(ai, state, eatExceptions, lastException);
             state.lastAiMoveDecision = new AiInfoMoveDecision
             {
                 name = ai.Name,
@@ -87,7 +85,7 @@ namespace lib
                 reason = moveDecision.reason
             };
 
-            map = map.ApplyMove(state.lastAiMoveDecision);
+            map = state.map.ApplyMove(state.lastAiMoveDecision);
             turnMoves[currentPunter] = moveDecision.move;
             moves.Add(moveDecision.move);
             currentPunter = (currentPunter + 1) % punters.Count;
@@ -95,11 +93,11 @@ namespace lib
             return new GameState(map, moves.TakeLast(punters.Count).ToList(), false);
         }
 
-        private static AiMoveDecision GetNextMove(IAi ai, State state, IServices services, bool eatExceptions, Dictionary<IAi, Exception> lastException)
+        private static AiMoveDecision GetNextMove(IAi ai, State state, bool eatExceptions, Dictionary<IAi, Exception> lastException)
         {
             try
             {
-                return ai.GetNextMove(state, services);
+                return ai.GetNextMove(state, new Services(state));
             }
             catch (Exception e)
             {

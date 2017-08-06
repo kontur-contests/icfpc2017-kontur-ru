@@ -54,7 +54,7 @@ namespace lib.Interaction
                 throw;
             }
 
-            if (setup.settings?.futures != true && setupDecision.futures?.Any() == true)
+            if (!state.settings.futures && setupDecision.futures?.Any() == true)
                 throw new InvalidOperationException($"BUG in Ai {ai.Name} - futures are not supported");
             state.aiSetupDecision = new AiInfoSetupDecision
             {
@@ -72,18 +72,14 @@ namespace lib.Interaction
 
             while (!serverResponse.IsScoring())
             {
-                var moves = serverResponse.move.moves;
+                var moves = serverResponse.move.moves.OrderBy(m => m.GetPunter()).ToArray();
+
+                moves = moves.Skip(setup.punter).Concat(moves.Take(setup.punter)).ToArray();
                 var gameplay = JsonConvert.SerializeObject(serverResponse, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore});
 
                 allMoves.AddRange(moves);
-                foreach (var move in moves)
-                    state.map = state.map.ApplyMove(move);
 
-                state.turns.Add(new TurnState
-                {
-                    moves = moves,
-                    aiMoveDecision = state.lastAiMoveDecision
-                });
+                state.ApplyMoves(moves);
 
                 AiMoveDecision moveDecision;
                 try

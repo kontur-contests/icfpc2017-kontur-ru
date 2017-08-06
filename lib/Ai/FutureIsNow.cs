@@ -28,10 +28,8 @@ namespace lib.Ai
             var graph = services.Get<Graph>();
             var mineDists = services.Get<MineDistCalculator>();
 
-            if (state.settings == null || !state.settings.futures)
-            {
+            if (!state.settings.futures)
                 return AiSetupDecision.Create(new Future[0]);
-            }
 
             var graphDiameterEstimation = (int)Math.Round(pathMultiplier * Math.Sqrt(state.map.Sites.Length));
             var length = graphDiameterEstimation;

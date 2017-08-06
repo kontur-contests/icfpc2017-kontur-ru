@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using lib.GraphImpl;
 
 namespace lib.Strategies
@@ -17,6 +14,7 @@ namespace lib.Strategies
         public ConnectedComponent(int id, int ownerPunterId)
         {
             Id = id;
+            OwnerPunterId = ownerPunterId;
         }
 
         public static List<ConnectedComponent> GetComponents(Graph graph, int owner)

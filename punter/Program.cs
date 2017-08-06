@@ -32,7 +32,7 @@ namespace punter
 
             var @in = Read<In>();
             if (@in.IsSetup())
-                Write(DoSetup(@in.punter, @in.punters, @in.map, @in.settings));
+                Write(DoSetup(@in.punter, @in.punters, @in.map, @in.settings ?? new Settings()));
             else if (@in.IsGameplay())
                 Write(DoGameplay(@in.move.moves, @in.state));
             else if (@in.IsScoring())
@@ -52,7 +52,7 @@ namespace punter
                 settings = settings
             };
             var setupDecision = ai.Setup(state, new Services(state));
-            if (settings?.futures != true && setupDecision.futures?.Any() == true)
+            if (!settings.futures && setupDecision.futures?.Any() == true)
             {
                 Console.Error.WriteLine($"BUG in Ai {ai.Name} - futures are not supported");
                 setupDecision = AiSetupDecision.Empty("futures are not supported");
@@ -74,13 +74,7 @@ namespace punter
 
         private static GameplayOut DoGameplay(Move[] moves, State state)
         {
-            foreach (var move in moves)
-                state.map = state.map.ApplyMove(move);
-            state.turns.Add(new TurnState
-            {
-                moves = moves,
-                aiMoveDecision = state.lastAiMoveDecision
-            });
+            state.ApplyMoves(moves);
             try
             {
                 var moveDecision = ai.GetNextMove(state, new Services(state));

@@ -8,6 +8,8 @@ namespace lib.Structures
         public int punter;
         public int[] route;
 
+        public int SplurgeLength() => route?.Length - 1 ?? 0;
+
         public bool Equals(SplurgerMove other)
         {
             if (ReferenceEquals(null, other)) return false;

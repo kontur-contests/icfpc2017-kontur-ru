@@ -67,7 +67,7 @@ namespace lib.Ai.StrategicFizzBuzz
                 return AiMoveDecision.Pass(state.punter);
             return AiMoveDecision.Claim(state.punter, bestTurn.River.Source, bestTurn.River.Target);
         }
-        
+
         private TurnResult GetMyBestTurn(IStrategy myStrategy)
         {
             var turns = myStrategy.NextTurns();
@@ -93,10 +93,10 @@ namespace lib.Ai.StrategicFizzBuzz
             int mineMultiplier)
             : base(
                 new PodnaseratorSettings(enemyTurnEstimationDifferenceWeight, myTurnEsimationWeight),
-                (punterId, state, services) => 
-                new BiggestComponentEWStrategy(
-                    new MaxVertextWeighter(mineMultiplier, state, services),
-                    state, services))
+                (punterId, state, services) =>
+                    new BiggestComponentEWStrategy(
+                        new MaxVertextWeighter(mineMultiplier, state, services),
+                        state, services))
         {
         }
 
