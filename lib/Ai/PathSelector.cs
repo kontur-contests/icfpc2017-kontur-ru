@@ -32,7 +32,7 @@ namespace lib.Ai
                     from m1 in map.Mines
                     from m2 in map.Mines
                     where m1 != m2
-                    let p12 = minDists.GetPath(m1, m2).Enumerate().Reverse().ToList()
+                    let p12 = minDists.GetReversedPath(m1, m2).Reverse().ToList()
                     select new { m1, m2, p12 };
                 var closestTuple = allPairs.MinBy(t => t.p12.Count);
                 return closestTuple.p12.Take(length + 1).ToList();
@@ -42,7 +42,7 @@ namespace lib.Ai
                 var minesPaths = map.Mines.Select(GreedyGrowPath).ToList();
                 var bestMinesPath = minesPaths.MaxBy(EstimatePath);
                 var fullPath = bestMinesPath
-                    .Pairwise((a, b) => minDists.GetPath(a, b).Enumerate().Reverse().Skip(1)).SelectMany(z => z)
+                    .Pairwise((a, b) => minDists.GetReversedPath(a, b).Reverse().Skip(1)).SelectMany(z => z)
                     .Take(length)
                     .ToList();
                 fullPath.Insert(0, bestMinesPath[0]);
