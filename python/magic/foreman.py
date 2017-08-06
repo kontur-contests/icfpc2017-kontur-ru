@@ -35,7 +35,7 @@ def execute_tasks(tasks_to_do, token):
                 results.append(data)
         if not remaining_answers:
             break
-        print('\rremaining ' + str(remaining_answers), end='')
+        print('\rremaining ' + str(remaining_answers), end='     ')
 
     return results
 
