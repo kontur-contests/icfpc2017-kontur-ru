@@ -11,7 +11,7 @@ namespace lib.Ai
         private GreedyAi Base = new GreedyAi();
 
         private Random rand = new Random();
-        public string Name => nameof(LochKillerAi);
+        public string Name => GetType().Name;
         public string Version => "0.1";
 
         public AiSetupDecision Setup(State state, IServices services)
