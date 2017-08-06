@@ -1,6 +1,7 @@
 ﻿using System;
 using lib.Strategies;
 using lib.Strategies.EdgeWeighting;
+using static lib.Strategies.EdgeWeighting.MetaStrategyHelpers;
 
 namespace lib.Ai.StrategicFizzBuzz
 {
@@ -8,7 +9,7 @@ namespace lib.Ai.StrategicFizzBuzz
     {
         public LochKillerAi()
             : base(
-                (state, services) => new AllComponentsEWStrategy(new LochKillerEdgeWeighter(state, services), state, services),
+                AllComponentsEWStrategy((state, services) => new LochKillerEdgeWeighter(state, services)),
                 (state, services) => new GreedyStrategy(state, services, Math.Max))
         {
         }
