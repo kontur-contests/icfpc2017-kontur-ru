@@ -34,7 +34,7 @@ class Fluent:
         self.players = [{ 'Name' : player_index, 'Params': {'MineWeight': default_mine_weight}}
                         for player_index
                         in range(players_number)]
-        self.players[-1]['Params']['MineWeight'] = mine_weight
+        self.players[0]['Params']['MineWeight'] = mine_weight
         return self
 
     def battling_in_pairs(self):
@@ -116,11 +116,10 @@ class Fluent:
         self.param_names = list(self.results[0]['Task']['Players'][0]['Params'])
         return self
 
-    def store_pointwise(self, filename, mode='w'):
+    def store_pointwise(self, filename, mode='w', header=True):
         keys = self.param_names
         with open(filename, mode) as file:
-            if mode == 'w':
-                # file.write('game_number,server_name,scores,ranking,tournament_scores,num_players,map,map_rivers_count,map_sites_count,map_mines_count,name,')
+            if header:
                 file.write(','.join([
                     'game_number',
                     'server_name',
@@ -139,7 +138,7 @@ class Fluent:
                 for player_index in range(len(game['Results'])):
                     player = game['Task']['Players'][player_index]
                     result = game['Results'][player_index]
-                    file.write(','.join([ str(x) for x in [
+                    file.write(','.join([str(x) for x in [
                         game_number,
                         result['ServerName'],
                         result['Scores'],
