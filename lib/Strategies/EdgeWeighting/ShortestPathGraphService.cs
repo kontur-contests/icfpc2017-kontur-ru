@@ -8,30 +8,26 @@ namespace lib.Strategies.EdgeWeighting
 {
     public class ShortestPathGraphService : IService
     {
+        public ShortestPathGraphService(Graph graph, ConnectedComponentsService connectedComponentsService)
+        {
+            Graph = graph;
+            ConnectedComponentsService = connectedComponentsService;
+        }
+
         private Graph Graph { get; set; }
         private ConnectedComponentsService ConnectedComponentsService { get; set; }
-        private IDictionary<Tuple<int, int>, ShortestPathGraph> Cache { get; } = new Dictionary<Tuple<int, int>, ShortestPathGraph>();
+        private IDictionary<Tuple<int, int>, ShortestPathGraph> ComponentsCache { get; } = new Dictionary<Tuple<int, int>, ShortestPathGraph>();
+        private IDictionary<int, ShortestPathGraph> VertexesCache { get; } = new Dictionary<int, ShortestPathGraph>();
 
-        public void Setup(State state, IServices services)
+        public ShortestPathGraph ForComponent(ConnectedComponent component)
         {
-            services.Setup<GraphService>(state);
-            services.Setup<ConnectedComponentsService>(state);
+            return ComponentsCache.GetOrCreate(
+                Tuple.Create(component.OwnerPunterId, component.Id), key => ShortestPathGraph.Build(Graph, component.Vertices));
         }
 
-        public void ApplyNextState(State state, IServices services)
+        public ShortestPathGraph ForVertex(int vertexId)
         {
-            Graph = services.Get<GraphService>(state).Graph;
-            ConnectedComponentsService = services.Get<ConnectedComponentsService>(state);
-        }
-
-        public ShortestPathGraph For(int punterId, int componentId)
-        {
-            return Cache.GetOrCreate(
-                Tuple.Create(punterId, componentId), key =>
-                {
-                    var components = ConnectedComponentsService.For(punterId);
-                    return ShortestPathGraph.Build(Graph, components[componentId].Vertices);
-                });
+            return VertexesCache.GetOrCreate(vertexId, key => ShortestPathGraph.Build(Graph, vertexId));
         }
     }
 }

@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using FluentAssertions;
 using System.Linq;
 using lib.GraphImpl;
-using lib.Structures;
 using MoreLinq;
 using NUnit.Framework;
 
@@ -12,10 +11,10 @@ namespace lib.Ai
     {
         private readonly Map map;
         private Graph graph;
-        private MineDistCalculator.Impl minDists;
+        private MineDistCalculator minDists;
         private readonly int length;
 
-        public PathSelector(Map map, MineDistCalculator.Impl minDists, int length)
+        public PathSelector(Map map, MineDistCalculator minDists, int length)
         {
             this.map = map;
             graph = new Graph(map);
@@ -84,7 +83,7 @@ namespace lib.Ai
             var map = MapLoader.LoadMapByNameInTests("tube.json").Map;
             var desiredLen = 15;
             var graph = new Graph(map);
-            var minDists = new MineDistCalculator.Impl(graph);
+            var minDists = new MineDistCalculator(graph);
             var path = new PathSelector(map, minDists, desiredLen).SelectPath();
             var positioner = new FuturesPositioner(map, graph, path, minDists);
             var futures = positioner.GetFutures();
@@ -96,7 +95,7 @@ namespace lib.Ai
         {
             var map = MapLoader.LoadMapByNameInTests("tube.json").Map;
             var desiredLen = 12;
-            var path = new PathSelector(map, new MineDistCalculator.Impl(new Graph(map)), desiredLen).SelectPath();
+            var path = new PathSelector(map, new MineDistCalculator(new Graph(map)), desiredLen).SelectPath();
             Assert.AreEqual(desiredLen + 1, path.Count);
             path.Should().Contain(new[] { 285, 260, 148, 64 });
         }

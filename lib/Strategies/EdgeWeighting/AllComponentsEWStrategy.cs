@@ -11,38 +11,22 @@ namespace lib.Strategies.EdgeWeighting
         {
             PunterId = state.punter;
             EdgeWeighter = edgeWeighter;
-            GraphService = services.Get<GraphService>(state);
-            MineDistCalulator = services.Get<MineDistCalculator>(state);
-            ConnectedComponentsService = services.Get<ConnectedComponentsService>(state);
+            Graph = services.Get<Graph>();
+            MineDistCalulator = services.Get<MineDistCalculator>();
+            ConnectedComponentsService = services.Get<ConnectedComponentsService>();
         }
 
         private MineDistCalculator MineDistCalulator { get; }
         private IEdgeWeighter EdgeWeighter { get; }
         private int PunterId { get; }
         private ConnectedComponentsService ConnectedComponentsService { get; }
-        private GraphService GraphService { get; }
+        private Graph Graph { get; }
 
 
         public List<TurnResult> NextTurns()
         {
-            var graph = GraphService.Graph;
-            var allComponents = GetAllComponents(graph).ToArray();
-            return allComponents.SelectMany(x => GetTurnsForComponents(graph, allComponents, x)).ToList();
-        }
-
-        private IEnumerable<ConnectedComponent> GetAllComponents(Graph graph)
-        {
             var connectedComponents = ConnectedComponentsService.For(PunterId);
-            foreach (var connectedComponent in connectedComponents)
-                yield return connectedComponent;
-            var notConnectedMines = graph.Mines.Keys.Except(connectedComponents.SelectMany(x => x.Mines));
-            foreach (var mine in notConnectedMines)
-            {
-                var connectedComponent = new ConnectedComponent(connectedComponents.Length, PunterId);
-                connectedComponent.Mines.Add(mine);
-                connectedComponent.Vertices.Add(mine);
-                yield return connectedComponent;
-            }
+            return connectedComponents.SelectMany(x => GetTurnsForComponents(Graph, connectedComponents, x)).ToList();
         }
 
         private List<TurnResult> GetTurnsForComponents(Graph graph, ConnectedComponent[] connectedComponents, ConnectedComponent currentComponent)

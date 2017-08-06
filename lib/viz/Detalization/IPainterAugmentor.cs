@@ -9,5 +9,6 @@ namespace lib.viz.Detalization
         RiverPainterData GetData(River river);
         FuturePainterData GetData(int punderId, Future future);
         bool ShowFutures { get; set; }
+        int SelectedPlayerIndex { get; set; }
     }
 }

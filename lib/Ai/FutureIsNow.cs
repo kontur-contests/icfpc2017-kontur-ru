@@ -25,24 +25,22 @@ namespace lib.Ai
 
         public AiSetupDecision Setup(State state, IServices services)
         {
-            var graph = services.Get<GraphService>(state).Graph;
-            var mineDists = services.Get<MineDistCalculator>(state);
+            var graph = services.Get<Graph>();
+            var mineDists = services.Get<MineDistCalculator>();
 
-            if (state.settings == null || !state.settings.futures)
-            {
+            if (!state.settings.futures)
                 return AiSetupDecision.Create(new Future[0]);
-            }
 
             var graphDiameterEstimation = (int)Math.Round(pathMultiplier * Math.Sqrt(state.map.Sites.Length));
             var length = graphDiameterEstimation;
-            var path = new PathSelector(state.map, mineDists.impl, length).SelectPath();
-            var futures = new FuturesPositioner(state.map, graph, path, mineDists.impl).GetFutures();
+            var path = new PathSelector(state.map, mineDists, length).SelectPath();
+            var futures = new FuturesPositioner(state.map, graph, path, mineDists).GetFutures();
             return AiSetupDecision.Create(futures);
         }
 
         public AiMoveDecision GetNextMove(State state, IServices services)
         {
-            var graph = services.Get<GraphService>(state).Graph;
+            var graph = services.Get<Graph>();
             var sitesToDefend = state.aiSetupDecision.futures.SelectMany(f => new[]{f.source, f.target}).ToArray();
             var edge = new MovesSelector(state.map, graph, sitesToDefend, state.punter).GetNeighbourToGo();
             if (edge == null)

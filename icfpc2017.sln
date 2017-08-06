@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StatisticsService", "Statis
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OnlineGameMonitor", "OnlineGameMonitor\OnlineGameMonitor.csproj", "{F196134C-10EE-4408-853E-43B04DDBD3EB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "foreman", "foreman\foreman.csproj", "{8591A1E1-6A81-4044-BA3B-3EDDD32684D9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -77,6 +79,12 @@ Global
 		{F196134C-10EE-4408-853E-43B04DDBD3EB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F196134C-10EE-4408-853E-43B04DDBD3EB}.tc|Any CPU.ActiveCfg = Debug|Any CPU
 		{F196134C-10EE-4408-853E-43B04DDBD3EB}.tc|Any CPU.Build.0 = Debug|Any CPU
+		{8591A1E1-6A81-4044-BA3B-3EDDD32684D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8591A1E1-6A81-4044-BA3B-3EDDD32684D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8591A1E1-6A81-4044-BA3B-3EDDD32684D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8591A1E1-6A81-4044-BA3B-3EDDD32684D9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8591A1E1-6A81-4044-BA3B-3EDDD32684D9}.tc|Any CPU.ActiveCfg = Debug|Any CPU
+		{8591A1E1-6A81-4044-BA3B-3EDDD32684D9}.tc|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

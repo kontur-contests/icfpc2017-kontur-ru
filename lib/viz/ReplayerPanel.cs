@@ -21,12 +21,12 @@ namespace lib.viz
             {
                 PainterAugmentor = new DefaultPainterAugmentor {ShowFutures = true}
             };
-            var mapPanel = new ScaledViewPanel(mapPainter)
+            mapPanel = new ScaledViewPanel(mapPainter)
             {
                 Dock = DockStyle.Fill
             };
             scorePanel = new ScorePanel {Dock = DockStyle.Top, Height = 40};
-            Controls.Add(scorePanel);
+            scorePanel.PlayerSelected += PlayerSelected;
 
             futuresPanel = new FuturesPanel();
             futuresPanel.FuturesVisibleChanged += v => mapPainter.PainterAugmentor.ShowFutures = v;
@@ -38,6 +38,7 @@ namespace lib.viz
             middlePanel.Controls.Add(mapPanel, 0, 0);
             middlePanel.Controls.Add(futuresPanel, 1, 0);
             Controls.Add(middlePanel);
+            Controls.Add(scorePanel);
 
             progressPanel = new ProgressControlPanel();
             progressPanel.CurrentStateUpdated += state => mapPainter.GameState = state;
@@ -49,8 +50,15 @@ namespace lib.viz
             timer.Start();
         }
 
+        private void PlayerSelected(int playerIndex, string playerName)
+        {
+            mapPainter.PainterAugmentor.SelectedPlayerIndex = playerIndex;
+            mapPanel.Invalidate();
+        }
+
         private bool liveScoreUpdate;
         private ProgressControlPanel progressPanel;
+        private ScaledViewPanel mapPanel;
 
         public bool LiveScoreUpdate
         {

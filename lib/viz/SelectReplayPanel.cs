@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
@@ -11,6 +12,8 @@ namespace lib.viz
     {
         public SelectReplayPanel()
         {
+            filter = new FilterReplayPanel();
+            filter.FiltersUpdated += UpdateVisualization;
             var buttonsPanel = new FlowLayoutPanel
             {
                 AutoSize = true,
@@ -22,6 +25,7 @@ namespace lib.viz
                 AutoSize = true
             };
             refreshButton.Click += (sender, args) => RefreshMetasList();
+            buttonsPanel.Controls.Add(filter);
             buttonsPanel.Controls.Add(refreshButton);
             debugTextArea = new TextBox()
             {
@@ -70,6 +74,7 @@ namespace lib.viz
         private ReplayRepo repo;
         private ListView listView;
         private TextBox debugTextArea;
+        private FilterReplayPanel filter;
 
         public ReplayRepo Repo
         {
@@ -88,6 +93,11 @@ namespace lib.viz
         }
 
         private void UpdateList(ReplayMeta[] metas)
+        {
+            filter.UpdateMetas(metas);
+        }
+
+        private void UpdateVisualization(ReplayMeta[] metas)
         {
             listView.BeginUpdate();
             listView.Items.Clear();

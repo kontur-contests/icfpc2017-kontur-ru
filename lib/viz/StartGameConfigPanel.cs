@@ -15,6 +15,7 @@ namespace lib
     {
         private readonly ListBox allAisList;
         private readonly ListBox mapsList;
+        private ListBox selectedAisList;
 
         public StartGameConfigPanel()
         {
@@ -52,7 +53,7 @@ namespace lib
                 Dock = DockStyle.Bottom,
                 Text = "Selected AIs list. Double click to remove."
             };
-            var selectedAisList = new ListBox
+            selectedAisList = new ListBox
             {
                 Dock = DockStyle.Bottom,
                 Height = 100
@@ -63,9 +64,19 @@ namespace lib
                 Dock = DockStyle.Bottom,
                 CheckState = CheckState.Checked
             };
+            var enablSplurges = new CheckBox
+            {
+                Text = "ENABLE SPLURGES",
+                Dock = DockStyle.Bottom,
+                CheckState = CheckState.Checked
+            };
             enableFutures.CheckStateChanged += (sender, args) =>
             {
                 EnableFuturesChanged?.Invoke(enableFutures.Checked);
+            };
+            enablSplurges.CheckStateChanged += (sender, args) =>
+            {
+                EnableSplurgesChanged?.Invoke(enablSplurges.Checked);
             };
             selectedAisList.DoubleClick += (sender, args) =>
             {
@@ -73,7 +84,11 @@ namespace lib
             };
             EnableFuturesChanged += enable =>
             {
-                Settings = new Settings(enable);
+                Settings.futures = enable;
+            };
+            EnableSplurgesChanged += enable =>
+            {
+                Settings.splurges = enable;
             };
             AiSelected += factory =>
             {
@@ -87,24 +102,53 @@ namespace lib
                 SelectedAis.RemoveAt(index);
             };
             MapChanged += map => { SelectedMap = map; };
+
+            var fastAiSelectors = new TableLayoutPanel
+            {
+                Dock = DockStyle.Bottom,
+                AutoSize = true
+            };
+            for (var i = 1; i < 5; i++)
+            {
+                var cnt = (int)Math.Pow(2, i);
+                var button = new Button
+                {
+                    Text = cnt.ToString(),
+                    Dock = DockStyle.Left,
+                    Width = 30
+                };
+                button.Click += (_, __) => AddRandomAis(cnt);
+                fastAiSelectors.Controls.Add(button, i, 0);
+            }
+
             Controls.Add(mapsList);
             Controls.Add(mapsListLabel);
             Controls.Add(allAisListLabel);
+            Controls.Add(fastAiSelectors);
             Controls.Add(allAisList);
             Controls.Add(selectedAisListLabel);
             Controls.Add(selectedAisList);
             Controls.Add(enableFutures);
+            Controls.Add(enablSplurges);
+        }
+
+        private void ClearSelected()
+        {
+            for (int i = selectedAisList.Items.Count - 1; i >= 0; i--)
+                AiAtIndexRemoved?.Invoke(i);
+            selectedAisList.Items.Clear();
         }
 
         public List<IAi> SelectedAis { get; } = new List<IAi>();
         public NamedMap SelectedMap { get; private set; }
 
-        public Settings Settings { get; private set; } = new Settings(true);
+        public Settings Settings { get; private set; } = new Settings(true, false);
 
         public event Action<NamedMap> MapChanged;
         public event Action<AiFactory> AiSelected;
         public event Action<int> AiAtIndexRemoved;
         public event Action<bool> EnableFuturesChanged;
+        public event Action<bool> EnableSplurgesChanged;
 
         public void SetMaps(NamedMap[] maps)
         {
@@ -115,6 +159,16 @@ namespace lib
         public void SetAis(params AiFactory[] ais)
         {
             allAisList.Items.AddRange(ais.Cast<object>().ToArray());
+        }
+
+        private void AddRandomAis(int count)
+        {
+            ClearSelected();
+            var random = new Random();
+            for (int i = 0; i < count; i++)
+            {
+                AiSelected?.Invoke((AiFactory)allAisList.Items[random.Next(0, allAisList.Items.Count)]);
+            }
         }
     }
 

@@ -4,6 +4,7 @@ using System.Linq;
 using lib.Ai.StrategicFizzBuzz;
 using lib.GraphImpl;
 using lib.StateImpl;
+using lib.Strategies.EdgeWeighting;
 using MoreLinq;
 
 namespace lib.Ai
@@ -16,9 +17,12 @@ namespace lib.Ai
         public string Name => nameof(LochDinicKiller);
         public string Version => "0.3";
 
+        DinicWeighter dinicWeighter;
+
         public AiSetupDecision Setup(State state, IServices services)
         {
-            services.Setup<GraphService>(state);
+            services.Setup<Graph>();
+            new DinicWeighter(state, services);
             return Base.Setup(state, services);
         }
 
@@ -29,7 +33,10 @@ namespace lib.Ai
 
         public AiMoveDecision GetNextMove(State state, IServices services)
         {
-            var graph = services.Get<GraphService>(state).Graph;
+            dinicWeighter = new DinicWeighter(state, services);
+            dinicWeighter.Init(null, null);
+
+            var graph = services.Get<Graph>();
 
             int maxCount = 10;
             Dictionary<Tuple<int, int>, double> edgesToBlock = new Dictionary<Tuple<int, int>, double>();
