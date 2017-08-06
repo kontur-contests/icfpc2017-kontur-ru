@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using lib.GraphImpl;
@@ -9,17 +10,17 @@ namespace lib.Ai
 {
     public class FutureIsNow : IAi
     {
-        private readonly int pathLen;
+        private readonly double pathMultiplier;
         public string Name => "Futurer";
         public string Version => "0";
 
         public FutureIsNow()
-            :this(-1)
+            :this(1)
         {
         }
-        public FutureIsNow(int pathLen)
+        public FutureIsNow(double pathMultiplier)
         {
-            this.pathLen = pathLen;
+            this.pathMultiplier = pathMultiplier;
         }
 
         public AiSetupDecision Setup(State state, IServices services)
@@ -32,7 +33,8 @@ namespace lib.Ai
                 return AiSetupDecision.Create(new Future[0]);
             }
 
-            var length = pathLen < 0 ? 5 * state.punters : pathLen;
+            var graphDiameterEstimation = (int)Math.Round(pathMultiplier * Math.Sqrt(state.map.Sites.Length));
+            var length = graphDiameterEstimation;
             var path = new PathSelector(state.map, mineDists.impl, length).SelectPath();
             var futures = new FuturesPositioner(state.map, graph, path, mineDists.impl).GetFutures();
             return AiSetupDecision.Create(futures);
