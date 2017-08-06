@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using lib.StateImpl;
+using lib.Strategies.EdgeWeighting;
 using lib.Strategies.StrategiesCatalog;
 using lib.viz;
 
@@ -16,7 +17,8 @@ namespace lib.Ai.StrategicFizzBuzz
                 Setups[setup].SetupStrategyProvider,
                 Debuts[debut].StrategyProvider,
                 Helpers[helper].StrategyProvider,
-                Mittelspiels[mittelspiel].StrategyProvider);
+                Mittelspiels[mittelspiel].StrategyProvider,
+                MetaStrategyHelpers.BiggestComponentEWStrategy((s, ss) => new RandomEdgeWeighter())); // Fall back to random in the end.
         }
 
         public static Dictionary<string, SetupStrategyFactory> Setups => SetupStrategies.Factories;
