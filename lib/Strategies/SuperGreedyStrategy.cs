@@ -28,8 +28,9 @@ namespace lib.Strategies
         public HashSet<int> Vertices = new HashSet<int>();
         public HashSet<int> Mines = new HashSet<int>();
         public int Id { get; }
+        public int OwnerPunterId { get; }
 
-        public ConnectedComponent(int id)
+        public ConnectedComponent(int id, int ownerPunterId)
         {
             Id = id;
         }
@@ -49,7 +50,7 @@ namespace lib.Strategies
                 if(usedMines.Contains(mine.Key))
                     continue;
                 
-                var component = new ConnectedComponent(componentIndexer);
+                var component = new ConnectedComponent(componentIndexer, owner);
                 componentIndexer++;
 
                 queue.Clear();
