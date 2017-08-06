@@ -22,7 +22,11 @@ namespace lib.Strategies.EdgeWeighting
         private int PunterId { get; }
         private ConnectedComponentsService ConnectedComponentsService { get; }
         private Graph Graph { get; }
-
+        
+        public AiSetupDecision Setup()
+        {
+            return null;
+        }
 
         public List<TurnResult> NextTurns()
         {

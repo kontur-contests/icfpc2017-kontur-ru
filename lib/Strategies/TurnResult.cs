@@ -1,5 +1,4 @@
 ﻿using lib.Ai;
-using lib.Structures;
 
 namespace lib.Strategies
 {

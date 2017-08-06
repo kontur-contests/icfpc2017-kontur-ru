@@ -20,8 +20,8 @@ namespace lib.Ai.StrategicFizzBuzz
 
         public AiSetupDecision Setup(State state, IServices services)
         {
-            StrategyProvider(state, services);
-            return AiSetupDecision.Empty();
+            var strategy = StrategyProvider(state, services);
+            return strategy.Setup() ?? AiSetupDecision.Empty();
         }
 
         public AiMoveDecision GetNextMove(State state, IServices services)

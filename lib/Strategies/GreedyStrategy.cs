@@ -22,6 +22,11 @@ namespace lib.Strategies
         private int PunterId { get; }
         private Graph Graph { get; }
 
+        public AiSetupDecision Setup()
+        {
+            return null;
+        }
+
         public List<TurnResult> NextTurns()
         {
             var calculator = new ConnectedCalculator(Graph, PunterId);

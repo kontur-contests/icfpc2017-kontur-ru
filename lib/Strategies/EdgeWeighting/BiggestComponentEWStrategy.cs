@@ -24,6 +24,11 @@ namespace lib.Strategies.EdgeWeighting
         private ConnectedComponentsService ConnectedComponentsService { get; }
         private Graph Graph { get; }
 
+        public AiSetupDecision Setup()
+        {
+            return null;
+        }
+
         public List<TurnResult> NextTurns()
         {
             var claimedVertexes = Graph.Vertexes.Values
