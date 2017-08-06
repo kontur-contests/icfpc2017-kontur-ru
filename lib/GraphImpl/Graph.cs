@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using lib.StateImpl;
 
 namespace lib.GraphImpl
@@ -29,6 +30,11 @@ namespace lib.GraphImpl
                 if (river.Source != river.Target)
                     Vertexes[river.Target].Edges.Add(Edge.Backward(river));
             }
+        }
+
+        public Vertex[] GetNotOwnedMines(int punter)
+        {
+            return Mines.Values.Where(v => v.Edges.All(e => e.Owner != punter)).ToArray();
         }
 
         [Obsolete("test purposes only")]

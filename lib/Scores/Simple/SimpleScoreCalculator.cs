@@ -5,8 +5,9 @@ namespace lib.Scores.Simple
 {
     public class SimpleScoreCalculator : IScoreCalculator
     {
-        public long GetScore(int punter, Map map, Future[] futures)
+        public ScoreData GetScoreData(int punter, Map map, Future[] futures)
         {
+            var scoreData = new ScoreData();
             var graph = new Graph(map);
             var distCalc = new MineDistCalculator(graph);
             var minesCalc = new ConnectedCalculator(graph, punter);
@@ -21,6 +22,7 @@ namespace lib.Scores.Simple
                     res += dist * dist;
                 }
             }
+            scoreData.ScoreWithoutFutures = res;
 
             foreach (var future in futures)
             {
@@ -29,15 +31,21 @@ namespace lib.Scores.Simple
                 var dist = distCalc.GetDist(future.source, future.target);
 
                 var futureScoreValue = dist * dist * dist;
-
-                var futureScore = mines.Contains(future.source)
-                    ? futureScoreValue
-                    : -futureScoreValue;
-
-                res += futureScore;
+                if (mines.Contains(future.source))
+                {
+                    scoreData.GainedFuturesScore += futureScoreValue;
+                    scoreData.GainedFuturesCount++;
+                }
+                scoreData.PossibleFuturesScore += futureScoreValue;
+                scoreData.TotalFuturesCount++;
             }
 
-            return res;
+            return scoreData;
+        }
+
+        public long GetScore(int punter, Map map, Future[] futures)
+        {
+            return GetScoreData(punter, map, futures).TotalScore;
         }
     }
 }

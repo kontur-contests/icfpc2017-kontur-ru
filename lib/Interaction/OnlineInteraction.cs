@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using lib.Ai;
+using lib.Ai.StrategicFizzBuzz;
 using lib.Interaction.Internal;
 using lib.Replays;
 using lib.StateImpl;

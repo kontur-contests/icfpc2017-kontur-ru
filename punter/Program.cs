@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using lib;
 using lib.Ai;
+using lib.Ai.StrategicFizzBuzz;
 using lib.StateImpl;
 using lib.Structures;
 using Newtonsoft.Json;
