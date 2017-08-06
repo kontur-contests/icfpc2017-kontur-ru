@@ -48,7 +48,7 @@ namespace worker
             arenaThread = new Thread(
                 () =>
                 {
-                    for (var i = 0; i < 3; i++)
+                    for (var i = 0; i < 5; i++)
                         System.Threading.Tasks.Task.Run(() =>
                         {
                             while (!cancelled)
@@ -111,7 +111,7 @@ namespace worker
                                         }
                                         catch (Exception exception)
                                         {
-                                            result = new Result {Error = exception.Message};
+                                            result = new Result {Error = exception.Message + "\n\n" + exception.StackTrace };
                                         }
                                         result.Task = task;
                                         result.Token = task.Token;

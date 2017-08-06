@@ -7,43 +7,48 @@ namespace lib.Strategies.EdgeWeighting
 {
     public class AllComponentsEWStrategy : IStrategy
     {
-        public AllComponentsEWStrategy(int punterId, IEdgeWeighter edgeWeighter, MineDistCalculator mineDistCalculator)
+        public AllComponentsEWStrategy(IEdgeWeighter edgeWeighter, State state, IServices services)
         {
-            PunterId = punterId;
+            PunterId = state.punter;
             EdgeWeighter = edgeWeighter;
-            MineDistCalulator = mineDistCalculator;
+            GraphService = services.Get<GraphService>(state);
+            MineDistCalulator = services.Get<MineDistCalculator>(state);
+            ConnectedComponentsService = services.Get<ConnectedComponentsService>(state);
         }
 
         private MineDistCalculator MineDistCalulator { get; }
         private IEdgeWeighter EdgeWeighter { get; }
         private int PunterId { get; }
+        private ConnectedComponentsService ConnectedComponentsService { get; }
+        private GraphService GraphService { get; }
 
 
-        public List<TurnResult> Turn(State state, IServices services)
+        public List<TurnResult> NextTurns()
         {
-            var graph = services.Get<GraphService>(state).Graph;
-            var connectedComponents = ConnectedComponent.GetComponents(graph, PunterId);
-            FillMines(graph, connectedComponents);
-            return connectedComponents.SelectMany(x => GetTurnsForComponents(state, services, connectedComponents, x)).ToList();
+            var graph = GraphService.Graph;
+            var allComponents = GetAllComponents(graph).ToArray();
+            return allComponents.SelectMany(x => GetTurnsForComponents(graph, allComponents, x)).ToList();
         }
 
-        private void FillMines(Graph graph, List<ConnectedComponent> connectedComponents)
+        private IEnumerable<ConnectedComponent> GetAllComponents(Graph graph)
         {
+            var connectedComponents = ConnectedComponentsService.For(PunterId);
+            foreach (var connectedComponent in connectedComponents)
+                yield return connectedComponent;
             var notConnectedMines = graph.Mines.Keys.Except(connectedComponents.SelectMany(x => x.Mines));
             foreach (var mine in notConnectedMines)
             {
-                var connectedComponent = new ConnectedComponent(connectedComponents.Count, PunterId);
+                var connectedComponent = new ConnectedComponent(connectedComponents.Length, PunterId);
                 connectedComponent.Mines.Add(mine);
                 connectedComponent.Vertices.Add(mine);
-                connectedComponents.Add(connectedComponent);
+                yield return connectedComponent;
             }
         }
 
-        private List<TurnResult> GetTurnsForComponents(State state, IServices services, List<ConnectedComponent> connectedComponents, ConnectedComponent maxComponent)
+        private List<TurnResult> GetTurnsForComponents(Graph graph, ConnectedComponent[] connectedComponents, ConnectedComponent currentComponent)
         {
-            var graph = services.Get<GraphService>(state).Graph;
-            EdgeWeighter.Init(state, services, connectedComponents, maxComponent);
-            return maxComponent.Vertices
+            EdgeWeighter.Init(connectedComponents, currentComponent);
+            return currentComponent.Vertices
                 .SelectMany(v => graph.Vertexes[v].Edges)
                 .Where(e => e.Owner == -1)
                 .Select(

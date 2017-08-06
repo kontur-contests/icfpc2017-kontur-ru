@@ -45,7 +45,7 @@ namespace lib.OnlineRunner
                 && match.Players.All(x => !x.IsOurBot())
                    
                    // ...and it's not a map fully populated with organizers' bots
-                && !(match.TakenSeats + 1 == match.TotalSeats && match.Players.All(x => orgBoxNames.Contains(x)));
+                && match.Players.Count(x => orgBoxNames.Contains(x)) != match.TotalSeats - 1;
         }
         
         private static ArenaMatch GetNextMatch()

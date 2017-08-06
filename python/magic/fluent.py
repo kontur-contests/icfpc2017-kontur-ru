@@ -34,7 +34,7 @@ class Fluent:
         self.players = [{ 'Name' : player_index, 'Params': {'MineWeight': default_mine_weight}}
                         for player_index
                         in range(players_number)]
-        self.players[-1]['Params']['MineWeight'] = mine_weight
+        self.players[0]['Params']['MineWeight'] = mine_weight
         return self
 
     def battling_in_pairs(self):
@@ -50,6 +50,19 @@ class Fluent:
 
     def on_maps(self, *args):
         self.battles_on_maps = [(battle,map) for battle in self.battles for map in args]
+        return self
+
+    def add_dummies(self, dummies):
+        bs = []
+        for battle, map in self.battles_on_maps:
+            place = np.random.randint(0,len(battle))
+            for i in range(len(battle)):
+                if i!=place:
+                    battle[i]=dummies[np.random.randint(0,len(dummies))]
+
+
+            bs.append((battle,map))
+        self.battles_on_maps = bs
         return self
 
     def repeating(self, count):
@@ -103,11 +116,10 @@ class Fluent:
         self.param_names = list(self.results[0]['Task']['Players'][0]['Params'])
         return self
 
-    def store_pointwise(self, filename, mode='w'):
+    def store_pointwise(self, filename, mode='w', header=True):
         keys = self.param_names
         with open(filename, mode) as file:
-            if mode == 'w':
-                # file.write('game_number,server_name,scores,ranking,tournament_scores,num_players,map,map_rivers_count,map_sites_count,map_mines_count,name,')
+            if header:
                 file.write(','.join([
                     'game_number',
                     'server_name',
@@ -119,15 +131,14 @@ class Fluent:
                     'map_rivers_count',
                     'map_sites_count',
                     'map_mines_count',
-                    'name'
-                ]))
-            file.write(",".join(keys))
+                    'name'] + keys
+                ))
             file.write('\n')
             for game_number, game in enumerate(self.results):
                 for player_index in range(len(game['Results'])):
                     player = game['Task']['Players'][player_index]
                     result = game['Results'][player_index]
-                    file.write(','.join([ str(x) for x in [
+                    file.write(','.join([str(x) for x in [
                         game_number,
                         result['ServerName'],
                         result['Scores'],

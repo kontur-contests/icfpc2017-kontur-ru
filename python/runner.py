@@ -16,6 +16,12 @@ maps = {
     'gothenburg-sparse.json': 16,
 }
 
+dummies = [
+    { 'Name' : 'LochKillerAi', 'ClassName' : 'LochKillerAi', 'Params' : {} },
+    { 'Name' : 'ConnectClosestMinesAi', 'ClassName' : 'ConnectClosestMinesAi', 'Params' : {} },
+    { 'Name' : 'LochMaxVertexWeighterKillerAi', 'ClassName': 'LochMaxVertexWeighterKillerAi', 'Params': {}}
+]
+
 def test_historical():
 
     (magic.Fluent()
@@ -25,19 +31,28 @@ def test_historical():
          .run().dump()
     )
 
-def test_parameter():
+
+def test_parameter_future():
     (magic.Fluent()
-     .create_random_players('Podnaserator2000Ai', 10, (0, 5), (0, 5), (0, 100))
-     .battles_on_map_set(maps, 30)
+     .create_random_players('FutureIsNow', 10, (0.3,2))
+     .battles_on_map_set(maps, 1)
+     .add_dummies(dummies)
      .experiment('Uber')
-     .run().dump())
+     #.preview()
+     .run().dump()
+     )
+
+
 
 def assemble(fname,*args):
     magic.Fluent().restore_dump(*args).store_pointwise(fname)
     pass
 
-test_historical()
-assemble('hist',12152,27372)
+test_parameter_future()
+#assemble('future',82958)
+
+#test_historical();assemble('hist',12152,27372)
+#assemble('future',14139,58033,61678,93832);test_parameter_future()
 
 #assemble('historical_4')
 #assemble('naserator.csv',45487)

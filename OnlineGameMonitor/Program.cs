@@ -21,16 +21,18 @@ namespace OnlineGameMonitor
 
         private static string GetTeamDesc(IGrouping<string, string> x)
         {
-            var name = x.Key.Length > 15 ? x.Key.Substring(0, 15) : x.Key;
+            var name = x.Key.Length > 9 ? x.Key.Substring(0, 9) : x.Key;
             var names = x.ToArray();
-            var count = names.Length > 1 ? $" x{names.Length}" : "";
-            var teams = $"{name}{count}";
-            return teams.Length > 50 ? teams.Substring(0, 50) : teams;
+            var count = names.Length > 1 ? $" ×{names.Length}" : "";
+            return $"{name}{count}";
         }
 
         private static string GetTeamsSummary(string[] teams)
         {
-            return string.Join(", ", teams.GroupBy(x => x).Select(GetTeamDesc));
+            var teams_ = string.Join(", ", teams
+                .OrderBy(x => x)
+                .GroupBy(x => x).Select(GetTeamDesc));
+            return teams_.Length > 50 ? teams_.Substring(0, 50) : teams_;
         }
         
         public static void Main(string[] args)
@@ -41,8 +43,16 @@ namespace OnlineGameMonitor
                     .ConfigureAwait(false).GetAwaiter()
                     .GetResult();
 
-                var suitableMatches = matches.Where(x => x.IsSuitableForOnlineGame()).ToArray();
-                var ignoredMatches = matches.Where(x => !x.IsSuitableForOnlineGame()).ToArray();
+                var suitableMatches = matches
+                    .Where(x => x.IsSuitableForOnlineGame())
+                    .OrderByDescending(x => x.TakenSeats)
+                    .ThenByDescending(x => x.TotalSeats)
+                    .ToArray();
+                var ignoredMatches = matches
+                    .Where(x => !x.IsSuitableForOnlineGame())
+                    .OrderByDescending(x => x.TakenSeats)
+                    .ThenByDescending(x => x.TotalSeats)
+                    .ToArray();
                 var playedByUsMatches = ignoredMatches.Where(x => x.Players.Any(y => y.IsOurBot())).ToArray();
                 
                 var gameStatus = $"Matches: {matches.Length} (suitable: {suitableMatches.Length}, played: {playedByUsMatches.Length}, ignored: {ignoredMatches.Length - playedByUsMatches.Length})";
@@ -52,8 +62,8 @@ namespace OnlineGameMonitor
                 var playedByUsStatuses = new[] {"PLAYED BY US:","---------------"}.Concat(playedByUsMatches.Select(GetMatchStatus)).ToArray();
                 var suitableStatuses = new[] {"SUITABLE FOR US:","---------------"}.Concat(suitableMatches.Select(GetMatchStatus)).ToArray();
 
-                playedByUsStatuses
-                    .ZipLongest(suitableStatuses, (a, b) =>
+                playedByUsStatuses.Take(60)
+                    .ZipLongest(suitableStatuses.Take(60), (a, b) =>
                     {
                         var playedByUsStatus = $"{a ?? "",-80}";
                         var suitableStatus = $"{b ?? "",-80}";
@@ -61,14 +71,14 @@ namespace OnlineGameMonitor
                     })
                     .ForEach(x => Console.WriteLine(x));
 
-                Console.ReadKey();
+                Thread.Sleep(3000);
                 Console.Clear();
                 Console.SetCursorPosition(0, 0);
             }
             while (true);
         }
     }
-
+    
     [TestFixture]
     internal class OnlineGameMonitorTests
     {
