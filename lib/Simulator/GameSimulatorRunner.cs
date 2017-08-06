@@ -53,6 +53,9 @@ namespace lib
 
         public IAi Gamer { get; }
         public long Score { get; }
+        public int MatchScore { get; set; }
+        public long TotalFuturesScore { get; set; }
+        public long CompletedFuturesScore { get; set; }
         public Exception LastException { get; }
     }
 }

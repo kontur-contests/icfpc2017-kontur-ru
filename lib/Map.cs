@@ -28,41 +28,34 @@ namespace lib
 
         public Map ApplyMove(AiInfoMoveDecision decision)
         {
-            try
-            {
-                return ApplyMove(decision.move);
-            }
-            catch (Exception e)
-            {
-                throw new InvalidOperationException($"Invalid move {decision}. {e.Message}", e);
-            }
-
+            return ApplyMove(decision.move);
         }
+
         public Map ApplyMove(Move move)
         {
             if (move.claim != null)
-                return ApplyClaim(move.claim.punter, move.claim.source, move.claim.target);
+                return ApplyClaim(move.claim.punter, move.claim.source, move.claim.target, move);
 
-            var map = this;
-            if (move.splurger != null && move.splurger.route.Length >= 2)
+            var current = this;
+            if (move.splurge != null && move.splurge.SplurgeLength() > 0)
             {
-                var old = move.splurger.route[0];
-                foreach (var step in move.splurger.route.Skip(1))
+                var old = move.splurge.route[0];
+                foreach (var step in move.splurge.route.Skip(1))
                 {
-                    map = map.ApplyClaim(move.splurger.punter, old, step);
+                    current = current.ApplyClaim(move.splurge.punter, old, step, move);
                     old = step;
                 }
             }
-            return map;
+            return current;
         }
 
-        private Map ApplyClaim(int punterId, int source, int target)
+        private Map ApplyClaim(int punterId, int source, int target, Move move)
         {
             var oldRiver = new River(source, target);
             var actualRiver = RiversList.FirstOrDefault(r => r.Equals(oldRiver))
-                              ?? throw new InvalidOperationException($"Try to claim unexistent river {source}--{target}");
+                              ?? throw new InvalidOperationException($"Try to claim unexistent river {source}--{target}. Move: {move}");
             if (actualRiver.Owner != -1)
-                throw new InvalidOperationException($"Try to claim river {actualRiver} in move {source}--{target}");
+                throw new InvalidOperationException($"Try to claim river {actualRiver}. Move: {move}");
             var mapRivers = RiversList.Remove(oldRiver).Add(new River(source, target, punterId));
             return new Map(Sites, mapRivers, Mines);
         }

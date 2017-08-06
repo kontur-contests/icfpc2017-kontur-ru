@@ -7,7 +7,7 @@ namespace lib.Structures
     {
         public ClaimMove claim;
         public PassMove pass;
-        public SplurgerMove splurger;
+        public SplurgeMove splurge;
 
         public static Move Claim(int punter, int source, int target)
         {
@@ -21,7 +21,7 @@ namespace lib.Structures
 
         public static Move Splurge(int punter, int[] siteIds)
         {
-            return new Move {splurger = new SplurgerMove {punter = punter, route = siteIds}};
+            return new Move {splurge = new SplurgeMove {punter = punter, route = siteIds}};
         }
 
         public override string ToString()
@@ -30,8 +30,8 @@ namespace lib.Structures
                 return claim.ToString();
             if (pass != null)
                 return pass.ToString();
-            if (splurger != null)
-                return splurger.ToString();
+            if (splurge != null)
+                return splurge.ToString();
             return "Invalid move";
         }
 
@@ -39,7 +39,7 @@ namespace lib.Structures
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return Equals(claim, other.claim) && Equals(pass, other.pass) && Equals(splurger, other.splurger);
+            return Equals(claim, other.claim) && Equals(pass, other.pass) && Equals(splurge, other.splurge);
         }
 
         public override bool Equals(object obj)
@@ -96,8 +96,8 @@ namespace lib.Structures
                 return move.claim.punter;
             if (move.pass != null)
                 return move.pass.punter;
-            if (move.splurger != null)
-                return move.splurger.punter;
+            if (move.splurge != null)
+                return move.splurge.punter;
             return -1;
         }
     }
