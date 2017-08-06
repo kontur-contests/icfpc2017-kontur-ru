@@ -86,9 +86,9 @@ namespace lib.viz
                 claims.Add(move.claim.source);
                 claims.Add(move.claim.target);
             }
-            else if (move?.splurger != null)
+            else if (move?.splurge != null)
             {
-                claims.AddRange(move.splurger.route);
+                claims.AddRange(move.splurge.route);
             }
 
             if (claims.Count >= 2)

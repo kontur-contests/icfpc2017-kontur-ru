@@ -14,7 +14,7 @@ namespace lib.Ai
         private IAi Base = new AgileMaxVertexWeighterAi();
 
         private Random rand = new Random();
-        public string Name => nameof(LochDinicKiller);
+        public string Name => GetType().Name;
         public string Version => "0.3";
 
         DinicWeighter dinicWeighter;

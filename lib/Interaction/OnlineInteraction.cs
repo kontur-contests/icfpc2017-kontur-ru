@@ -92,13 +92,15 @@ namespace lib.Interaction
                     File.WriteAllText($@"error-turn-{DateTime.UtcNow.ToString("O").Replace(":", "_")}.json", $@"{handshake.Length}:{handshake}{gameplay.Length}:{gameplay}");
                     throw;
                 }
-                state.lastAiMoveDecision = new AiInfoMoveDecision
+                var aiInfoMoveDecision = new AiInfoMoveDecision
                 {
                     name = ai.Name,
                     version = ai.Version,
                     move = moveDecision.move,
                     reason = moveDecision.reason
                 };
+                state.ValidateMove(aiInfoMoveDecision);
+                state.lastAiMoveDecision = aiInfoMoveDecision;
 
                 connection.WriteMove(moveDecision.move);
                 serverResponse = connection.ReadNextTurn();

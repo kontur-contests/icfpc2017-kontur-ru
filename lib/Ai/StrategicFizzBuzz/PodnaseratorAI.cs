@@ -30,7 +30,7 @@ namespace lib.Ai.StrategicFizzBuzz
 
         public PodnaseratorSettings Settings { get; }
         private Func<int, State, IServices, IStrategy> StrategyProvider { get; }
-        public abstract string Name { get; }
+        public string Name => GetType().Name;
         public abstract string Version { get; }
 
         public AiSetupDecision Setup(State state, IServices services)
@@ -100,7 +100,6 @@ namespace lib.Ai.StrategicFizzBuzz
         {
         }
 
-        public override string Name => nameof(Podnaserator2000Ai);
         public override string Version => "2000";
     }
 }

@@ -13,7 +13,7 @@ namespace lib.Ai
 {
     public class ConnectClosestMinesAi : IAi
     {
-        public string Name => nameof(ConnectClosestMinesAi);
+        public string Name => GetType().Name;
         public string Version => "0.1";
 
         public AiSetupDecision Setup(State state, IServices services)

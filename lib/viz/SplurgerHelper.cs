@@ -8,8 +8,8 @@ namespace lib.viz
         {
             if (move.pass != null)
                 spluregerPoints[move.pass.punter]++;
-            else if (move.splurger != null)
-                spluregerPoints[move.splurger.punter] -= move.splurger.route.Length - 2;
+            else if (move.splurge != null)
+                spluregerPoints[move.splurge.punter] -= move.splurge.route.Length - 2;
         }
     }
 }

@@ -56,6 +56,7 @@ namespace lib.Strategies.EdgeWeighting
                         Estimation = EdgeWeighter.EstimateWeight(e),
                         River = e.River
                     })
+                .Where(t => t.Estimation > 0)
                 .ToList();
         }
 
