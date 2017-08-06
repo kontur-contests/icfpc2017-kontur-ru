@@ -16,7 +16,7 @@ namespace lib.Strategies.EdgeWeighting
         
         public ConnectedComponent[] For(int punterId)
         {
-            return cache.GetOrCreate(punterId, key => ConnectedComponent.GetComponents(graph, punterId).ToArray());
+            return cache.GetOrCreate(punterId, key => ConnectedComponent.GetComponentsFromMines(graph, punterId).ToArray());
         }
     }
 }
