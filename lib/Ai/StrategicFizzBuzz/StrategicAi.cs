@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using lib.GraphImpl;
 using lib.StateImpl;
 using lib.Strategies;
 using MoreLinq;
@@ -14,14 +13,13 @@ namespace lib.Ai.StrategicFizzBuzz
             StrategyProvider = strategyProvider;
         }
 
+        private Func<State, IServices, IStrategy> StrategyProvider { get; }
+
         public string Name => GetType().Name;
         public abstract string Version { get; }
 
-        private Func<State, IServices, IStrategy> StrategyProvider { get; }
-
         public AiSetupDecision Setup(State state, IServices services)
         {
-            services.Setup<Graph>();
             StrategyProvider(state, services);
             return AiSetupDecision.Empty();
         }
