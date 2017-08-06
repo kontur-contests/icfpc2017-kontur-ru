@@ -42,7 +42,7 @@ namespace lib.Ai
                 .Select(e => e.Key)
                 .ToHashSet();
 
-            return new ConnectClosestMinesAi.AiState {stage = 1, myMines = myMines};
+            return new ConnectClosestMinesAi.AiState {stage = 0, myMines = myMines};
         }
     }
 
@@ -71,16 +71,23 @@ namespace lib.Ai
                 from c in components
                 let neighbours = GetFreeNeighbours(c)
                 select new{c, neighbours};
-            var weakComponent = q.MinBy(t => t.neighbours.Count - MinesToDefendablesRatio(t.c));
-            var otherComponents = components.Where(c => c != weakComponent.c).ToHashSet();
-            var res = Bfs(weakComponent.neighbours, otherComponents.SelectMany(c=>c).ToHashSet());
-            var candidateSites = res.MaxListBy(r => -r.Value);
-            if (candidateSites.Count > 0)
+
+            var weakComponents = q.OrderBy(t => t.neighbours.Count - MinesToDefendablesRatio(t.c));
+
+            foreach (var weakComponent in weakComponents)
             {
-                int neighbourToGo = candidateSites[0].Key;
-                var weakComponentSiteIds = weakComponent.c;
-                return graph.Vertexes[neighbourToGo].Edges.First(e => weakComponentSiteIds.Contains(e.To));
+                var otherComponents = components.Where(c => c != weakComponent.c).ToHashSet();
+                var res = Bfs(weakComponent.neighbours, otherComponents.SelectMany(c => c).ToHashSet());
+                var candidateSites = res.MaxListBy(r => -r.Value);
+
+                if (candidateSites.Count > 0)
+                {
+                    int neighbourToGo = candidateSites[0].Key;
+                    var weakComponentSiteIds = weakComponent.c;
+                    return graph.Vertexes[neighbourToGo].Edges.First(e => weakComponentSiteIds.Contains(e.To));
+                }
             }
+
             return null;
         }
 
