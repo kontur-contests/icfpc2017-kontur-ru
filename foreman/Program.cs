@@ -35,7 +35,7 @@ namespace foreman
                         match = OnlineArenaRunner.GetNextMatch();
                         while (new ArenaApi()
                                    .GetArenaMatchesAsync().ConfigureAwait(false)
-                                   .GetAwaiter().GetResult().Count(x => x.Players.Any(p => p.IsOurBot())) > 30)
+                                   .GetAwaiter().GetResult().Count(x => x.Players.Any(p => p.IsOurBot())) > 64)
                         {
                             logger.Info($"Too many kontur.ru bots, sleeping");
                             Thread.Sleep(10000);
