@@ -106,14 +106,30 @@ namespace lib.GraphImpl
             return 0;
         }
 
-        public Dinic(Graph graph, int punterId, int s, int t, out int flow)
+        public Dinic(Graph graph, int punterId, int s, int t, out int flow, bool expandST = false)
         {
-            s = v(s);
-            t = v(t);
+            if (s == t) throw new ArgumentException($"s == t == {s}");
+            if (!expandST)
+            {
+                s = v(s);
+                t = v(t);
+                n = graph.Vertexes.Count;
+            }
+            else
+            {
+                int ss = 100500 + s;
+                int tt = 100500 + t;
+                foreach (var edge in graph.Vertexes[s].Edges)
+                    add_edge(ss, edge.To, INF);
+                foreach (var edge in graph.Vertexes[t].Edges)
+                    add_edge(edge.To, tt, INF);
+                s = v(ss);
+                t = v(tt);
+                n = graph.Vertexes.Count + 2;
+            }
             this.s = s;
             this.t = t;
 
-            n = graph.Vertexes.Count;
 
             foreach (var vertex in graph.Vertexes)
             {
@@ -140,7 +156,7 @@ namespace lib.GraphImpl
                     flow += pushed;
             }
         }
-        
+
         class Edge2
         {
             public int a, b, cap, flow;
@@ -181,7 +197,7 @@ namespace lib.GraphImpl
             graph.AddEdge(1, 2);
             graph.AddEdge(2, 4);
             graph.AddEdge(3, 4);
-            
+
             var dinic = new Dinic(graph, me, 0, 4, out int flow);
             flow.ShouldBeEquivalentTo(2);
 
