@@ -1,12 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using Confluent.Kafka;
 using Confluent.Kafka.Serialization;
-using lib.OnlineRunner;
+using lib.Arena;
+using lib.Interaction;
+using lib.Replays;
+using lib.viz;
+using MoreLinq;
 using Newtonsoft.Json;
 using NLog;
 
@@ -16,18 +21,17 @@ namespace worker
     {
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
         private readonly Dictionary<string, object> config;
-        private readonly string inputTopicName;
+        private readonly string[] inputTopicNames;
         private readonly string outputTopicName;
         private readonly IExperiment experiment;
         private bool cancelled;
         private Thread workerThread;
-        private Thread arenaThread;
-        private string commitHash;
+        private readonly string commitHash;
 
-        public WorkerService(Dictionary<string, object> conf, string input, string output, IExperiment experiment)
+        public WorkerService(Dictionary<string, object> conf, string[] input, string output, IExperiment experiment)
         {
             config = conf;
-            inputTopicName = input;
+            inputTopicNames = input;
             outputTopicName = output;
             this.experiment = experiment;
             try
@@ -45,18 +49,6 @@ namespace worker
 
         public void Start()
         {
-            arenaThread = new Thread(
-                () =>
-                {
-                    for (var i = 0; i < 5; i++)
-                        System.Threading.Tasks.Task.Run(() =>
-                        {
-                            while (!cancelled)
-                                OnlineArenaRunner.TryCompeteOnArena("TCWorker", commitHash);
-                        });
-                });
-            arenaThread.Start();
-
             workerThread = new Thread(
                 () =>
                 {
@@ -84,7 +76,7 @@ namespace worker
 
                         consumer.OnStatistics += (_, json) => logger.Info($"Statistics: {json}");
 
-                        consumer.Subscribe(inputTopicName);
+                        consumer.Subscribe(inputTopicNames);
 
                         while (!cancelled)
                         {
@@ -100,32 +92,11 @@ namespace worker
 
                             try
                             {
-                                System.Threading.Tasks.Task.Run(
-                                    () =>
-                                    {
-                                        var task = JsonConvert.DeserializeObject<Task>(msg.Value);
-                                        Result result = null;
-                                        try
-                                        {
-                                            result = experiment.Play(task);
-                                        }
-                                        catch (Exception exception)
-                                        {
-                                            result = new Result {Error = exception.Message + "\n\n" + exception.StackTrace };
-                                        }
-                                        result.Task = task;
-                                        result.Token = task.Token;
-                                        var resultString = JsonConvert.SerializeObject(result);
+                                if (msg.Topic == "tasks")
+                                    ProcessTask(msg, producer);
 
-                                        var deliveryReport = producer.ProduceAsync(outputTopicName, null, resultString);
-
-                                        deliveryReport.ContinueWith(
-                                            x =>
-                                            {
-                                                logger.Info(
-                                                    $"Sent result | Partition: {x.Result.Partition}, Offset: {x.Result.Offset}");
-                                            });
-                                    });
+                                if (msg.Topic == "matches")
+                                    ProcessMatch(msg);
                             }
                             catch (Exception e)
                             {
@@ -139,11 +110,70 @@ namespace worker
             workerThread.Start();
         }
 
+        private void ProcessMatch(Message<Null, string> msg)
+        {
+            System.Threading.Tasks.Task.Run(
+                () =>
+                {
+                    var ai = AiFactoryRegistry.GetNextAi();
+                    var match = ArenaMatch.EmptyMatch;
+
+                    if (!int.TryParse(msg.Value, out match.Port)) return;
+                    logger.Info($"Match on port {match.Port} for {GetBotName(ai.Name)}");
+
+                    var interaction = new OnlineInteraction(match.Port, GetBotName(ai.Name));
+                    if (!interaction.Start()) return;
+
+                    logger.Info($"Running game on port {match.Port}");
+                    var metaAndData = interaction.RunGame(ai);
+                    metaAndData.Item1.CommitHash = commitHash;
+                    new ReplayRepo().SaveReplay(metaAndData.Item1, metaAndData.Item2);
+                    logger.Info($"Saved replay {metaAndData.Item1.Scores.ToDelimitedString(", ")}");
+                });
+        }
+
+        private void ProcessTask(Message<Null, string> msg, ISerializingProducer<Null, string> producer)
+        {
+            System.Threading.Tasks.Task.Run(
+                () =>
+                {
+                    var task = JsonConvert.DeserializeObject<Task>(msg.Value);
+                    Result result;
+                    try
+                    {
+                        result = experiment.Play(task);
+                    }
+                    catch (Exception exception)
+                    {
+                        result = new Result
+                        {
+                            Error = exception.Message + "\n\n" + exception.StackTrace
+                        };
+                    }
+                    result.Task = task;
+                    result.Token = task.Token;
+                    var resultString = JsonConvert.SerializeObject(result);
+
+                    var deliveryReport = producer.ProduceAsync(outputTopicName, null, resultString);
+
+                    deliveryReport.ContinueWith(
+                        x =>
+                        {
+                            logger.Info(
+                                $"Sent result | Partition: {x.Result.Partition}, Offset: {x.Result.Offset}");
+                        });
+                });
+        }
+
         public void Stop()
         {
-            cancelled = true;  
+            cancelled = true;
             workerThread.Join();
-            arenaThread.Join();
+        }
+
+        private static string GetBotName(string botTypeName)
+        {
+            return $"kontur.ru_{string.Join("", botTypeName.Where(char.IsUpper).ToArray())}";
         }
     }
 }
