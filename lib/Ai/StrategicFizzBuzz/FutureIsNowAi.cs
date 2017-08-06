@@ -6,7 +6,7 @@ namespace lib.Ai.StrategicFizzBuzz
 {
     public class FutureIsNowAi : CompositeStrategicAi
     {
-        public FutureIsNowAi() : this(0.2, 100)
+        public FutureIsNowAi() : this(1, 100)
         {
         }
 
