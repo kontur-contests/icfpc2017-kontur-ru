@@ -4,6 +4,21 @@ from magic.foreman import *
 import os
 
 
+def get_maps():
+    return {
+    'sample.json': 2,
+    'Sierpinski-triangle.json': 3,
+    'randomSparse.json': 4,
+    'lambda.json': 4,
+    'circle.json': 4,
+    'randomMedium.json': 4,
+    'boston-sparse.json': 8,
+    'tube.json': 8,
+    'edinburgh-sparse.json': 16,
+    'oxford-sparse.json': 16,
+    'gothenburg-sparse.json': 16,
+    }
+
 class Fluent:
 
     def __init__(self):
@@ -24,6 +39,9 @@ class Fluent:
             self.players.append({'Name': uuid4().hex, 'Params': player, 'ClassName' : class_name})
         return self
 
+    def set_players(self, players):
+        self.players=players
+        return self
 
     def create_historical_players(self, history_length):
         self.players = [ { 'Name' : 'Age'+str(i), 'Params' : {'Age' : i}} for i in range(history_length)]
