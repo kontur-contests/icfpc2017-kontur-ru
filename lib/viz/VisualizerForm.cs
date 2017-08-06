@@ -39,6 +39,7 @@ namespace lib.viz
             startGameConfigPanel.AiAtIndexRemoved += _ => UpdateMap(rightPanel);
 
             startGameConfigPanel.EnableFuturesChanged += _ => UpdateMap(rightPanel);
+            startGameConfigPanel.EnableSplurgesChanged += _ => UpdateMap(rightPanel);
 
             Controls.Add(rightPanel);
             Controls.Add(startGameConfigPanel);
