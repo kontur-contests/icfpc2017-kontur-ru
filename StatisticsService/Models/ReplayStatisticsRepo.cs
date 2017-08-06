@@ -18,6 +18,7 @@ namespace StatisticsService.Models
 
     public class ReplayStatisticsRepo : IReplayStatisticsRepo
     {
+        private static IDictionary<string, int[]> mapsDictionary;
         private const int interval = 120 / ReplaysStatisticsConverter.minutesGroupSize;
 
         private readonly FirebaseClient fb;
@@ -45,17 +46,19 @@ namespace StatisticsService.Models
 
         public IList<ReportModel> GetReportsStatistics()
         {
+            var dictionary = mapsDictionary ?? (mapsDictionary = GetMapsInner());
+
             var replayMetas = GetAllMeta()
                 .Select(e => e.Object)
                 .ToArray();
 
-            var maxTime = replayMetas.Max(e => ((DateTimeOffset) e.Timestamp).ToUnixTimeSeconds() / (60 * ReplaysStatisticsConverter.minutesGroupSize));
+            var maxTime = ((DateTimeOffset)DateTime.Now).ToUnixTimeSeconds() / (60 * ReplaysStatisticsConverter.minutesGroupSize);
 
             var sizes = new Dictionary<string, int>();
 
             return replayMetas
                 .GroupBy(e => ((DateTimeOffset) e.Timestamp).ToUnixTimeSeconds() / (60 * ReplaysStatisticsConverter.minutesGroupSize))
-                .Where(e => e.Key > maxTime - interval)
+                .Where(e => e.Key >= maxTime - interval)
                 .Select(
                     e =>
                     {
@@ -67,18 +70,10 @@ namespace StatisticsService.Models
                                     {
                                         if (!sizes.ContainsKey(g.MapHash))
                                         {
-                                            var mapData = maps.Child("data")
-                                                .Child(g.MapHash)
-                                                .OnceSingleAsync<EncodedData>()
-                                                .ConfigureAwait(false).GetAwaiter()
-                                                .GetResult().D;
+                                            var mines = dictionary[g.MapHash];
 
-                                            var map = JsonConvert.DeserializeObject<Map>(mapData);
-
-                                            var array = map.Mines.OrderBy(ee => ee).ToArray();
-
-                                            sizes[g.MapHash] = MapMapper.Hashes.Any(ee => ee.Key.OrderBy(gg => gg).SequenceEqual(array))
-                                                ? MapMapper.Hashes.FirstOrDefault(ee => ee.Key.OrderBy(gg => gg).SequenceEqual(array)).Value
+                                            sizes[g.MapHash] = MapMapper.Hashes.Any(ee => ee.Key.OrderBy(gg => gg).SequenceEqual(mines))
+                                                ? MapMapper.Hashes.FirstOrDefault(ee => ee.Key.OrderBy(gg => gg).SequenceEqual(mines)).Value
                                                 : 0;
                                         }
 
@@ -95,7 +90,7 @@ namespace StatisticsService.Models
                     })
                 .ToArray();
         }
-        
+
         private IReadOnlyCollection<FirebaseObject<ReplayMeta>> GetAllMeta()
         {
             return metas
@@ -103,55 +98,25 @@ namespace StatisticsService.Models
                 .ConfigureAwait(false).GetAwaiter()
                 .GetResult();
         }
+
+        private IDictionary<string, int[]> GetMapsInner()
+        {
+            return maps.Child("data")
+                .OnceAsync<EncodedData>()
+                .ConfigureAwait(false).GetAwaiter()
+                .GetResult()
+                .ToDictionary(e => e.Key, e => JsonConvert.DeserializeObject<Map>(e.Object.D).Mines.OrderBy(g => g).ToArray());
+        }
     }
 
     public static class MapMapper
     {
-        private static readonly IDictionary<string, int> maps = new Dictionary<string, int>
-        {
-            ["boston-sparse"] = 8,
-            //["boston"] = 1,
-            ["circle"] = 4,
-            //["edge"] = 1,
-            //["edinburgh-scaled"] = 1,
-            ["edinburgh-sparse"] = 16,
-            //["edinburgh-sparse2"] = 1,
-            //["edinburgh"] = 1,
-            //["gen1"] = 1,
-            //["gen2"] = 1,
-            //["gen3"] = 1,
-            //["gen4"] = 1,
-            ["gothenburg-sparse"] = 16,
-            ["lambda"] = 4,
-            //["nara-scaled"] = 1,
-            ["nara-sparse"] = 16,
-            //["nara"] = 1,
-            //["oxford-3000-nodes"] = 1,
-            //["oxford-center-sparse"] = 1,
-            //["oxford-center"] = 1,
-            ["oxford-sparse"] = 16,
-            //["oxford-sparse2"] = 1,
-            //["oxford"] = 1,
-            //["oxford2-scaled"] = 1,
-            //["oxford2-sparse-2"] = 1,
-            //["oxford2-sparse"] = 1,
-            //["oxford2"] = 1,
-            ["randomMedium"] = 4,
-            ["randomSparse"] = 4,
-            ["sample"] = 2,
-            ["Sierpinski-triangle"] = 3,
-            //["spider_web"] = 1,
-            //["t1"] = 1,
-            ["tube"] = 8,
-            //["van-city-sparse"] = 1
-        };
-
-        private static  IDictionary<int[], int> hashes;
+        private static IDictionary<int[], int> hashes;
         public static IDictionary<int[], int> Hashes => hashes ?? (hashes = LoadHashes());
 
         private static Dictionary<int[], int> LoadHashes()
             => MapLoader.LoadDefaultMaps()
-                .Join(maps, map => map.Name, pair => pair.Key, (map, pair) => new {NamedMap = map, Size = pair.Value})
+                .Join(MapLoader.LoadOnlineMapSizes(), map => $"{map.Name}.json", pair => pair.Key, (map, pair) => new {NamedMap = map, Size = pair.Value})
                 .ToDictionary(e => e.NamedMap.Map.Mines, e => e.Size);
     }
 }

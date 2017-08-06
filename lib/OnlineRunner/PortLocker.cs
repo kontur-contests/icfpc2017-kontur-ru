@@ -32,7 +32,7 @@ namespace lib.OnlineRunner
                 });
         }
 
-        public bool TryAcquire(int portNumber)
+        public bool CheckIfPortIsFree(int portNumber)
         {
             var portChild = rootQuery.Child(portNumber.ToString());
             var resp = portChild.PostAsync(GetValidToTimestamp()).ConfigureAwait(false)
@@ -42,15 +42,20 @@ namespace lib.OnlineRunner
 
             var now = DateTime.UtcNow;
             var firebaseObject = dateTimes.First(x => x.Object >= now);
-            if (firebaseObject.Key == resp.Key)
-            {
-                portChild.DeleteAsync().ConfigureAwait(false).GetAwaiter().GetResult();
-                portChild.PostAsync(GetValidToTimestamp()).ConfigureAwait(false).GetAwaiter().GetResult();
-                return true;
-            }
             
             portChild.Child(resp.Key).DeleteAsync().ConfigureAwait(false).GetAwaiter().GetResult();
-            return false;
+
+            return firebaseObject.Key == resp.Key;
+        }
+
+        public bool TryAcquire(int portNumber)
+        {
+            if (!CheckIfPortIsFree((portNumber))) return false;
+            
+            var portChild = rootQuery.Child(portNumber.ToString());
+            portChild.DeleteAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+            portChild.PostAsync(GetValidToTimestamp()).ConfigureAwait(false).GetAwaiter().GetResult();
+            return true;
         }
 
         private static DateTime GetValidToTimestamp()

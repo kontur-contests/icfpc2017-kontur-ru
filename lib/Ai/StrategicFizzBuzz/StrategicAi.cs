@@ -30,7 +30,7 @@ namespace lib.Ai.StrategicFizzBuzz
         {
             var strategy = StrategyProvider(state, services);
             var graph = services.Get<GraphService>(state).Graph;
-            var turns = strategy.Turn(graph);
+            var turns = strategy.Turn(state, services);
             if (!turns.Any())
                 return AiMoveDecision.Pass(state.punter);
             var bestTurn = turns.MaxBy(x => x.Estimation);

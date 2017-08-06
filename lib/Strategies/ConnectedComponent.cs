@@ -4,32 +4,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using lib.GraphImpl;
-using lib.GraphImpl.ShortestPath;
 
 namespace lib.Strategies
 {
-    public class SuperGreedyStrategy : IStrategy
-    {
-        private MineDistCalculator MineDistCalulator;
-
-        public SuperGreedyStrategy(ShortestPathGraph shortestPathGraph, MineDistCalculator mineDistCalulator)
-        {
-            MineDistCalulator = mineDistCalulator;
-        }
-
-        public List<TurnResult> Turn(Graph graph)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
     public class ConnectedComponent
     {
         public HashSet<int> Vertices = new HashSet<int>();
         public HashSet<int> Mines = new HashSet<int>();
         public int Id { get; }
+        public int OwnerPunterId { get; }
 
-        public ConnectedComponent(int id)
+        public ConnectedComponent(int id, int ownerPunterId)
         {
             Id = id;
         }
@@ -46,10 +31,10 @@ namespace lib.Strategies
 
             foreach (var mine in graph.Mines)
             {
-                if(usedMines.Contains(mine.Key))
+                if (usedMines.Contains(mine.Key))
                     continue;
-                
-                var component = new ConnectedComponent(componentIndexer);
+
+                var component = new ConnectedComponent(componentIndexer, owner);
                 componentIndexer++;
 
                 queue.Clear();

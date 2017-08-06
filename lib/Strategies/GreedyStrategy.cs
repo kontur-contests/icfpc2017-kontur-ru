@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using lib.GraphImpl;
+using lib.StateImpl;
 
 namespace lib.Strategies
 {
@@ -15,8 +16,10 @@ namespace lib.Strategies
         private MineDistCalculator MineDistCalulator { get; }
         private int PunterId { get; }
 
-        public List<TurnResult> Turn(Graph graph)
+        public List<TurnResult> Turn(State state, IServices services)
         {
+            var graph = services.Get<GraphService>(state).Graph;
+
             var calculator = new ConnectedCalculator(graph, PunterId);
             var result = new List<TurnResult>();
             foreach (var vertex in graph.Vertexes.Values)

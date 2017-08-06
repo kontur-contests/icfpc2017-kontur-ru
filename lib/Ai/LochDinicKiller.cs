@@ -4,6 +4,7 @@ using System.Linq;
 using lib.Ai.StrategicFizzBuzz;
 using lib.GraphImpl;
 using lib.StateImpl;
+using MoreLinq;
 
 namespace lib.Ai
 {
@@ -13,7 +14,7 @@ namespace lib.Ai
 
         private Random rand = new Random();
         public string Name => nameof(LochDinicKiller);
-        public string Version => "0.2";
+        public string Version => "0.3";
 
         public AiSetupDecision Setup(State state, IServices services)
         {
@@ -21,12 +22,17 @@ namespace lib.Ai
             return Base.Setup(state, services);
         }
 
+        private Tuple<int, int> ConvertToTuple(Edge edge)
+        {
+            return edge.From > edge.To ? Tuple.Create(edge.To, edge.From) : Tuple.Create(edge.From, edge.To);
+        }
+
         public AiMoveDecision GetNextMove(State state, IServices services)
         {
             var graph = services.Get<GraphService>(state).Graph;
 
             int maxCount = 10;
-            List<Edge> edgesToBlock = new List<Edge>();
+            Dictionary<Tuple<int, int>, double> edgesToBlock = new Dictionary<Tuple<int, int>, double>();
 
             var mineToSave = graph.Mines
                 .Where(mine => mine.Value.Edges.All(edge => edge.Owner != state.punter))
@@ -55,15 +61,19 @@ namespace lib.Ai
                     continue;
                 if (flow > maxCount)
                     continue;
-                edgesToBlock.AddRange(dinic.GetMinCut().Where(edge => !bannedMines.Contains(edge.From)));
+                
+                foreach (var edge in dinic.GetMinCut().Select(ConvertToTuple))
+                {
+                    if(bannedMines.Contains(edge.Item1) || bannedMines.Contains(edge.Item2))
+                        continue;
+                    edgesToBlock[edge] = edgesToBlock.GetOrDefault(edge, 0) + 1.0 / flow;
+                }
             }
-
-            edgesToBlock = edgesToBlock.Distinct().ToList();
 
             if (edgesToBlock.Count == 0)
                 return Base.GetNextMove(state, services);
-            var choosenEdge = edgesToBlock[Math.Min(edgesToBlock.Count - 1, rand.Next(edgesToBlock.Count))]; 
-            return AiMoveDecision.Claim(state.punter, choosenEdge.From, choosenEdge.To);
+            var choosenEdge = edgesToBlock.MaxBy(edge => edge.Value).Key; 
+            return AiMoveDecision.Claim(state.punter, choosenEdge.Item1, choosenEdge.Item2);
         }
     }
 }

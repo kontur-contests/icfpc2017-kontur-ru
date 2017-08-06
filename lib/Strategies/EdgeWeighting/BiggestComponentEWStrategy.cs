@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using lib.GraphImpl;
+using lib.StateImpl;
 using MoreLinq;
 
 namespace lib.Strategies.EdgeWeighting
@@ -19,8 +20,9 @@ namespace lib.Strategies.EdgeWeighting
         private int PunterId { get; }
 
 
-        public List<TurnResult> Turn(Graph graph)
+        public List<TurnResult> Turn(State state, IServices services)
         {
+            var graph = services.Get<GraphService>(state).Graph;
             var claimedVertexes = graph.Vertexes.Values
                 .SelectMany(x => x.Edges)
                 .Where(edge => edge.Owner == PunterId)
@@ -42,7 +44,7 @@ namespace lib.Strategies.EdgeWeighting
 
             var connectedComponents = ConnectedComponent.GetComponents(graph, PunterId);
             var maxComponent = connectedComponents.MaxBy(comp => comp.Vertices.Count);
-            EdgeWeighter.Init(graph, connectedComponents, maxComponent);
+            EdgeWeighter.Init(state, services, connectedComponents, maxComponent);
             return maxComponent.Vertices
                 .SelectMany(v => graph.Vertexes[v].Edges)
                 .Where(e => e.Owner == -1)

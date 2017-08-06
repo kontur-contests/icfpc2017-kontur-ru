@@ -15,7 +15,7 @@ namespace lib
         private readonly Settings settings;
         private readonly bool eatExceptions;
         private Dictionary<IAi, Exception> lastException = new Dictionary<IAi, Exception>();
-        private List<Tuple<IAi, State, IServices>> punters;
+        private List<Tuple<IAi, State>> punters;
         private int currentPunter = 0;
         private readonly List<Move> moves;
         private int turnsAmount;
@@ -48,12 +48,12 @@ namespace lib
                 punter = i,
                 punters = gamers.Count,
                 settings = settings
-            }, (IServices)new Services())).ToList();
+            })).ToList();
             for (int i = 0; i < punters.Count; i++)
             {
                 var ai = punters[i].Item1;
                 var state = punters[i].Item2;
-                var services = punters[i].Item3;
+                var services = new Services();
                 var setupDecision = ai.Setup(state, services);
                 Futures.Add(ValidateFutures(setupDecision.futures));
                 state.aiSetupDecision = new AiInfoSetupDecision
@@ -75,10 +75,9 @@ namespace lib
 
             var ai = punters[currentPunter].Item1;
             var state = punters[currentPunter].Item2;
-            var services = punters[currentPunter].Item3;
             state.map = map;
             state.turns.Add(new TurnState{moves = turnMoves.ToArray(), aiMoveDecision = state.lastAiMoveDecision});
-            services.ApplyNextState(state);
+            var services = new Services();
             var moveDecision = GetNextMove(ai, state, services, eatExceptions, lastException);
             state.lastAiMoveDecision = new AiInfoMoveDecision
             {

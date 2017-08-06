@@ -90,7 +90,7 @@ namespace lib
                 MapLoader.LoadDefaultMaps().Select(x => x.Name),
                 Is.EquivalentTo(
                     new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\..\..\maps"))
-                        .EnumerateFiles().Select(x => Path.GetFileNameWithoutExtension(x.FullName))));
+                        .EnumerateFiles("*.json").Select(x => Path.GetFileNameWithoutExtension(x.FullName))));
         }
     }
 }

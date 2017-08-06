@@ -47,15 +47,14 @@ namespace lib.Ai.StrategicFizzBuzz
 
         public AiMoveDecision GetNextMove(State state, IServices services)
         {
-            var graph = services.Get<GraphService>(state).Graph;
             var myStrategy = StrategyProvider(state.punter, state, services);
             var enemyStrategies = Enumerable.Range(0, state.punters)
                 .Except(new[] { state.punter })
                 .Select(enemyId => StrategyProvider(enemyId, state, services))
                 .ToArray();
-            var bestTurn = GetMyBestTurn(myStrategy, state.map);
+            var bestTurn = GetMyBestTurn(state, services, myStrategy);
             var enemyBestTurns = enemyStrategies
-                .Select(s => s.Turn(graph))
+                .Select(s => s.Turn(state, services))
                 .Where(ts => ts.Count >= 2)
                 .Select(ts => ts.OrderByDescending(x => x.Estimation).Take(2).ToArray())
                 .ToArray();
@@ -72,9 +71,9 @@ namespace lib.Ai.StrategicFizzBuzz
             return AiMoveDecision.Claim(state.punter, bestTurn.River.Source, bestTurn.River.Target);
         }
         
-        private TurnResult GetMyBestTurn(IStrategy myStrategy, Map map)
+        private TurnResult GetMyBestTurn(State state, IServices services, IStrategy myStrategy)
         {
-            var turns = myStrategy.Turn(new Graph(map));
+            var turns = myStrategy.Turn(state, services);
             if (!turns.Any())
                 return new TurnResult
                 {
@@ -100,7 +99,7 @@ namespace lib.Ai.StrategicFizzBuzz
                 (punterId, state, services) => 
                 new BiggestComponentEWStrategy(
                     punterId,
-                    new MaxVertextWeighter(mineMultiplier, services.Get<MineDistCalculator>(state)),
+                    new MaxVertextWeighter(mineMultiplier, state, services),
                     services.Get<MineDistCalculator>(state)))
         {
         }

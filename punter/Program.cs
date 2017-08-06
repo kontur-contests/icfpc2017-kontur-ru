@@ -85,7 +85,6 @@ namespace punter
             });
             try
             {
-                services.ApplyNextState(state);
                 var moveDecision = ai.GetNextMove(state, services);
                 moveDecision = ValidateMove(state.map, moveDecision);
                 state.lastAiMoveDecision = new AiInfoMoveDecision
