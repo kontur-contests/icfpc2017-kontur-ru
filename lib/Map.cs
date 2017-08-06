@@ -40,14 +40,29 @@ namespace lib
         }
         public Map ApplyMove(Move move)
         {
-            if (move.claim == null)
-                return this;
-            var oldRiver = new River(move.claim.source, move.claim.target);
+            if (move.claim != null)
+                return ApplyClaim(move.claim.punter, move.claim.source, move.claim.target);
+            if (move.splurger != null && move.splurger.route.Length >= 2)
+            {
+                var old = move.splurger.route[0];
+                var current = this;
+                foreach (var step in move.splurger.route.Skip(1))
+                {
+                    current.ApplyClaim(move.splurger.punter, old, step);
+                    old = step;
+                }
+            }
+            return this;
+        }
+
+        private Map ApplyClaim(int punterId, int source, int target)
+        {
+            var oldRiver = new River(source, target);
             var actualRiver = RiversList.FirstOrDefault(r => r.Equals(oldRiver))
-                ?? throw new InvalidOperationException($"Try to Claim unexistent river {move}");
+                              ?? throw new InvalidOperationException($"Try to claim unexistent river {source}--{target}");
             if (actualRiver.Owner != -1)
-                throw new InvalidOperationException($"Try to claim river {actualRiver} in move {move}");
-            var mapRivers = RiversList.Remove(oldRiver).Add(new River(move.claim.source, move.claim.target, move.claim.punter));
+                throw new InvalidOperationException($"Try to claim river {actualRiver} in move {source}--{target}");
+            var mapRivers = RiversList.Remove(oldRiver).Add(new River(source, target, punterId));
             return new Map(Sites, mapRivers, Mines);
         }
 
