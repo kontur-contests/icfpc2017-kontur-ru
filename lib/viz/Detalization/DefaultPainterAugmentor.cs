@@ -67,13 +67,23 @@ namespace lib.viz.Detalization
 
         public RiverPainterData GetData(River river)
         {
-            return new RiverPainterData
+            var data = new RiverPainterData
             {
-                Color = river.Owner == -1 ? Color.LightGray : Colors[river.Owner],
+                Color = FadeBySelectedOwner(river.Owner == -1 ? Color.LightGray : Colors[river.Owner], river.Owner),
                 PenWidth = river.Owner == -1 ? 1 : 3,
-                HoverText = "It's a river!",
+                HoverText = river.Owner >= 0 ? "Owner " + river.Owner : "",
                 DashStyle = DashStyle.Solid
             };
+            return data;
+        }
+
+        private Color FadeBySelectedOwner(Color color, int riverOwner)
+        {
+            if (riverOwner != SelectedPlayerIndex && SelectedPlayerIndex != -1)
+            {
+                return Color.FromArgb(30, color);
+            }
+            return color;
         }
 
         public FuturePainterData GetData(int punderId, Future future)
@@ -85,13 +95,14 @@ namespace lib.viz.Detalization
                            calc.GetConnectedMines(future.target).Contains(future.source);
             return new FuturePainterData
             {
-                Color = Colors[punderId],
+                Color = FadeBySelectedOwner(Colors[punderId], punderId),
                 PenWidth = conected ? 1 : 2,
                 DashStyle = DashStyle.Solid
             };
         }
 
         public bool ShowFutures { get; set; }
+        public int SelectedPlayerIndex { get; set; } = -1;
 
         private float CalcMinDistance()
         {
