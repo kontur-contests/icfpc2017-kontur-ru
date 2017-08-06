@@ -14,7 +14,8 @@ namespace lib.Ai.StrategicFizzBuzz
             : base(
                 (state, services) => new FutureIsNowSetupStrategy(state, services, pathMultiplier),
                 (state, services) => new FutureIsNowStrategy(state, services),
-                BiggestComponentEWStrategy((state, services) => new MaxVertextWeighter(mineWeight, state, services)))
+                BiggestComponentEWStrategy((state, services) => new MaxVertextWeighter(mineWeight, state, services)),
+                (state, services) => new GreedyStrategy(state, services, (x, y) => x + y))
         {
         }
 

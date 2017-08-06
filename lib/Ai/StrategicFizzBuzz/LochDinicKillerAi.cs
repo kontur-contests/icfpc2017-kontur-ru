@@ -10,7 +10,8 @@ namespace lib.Ai.StrategicFizzBuzz
         public LochDinicKillerAi()
             : base(
                 (state, services) => new LochDinicKillerStrategy(state, services),
-                AllComponentsEWStrategy((state, services) => new MaxVertextWeighter(100, state, services)))
+                AllComponentsEWStrategy((state, services) => new MaxVertextWeighter(100, state, services)),
+                (state, services) => new GreedyStrategy(state, services, (x, y) => x + y))
         {
         }
 
@@ -22,7 +23,8 @@ namespace lib.Ai.StrategicFizzBuzz
         public AntiLochDinicKillerAi()
             : base(
                 (state, services) => new AntiLochDinicStrategy(state, services),
-                AllComponentsEWStrategy((state, services) => new MaxVertextWeighter(100, state, services)))
+                AllComponentsEWStrategy((state, services) => new MaxVertextWeighter(100, state, services)),
+                (state, services) => new GreedyStrategy(state, services, (x, y) => x + y))
         {
         }
 
