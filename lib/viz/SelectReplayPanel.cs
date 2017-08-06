@@ -8,40 +8,6 @@ using MoreLinq;
 
 namespace lib.viz
 {
-    internal class FilterReplayPanel : TableLayoutPanel
-    {
-        public FilterReplayPanel()
-        {
-            aiFilter = new ComboBox
-            {
-                Dock = DockStyle.Top,
-                DropDownStyle = ComboBoxStyle.DropDownList
-            };
-            aiFilter.SelectedIndexChanged += (_, __) => ApplyFilters();
-            
-            Controls.Add(aiFilter);
-        }
-
-        public void UpdateInfo(ReplayMeta[] metas)
-        {
-            this.metas = metas;
-            aiFilter.Items.Clear();
-            aiFilter.Items.AddRange(metas.Select(m => $"{m.AiName}:{m.AiVersion}").Distinct().OrderBy(s => s).Cast<object>().ToArray());
-
-            ApplyFilters();
-        }
-
-        public event Action<ReplayMeta[]> FiltersUpdated;
-
-        private void ApplyFilters()
-        {
-            FiltersUpdated?.Invoke(metas);
-        }
-
-        private readonly ComboBox aiFilter;
-        private ReplayMeta[] metas;
-    }
-
     internal class SelectReplayPanel : Panel
     {
         public SelectReplayPanel()
@@ -128,7 +94,7 @@ namespace lib.viz
 
         private void UpdateList(ReplayMeta[] metas)
         {
-            filter.UpdateInfo(metas);
+            filter.UpdateMetas(metas);
         }
 
         private void UpdateVisualization(ReplayMeta[] metas)
