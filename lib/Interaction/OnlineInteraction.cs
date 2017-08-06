@@ -56,8 +56,8 @@ namespace lib.Interaction
                 throw;
             }
 
-            if (setup.settings?.futures != true && setupDecision.futures?.Any() == true)
-                throw new InvalidOperationException($"BUG in Ai {ai.Name} - futures are not supported");
+            //if (setup.settings?.futures != true && setupDecision.futures?.Any() == true)
+            //    throw new InvalidOperationException($"BUG in Ai {ai.Name} - futures are not supported");
             state.aiSetupDecision = new AiInfoSetupDecision
             {
                 name = ai.Name,

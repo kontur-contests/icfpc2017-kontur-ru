@@ -10,8 +10,8 @@ namespace lib.viz
         private readonly List<Move> prevMoves = new List<Move>();
         private int nextMoveIndex;
         private Map map;
-        private int ourPunterIndex;
-        private Future[] futures;
+        private readonly int ourPunterIndex;
+        private readonly Future[] futures;
 
         public LogReplayDataProvider(ReplayFullData data)
         {
@@ -20,6 +20,7 @@ namespace lib.viz
             PunterNames = data.Meta.Scores
                 .Select((s, i) => i == data.Meta.OurPunter ? data.Meta.AiName : i.ToString())
                 .ToArray();
+            ourPunterIndex = data.Meta.OurPunter;
             futures = data.Data.Futures ?? new Future[0];
         }
 
