@@ -123,7 +123,7 @@ namespace lib.Ai
             return false;
         }
 
-        private static IEnumerable<Vertex> GetNotMyMines(State state, Graph graph)
+        public static IEnumerable<Vertex> GetNotMyMines(State state, Graph graph)
         {
             return graph.Mines.Values.Where(v => v.Edges.All(e => e.Owner != state.punter));
         }
