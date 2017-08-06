@@ -8,6 +8,7 @@ namespace worker
     public class PlayerWithParams
     {
         public string Name { get; set; }
+        public string ClassName { get; set; }
         public Dictionary<string, double> Params { get; set; }
         public long Rank { get; set; } = 0;
     }
