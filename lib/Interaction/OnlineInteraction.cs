@@ -72,7 +72,9 @@ namespace lib.Interaction
 
             while (!serverResponse.IsScoring())
             {
-                var moves = serverResponse.move.moves;
+                var moves = serverResponse.move.moves.OrderBy(m => m.GetPunter()).ToArray();
+
+                moves = moves.Skip(setup.punter).Concat(moves.Take(setup.punter)).ToArray();
                 var gameplay = JsonConvert.SerializeObject(serverResponse, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore});
 
                 allMoves.AddRange(moves);
