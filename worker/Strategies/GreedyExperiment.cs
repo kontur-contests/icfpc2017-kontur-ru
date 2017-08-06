@@ -1,15 +1,8 @@
-﻿using lib;
-using lib.Ai;
-using lib.Scores.Simple;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using lib.Ai.StrategicFizzBuzz;
 
 namespace worker.Strategies
 {
-    class GreedyExperiment : IExperiment
+    internal class GreedyExperiment : IExperiment
     {
         public Result Play(Task task)
         {
