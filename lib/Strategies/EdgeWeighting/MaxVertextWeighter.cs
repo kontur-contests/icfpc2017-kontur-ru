@@ -21,6 +21,8 @@ namespace lib.Strategies.EdgeWeighting
         private Dictionary<int, double> SubGraphWeight { get; set; }
         private int[] ClaimedMineIds { get; set; }
 
+        public ConnectedComponent CurrentComponent => null;
+
         public void Init(Graph graph, List<ConnectedComponent> connectedComponents)
         {
             var claimedVertexIds = connectedComponents.SelectMany(comp => comp.Vertices).ToArray();

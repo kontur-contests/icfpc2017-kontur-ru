@@ -42,7 +42,7 @@ namespace lib.Strategies.EdgeWeighting
 
             var connectedComponents = ConnectedComponent.GetComponents(graph, PunterId);
             EdgeWeighter.Init(graph, connectedComponents);
-            var maxComponent = connectedComponents.MaxBy(comp => comp.Vertices.Count);
+            var maxComponent = EdgeWeighter.CurrentComponent ?? connectedComponents.MaxBy(comp => comp.Vertices.Count);
             return maxComponent.Vertices
                 .SelectMany(v => graph.Vertexes[v].Edges)
                 .Where(e => e.Owner == -1)
