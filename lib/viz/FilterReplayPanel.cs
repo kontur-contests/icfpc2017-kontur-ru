@@ -25,8 +25,8 @@ namespace lib.viz
             };
             sizeFilter.Items.Add("*");
             sizeFilter.Items.Add("SMALL");
-            sizeFilter.Items.Add("MDEIUM");
-            sizeFilter.Items.Add("HIGHT");
+            sizeFilter.Items.Add("MEDIUM");
+            sizeFilter.Items.Add("BIG");
             sizeFilter.SelectedIndex = 0;
             sizeFilter.SelectedIndexChanged += (_, __) => ApplyFilters();
 
@@ -37,27 +37,29 @@ namespace lib.viz
                 CheckState = CheckState.Checked
             };
             winFilter.CheckStateChanged += (_, __) => ApplyFilters();
-            loosFilter = new CheckBox
+            loseFilter = new CheckBox
             {
                 Dock = DockStyle.Top,
-                Text = "LOOSES",
+                Text = "LOSES",
                 CheckState = CheckState.Checked
             };
-            loosFilter.CheckStateChanged += (_, __) => ApplyFilters();
+            loseFilter.CheckStateChanged += (_, __) => ApplyFilters();
 
             Controls.Add(aiFilter, 0, 0);
             Controls.Add(sizeFilter, 0, 1);
             Controls.Add(winFilter, 0, 2);
-            Controls.Add(loosFilter, 1, 2);
+            Controls.Add(loseFilter, 1, 2);
         }
 
         public void UpdateMetas(ReplayMeta[] metas)
         {
             this.metas = metas;
+            var wasSelected = aiFilter.SelectedText;
             aiFilter.Items.Clear();
             aiFilter.Items.Add("*");
             aiFilter.Items.AddRange(metas.Select(m => $"{m.AiName}").Distinct().OrderBy(s => s).Cast<object>().ToArray());
-            aiFilter.SelectedIndex = 0;
+            if (!aiFilter.Items.Contains(wasSelected))
+                aiFilter.SelectedIndex = 0; 
 
             ApplyFilters();
         }
@@ -66,7 +68,7 @@ namespace lib.viz
 
         private void ApplyFilters()
         {
-            FiltersUpdated?.Invoke(Enumerable.ToArray<ReplayMeta>(metas.Where(Captured)));
+            FiltersUpdated?.Invoke(metas.Where(Captured).ToArray());
         }
 
         private bool Captured(ReplayMeta meta)
@@ -84,19 +86,14 @@ namespace lib.viz
             var ourScore = meta.Scores.First(s => s.punter == meta.OurPunter).score;
             var count = meta.Scores.Count(s => s.score < ourScore) + 1;
             var win = count == meta.Scores.Length;
-            if (!loosFilter.Checked && !win)
-                return false;
-            if (!winFilter.Checked && win)
-                return false;
-
-            return true;
+            return (loseFilter.Checked || win) && (winFilter.Checked || !win);
         }
 
         private readonly ComboBox aiFilter;
         private ReplayMeta[] metas;
         private readonly ComboBox sizeFilter;
         private CheckBox winFilter;
-        private CheckBox loosFilter;
+        private CheckBox loseFilter;
 
         private static readonly Tuple<int, int>[] SizeGroups =
         {
