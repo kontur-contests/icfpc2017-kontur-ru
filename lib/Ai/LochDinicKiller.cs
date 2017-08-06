@@ -9,7 +9,7 @@ namespace lib.Ai
 {
     public class LochDinicKiller : IAi
     {
-        private IAi Base = new MaxReachableVertexWithConnectedComponentsWeightAi();
+        private IAi Base = new AgileMaxVertexWeighterAi();
 
         private Random rand = new Random();
         public string Name => nameof(LochDinicKiller);
