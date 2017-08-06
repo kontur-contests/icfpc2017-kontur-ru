@@ -32,11 +32,15 @@ namespace lib.Ai
         {
             var meetingPoint = state.mps.meetingPoint;
 
+            var graph = services.Get<GraphService>(state).Graph;
+            var toDo = ConnectClosestMinesAi.GetNotMyMines(state, graph);
+
+            foreach (var mine in toDo)
+            {
+                
+            }
+
             AiMoveDecision move;
-            if (ConnectClosestMinesAi.TryExtendComponent(state, services, out move))
-                return move;
-            if (ConnectClosestMinesAi.TryBuildNewComponent(state, services, out move))
-                return move;
             if (ConnectClosestMinesAi.TryExtendAnything(state, services, out move))
                 return move;
             return AiMoveDecision.Pass(state.punter);
