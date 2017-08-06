@@ -21,7 +21,8 @@ namespace worker.Strategies
                 case nameof(MaxReachableVertexWeightAi): return new MaxReachableVertexWeightAi(pars["param1"]);
                 case nameof(Podnaserator2000Ai): return new Podnaserator2000Ai((int)pars["param1"], (int)pars["param2"], (int)pars["param3"]);
                 case nameof(FutureIsNow): return new FutureIsNow(pars["param1"]);
-                    
+                case nameof(UberAi): return new UberAi(pars["initBot"], pars["startBot"], pars["middleBot"], pars["endBot"]);
+
                 default: throw new Exception("Unknown classname " + className);
             }
         }
