@@ -45,7 +45,7 @@ namespace lib.Strategies.EdgeWeighting
             if (SubGraphWeight.TryGetValue(vertexId, out var weight))
                 return weight;
             weight = CalcVertexScore(vertexId);
-            foreach (var edge in SpGraph.Vertexes[vertexId].Edges)
+            foreach (var edge in SpGraph[vertexId].Edges)
                 weight = Math.Max(weight, CalcSubGraphWeight(edge.To));
             SubGraphWeight[vertexId] = weight;
             return weight;
