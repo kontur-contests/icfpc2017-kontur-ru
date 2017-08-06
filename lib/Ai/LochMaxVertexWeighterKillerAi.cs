@@ -11,7 +11,7 @@ namespace lib.Ai
         private IAi Base = new MaxReachableVertexWeightAi();
 
         private Random rand = new Random();
-        public string Name => nameof(LochMaxVertexWeighterKillerAi);
+        public string Name => GetType().Name;
         public string Version => "0.2";
 
         public AiSetupDecision Setup(State state, IServices services)
