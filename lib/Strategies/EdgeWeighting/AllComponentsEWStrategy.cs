@@ -50,7 +50,7 @@ namespace lib.Strategies.EdgeWeighting
             EdgeWeighter.Init(connectedComponents, currentComponent);
             return currentComponent.Vertices
                 .SelectMany(v => graph.Vertexes[v].Edges)
-                .Where(e => e.Owner == -1)
+                .Where(e => e.Owner == -1 && !AreConnected(currentComponent, e.From, e.To))
                 .Select(
                     e => new TurnResult
                     {
@@ -58,6 +58,11 @@ namespace lib.Strategies.EdgeWeighting
                         River = e.River
                     })
                 .ToList();
+        }
+
+        private bool AreConnected(ConnectedComponent currentComponent, int fromId, int toId)
+        {
+            return currentComponent.Vertices.Contains(fromId) && currentComponent.Vertices.Contains(toId);
         }
     }
 }
