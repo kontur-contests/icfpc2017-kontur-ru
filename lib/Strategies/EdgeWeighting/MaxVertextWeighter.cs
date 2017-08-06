@@ -11,15 +11,18 @@ namespace lib.Strategies.EdgeWeighting
     {
         public MaxVertextWeighter(double mineMultiplier, State state, IServices services)
         {
-            MineDistCalculator = services.Get<MineDistCalculator>();
-            SpGraphService = services.Get<ShortestPathGraphService>();
+            MineDistCalculator = services.Get<MineDistCalculator>(state);
+            GraphService = services.Get<GraphService>(state);
+            SpGraphService = services.Get<ShortestPathGraphService>(state);
             MineMultiplier = mineMultiplier;
         }
 
         private double MineMultiplier { get; }
-        private Graph Graph { get; set; }
-        private MineDistCalculator MineDistCalculator { get; }
+        private GraphService GraphService { get; }
         private ShortestPathGraphService SpGraphService { get; }
+        private MineDistCalculator MineDistCalculator { get; }
+        
+        private Graph Graph => GraphService.Graph;
         private ShortestPathGraph SpGraph { get; set; }
         private Dictionary<int, double> SubGraphWeight { get; set; }
         private ICollection<int> ClaimedMineIds { get; set; }
@@ -27,7 +30,7 @@ namespace lib.Strategies.EdgeWeighting
         private ConnectedComponent CurrentComponent { get; set; }
         private Dictionary<Tuple<int, int>, long> MutualComponentWeights { get; set; }
 
-        public void Init(State state, IServices services, List<ConnectedComponent> connectedComponents, ConnectedComponent currentComponent)
+        public void Init(ConnectedComponent[] connectedComponents, ConnectedComponent currentComponent)
         {
             SubGraphWeight = new Dictionary<int, double>();
             CurrentComponent = currentComponent;

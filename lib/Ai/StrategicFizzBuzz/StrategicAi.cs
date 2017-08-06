@@ -21,16 +21,14 @@ namespace lib.Ai.StrategicFizzBuzz
 
         public AiSetupDecision Setup(State state, IServices services)
         {
-            services.Setup<Graph>();
+            services.Setup<GraphService>(state);
             StrategyProvider(state, services);
             return AiSetupDecision.Empty();
         }
 
         public AiMoveDecision GetNextMove(State state, IServices services)
         {
-            var strategy = StrategyProvider(state, services);
-            var graph = services.Get<Graph>();
-            var turns = strategy.Turn(state, services);
+            var turns = StrategyProvider(state, services).NextTurns();
             if (!turns.Any())
                 return AiMoveDecision.Pass(state.punter);
             var bestTurn = turns.MaxBy(x => x.Estimation);

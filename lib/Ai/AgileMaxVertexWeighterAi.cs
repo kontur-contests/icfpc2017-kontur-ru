@@ -16,6 +16,6 @@ namespace lib.Ai
         {
         }
 
-        public override string Version => "1.1";
+        public override string Version => "1.2";
     }
 }

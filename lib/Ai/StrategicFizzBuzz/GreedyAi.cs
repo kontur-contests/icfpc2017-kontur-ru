@@ -3,35 +3,21 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
-using lib.GraphImpl;
 using lib.Scores.Simple;
-using lib.StateImpl;
+using lib.Strategies;
 using lib.Structures;
 using lib.viz;
 using NUnit.Framework;
 
-namespace lib.Ai
+namespace lib.Ai.StrategicFizzBuzz
 {
-    public class GreedyAi : IAi
+    public class GreedyAi : StrategicAi
     {
-        public string Name => nameof(GreedyAi);
-        public string Version => "0.1";
-        
-        public AiSetupDecision Setup(State state, IServices services)
+        public GreedyAi() : base((state, services) => new GreedyStrategy(state, services, Math.Max))
         {
-            services.Setup<Graph>();
-            services.Setup<MineDistCalculator>();
-            return AiSetupDecision.Empty();
         }
 
-        public AiMoveDecision GetNextMove(State state, IServices services)
-        {
-            var graph = services.Get<Graph>();
-            var mineDistCalculator = services.Get<MineDistCalculator>();
-            var connectedCalculator = new ConnectedCalculator(graph, state.punter);
-            GreedyAiHelper.TryExtendAnything(state.punter, graph, connectedCalculator, mineDistCalculator, out Move nextMove);
-            return AiMoveDecision.Move(nextMove);
-        }
+        public override string Version => "0.1";
     }
 
     [TestFixture]
@@ -75,10 +61,8 @@ namespace lib.Ai
                 gamers, MapLoader.LoadMapByName("gen1.json").Map, new Settings());
 
             foreach (var gameSimulationResult in results)
-            {
                 Console.Out.WriteLine(
                     "gameSimulationResult = {0}:{1}", gameSimulationResult.Gamer.Name, gameSimulationResult.Score);
-            }
         }
 
         [Test]

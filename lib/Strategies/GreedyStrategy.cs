@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using lib.GraphImpl;
 using lib.StateImpl;
@@ -7,18 +8,22 @@ namespace lib.Strategies
 {
     public class GreedyStrategy : IStrategy
     {
-        public GreedyStrategy(int punterId, MineDistCalculator mineDistCalculator)
+        public GreedyStrategy(State state, IServices services, Func<long, long, long> aggregateEdgeScores)
         {
-            PunterId = punterId;
-            MineDistCalulator = mineDistCalculator;
+            AggregateEdgeScores = aggregateEdgeScores;
+            PunterId = state.punter;
+            MineDistCalulator = services.Get<MineDistCalculator>(state);
+            GraphService = services.Get<GraphService>(state);
         }
 
+        private Func<long, long, long> AggregateEdgeScores { get; }
         private MineDistCalculator MineDistCalulator { get; }
         private int PunterId { get; }
+        private GraphService GraphService { get; }
 
-        public List<TurnResult> Turn(State state, IServices services)
+        public List<TurnResult> NextTurns()
         {
-            var graph = services.Get<Graph>();
+            var graph = GraphService.Graph;
 
             var calculator = new ConnectedCalculator(graph, PunterId);
             var result = new List<TurnResult>();
@@ -27,7 +32,9 @@ namespace lib.Strategies
             {
                 var fromMines = calculator.GetConnectedMines(edge.From);
                 var toMines = calculator.GetConnectedMines(edge.To);
-                var addScore = CalcVertexScore(toMines, fromMines, edge.From) + CalcVertexScore(fromMines, toMines, edge.To);
+                var fromScore = CalcVertexScore(toMines, fromMines, edge.From);
+                var toScore = CalcVertexScore(fromMines, toMines, edge.To);
+                var addScore = AggregateEdgeScores(fromScore, toScore);
                 result.Add(
                     new TurnResult
                     {
