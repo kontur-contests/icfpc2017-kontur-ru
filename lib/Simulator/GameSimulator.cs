@@ -76,7 +76,7 @@ namespace lib
             var ai = punters[currentPunter].Item1;
             var state = punters[currentPunter].Item2;
             state.map = map;
-            state.turns.Add(new TurnState{moves = turnMoves.ToArray(), aiMoveDecision = state.lastAiMoveDecision});
+            state.turns.Add(new TurnState { moves = turnMoves.ToArray(), aiMoveDecision = state.lastAiMoveDecision });
             var services = new Services(state);
             var moveDecision = GetNextMove(ai, state, services, eatExceptions, lastException);
             state.lastAiMoveDecision = new AiInfoMoveDecision
