@@ -19,7 +19,7 @@ maps = {
 dummies = [
     { 'Name' : 'LochKillerAi', 'ClassName' : 'LochKillerAi', 'Params' : {} },
     { 'Name' : 'ConnectClosestMinesAi', 'ClassName' : 'ConnectClosestMinesAi', 'Params' : {} },
-    { 'Name' : 'LochMaxVertexWeighterKillerAi', 'ClassName': 'LochMaxVertexWeighterKillerAi', 'Params': {}}
+#    { 'Name' : 'LochMaxVertexWeighterKillerAi', 'ClassName': 'LochMaxVertexWeighterKillerAi', 'Params': {}}
 ]
 
 def test_historical():
@@ -35,7 +35,7 @@ def test_historical():
 def test_parameter_future():
     (magic.Fluent()
      .create_random_players('FutureIsNow', 10, (0.3,2))
-     .battles_on_map_set(maps, 1)
+     .battles_on_map_set(maps, 20)
      .add_dummies(dummies)
      .experiment('Uber')
      #.preview()
@@ -48,8 +48,8 @@ def assemble(fname,*args):
     magic.Fluent().restore_dump(*args).store_pointwise(fname)
     pass
 
-test_parameter_future()
-#assemble('future',82958)
+#test_parameter_future()
+assemble('future.csv',45820,41308,35379)
 
 #test_historical();assemble('hist',12152,27372)
 #assemble('future',14139,58033,61678,93832);test_parameter_future()

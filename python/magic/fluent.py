@@ -113,7 +113,12 @@ class Fluent:
                 results = json.loads(file.read())
                 for r in results:
                     self.results.append(r)
-        self.param_names = list(self.results[0]['Task']['Players'][0]['Params'])
+        self.param_names = []
+        for result in self.results:
+            for player in result['Task']['Players']:
+                for key in player['Params']:
+                    if key not in self.param_names:
+                        self.param_names.append(key)
         return self
 
     def store_pointwise(self, filename, mode='w', header=True):
@@ -153,6 +158,8 @@ class Fluent:
                         player['Name']
                     ]]))
                     file.write(',')
-                    file.write(','.join([str(player['Params'][key]) for key in keys]))
+                    file.write(','.join([
+                        str(player['Params'][key]) if key in player['Params'] else 'NA' for key in keys
+                    ]))
                     file.write('\n')
         return self
