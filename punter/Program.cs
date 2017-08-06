@@ -75,7 +75,14 @@ namespace punter
         private static GameplayOut DoGameplay(Move[] moves, State state)
         {
             foreach (var move in moves)
+            {
                 state.map = state.map.ApplyMove(move);
+                state.credits[move.pass.punter] = state.credits.GetOrDefault(move.pass.punter, 0) + 1;
+                if (move.claim != null)
+                    state.credits[move.pass.punter]--;
+                else if (move.splurger != null)
+                    state.credits[move.splurger.punter] -= move.splurger.SplurgeLength();
+            }
             state.turns.Add(new TurnState
             {
                 moves = moves,
