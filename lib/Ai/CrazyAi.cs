@@ -15,7 +15,7 @@ namespace lib.Ai
 {
     public class CrazyAi : IAi
     {
-        public string Name => nameof(CrazyAi);
+        public string Name => GetType().Name;
         public string Version => "0.1";
         
         private readonly Random random = new Random(314);

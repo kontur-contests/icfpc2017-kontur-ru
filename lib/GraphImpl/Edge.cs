@@ -20,6 +20,7 @@ namespace lib.GraphImpl
         public int From { get; }
         public int To { get; }
         public int Owner => River.Owner;
+        public bool IsFree => Owner == -1;
 
         public static Edge Forward(River river) => new Edge(river, river.Source, river.Target);
         public static Edge Backward(River river) => new Edge(river, river.Target, river.Source);

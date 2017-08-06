@@ -10,7 +10,6 @@ namespace worker
         {
             HostFactory.Run(x =>
             {
-                
                 x.Service<WorkerService>(s =>
                 {
                     var player = new ExperimentSelector();
@@ -20,7 +19,7 @@ namespace worker
                         { "group.id", "icfpc2017-worker" },
                         { "bootstrap.servers", "icfpc-broker.dev.kontur.ru" }
                     };
-                    s.ConstructUsing(name => new WorkerService(config, "tasks", "results", player));
+                    s.ConstructUsing(name => new WorkerService(config, new[] {"tasks", "matches"}, "results", player));
                     s.WhenStarted(ws => ws.Start());
                     s.WhenStopped(ws => ws.Stop());
                 });
