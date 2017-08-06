@@ -22,6 +22,8 @@ dummies = [
 #    { 'Name' : 'LochMaxVertexWeighterKillerAi', 'ClassName': 'LochMaxVertexWeighterKillerAi', 'Params': {}}
 ]
 
+
+
 def test_historical():
 
     (magic.Fluent()
@@ -43,16 +45,30 @@ def test_parameter_future():
      )
 
 
+def test_uber():
+    (magic.Fluent()
+     .create_random_players('UberAi', 100, (0,1), (0,1), (0,1), (0,1) )
+     .battles_on_map_set(maps, 50)
+     .experiment('Uber')
+     #.preview()
+     .run().dump()
+     )
+
+
 
 def assemble(fname,*args):
+    if len(args)==0: return
     magic.Fluent().restore_dump(*args).store_pointwise(fname)
-    pass
 
 #assemble('future.csv',45820,41308,35379,31603,48105,16426)
 #test_parameter_future()
 
+assemble('uber.csv',1274,40991,81735,79724,11270,71580,57526)
+test_uber()
+
+
 #test_historical();
-assemble('hist',46229,86839,85957)
+#assemble('hist',46229,86839,85957)
 #assemble('future',14139,58033,61678,93832);test_parameter_future()
 
 #assemble('historical_4')

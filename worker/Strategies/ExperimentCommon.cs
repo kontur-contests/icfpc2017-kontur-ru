@@ -17,8 +17,8 @@ namespace worker.Strategies
             var ais = task.Players.Select(selector).ToList();
             var gameSimulator = new GameSimulatorRunner(new SimpleScoreCalculator());
             var map = MapLoader.LoadMapByName(task.Map).Map;
-            
-            var results = gameSimulator.SimulateGame(ais, map, new Settings());
+
+            var results = gameSimulator.SimulateGame(ais, map, new Settings(true, true));
             var rankings = Enumerable.Range(0, results.Count).OrderByDescending(z => results[z].Score).ToList();
             var playerResults = results
                 .Zip(rankings, (res, ranking) => new PlayerResult

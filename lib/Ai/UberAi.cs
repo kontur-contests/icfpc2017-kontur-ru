@@ -16,7 +16,17 @@ namespace lib.Ai
         public string Name => "UberAi";
         public string Version => "0.1";
 
-        private IAi[] Bots = AiByGeneration.Generations.Select(generation => generation()).Where(z=>z.GetType()!=typeof(ConnectClosestMinesAi)).ToArray();
+        private IAi[] Bots =
+            new IAi[]
+            {
+                new LochKillerAi(),
+                new MaxReachableVertexWeightAi(),
+                new LochMaxVertexWeighterKillerAi(),
+                new Podnaserator2000Ai(),
+                new FutureIsNow(),
+                new LochDinicKiller(),
+            };
+        
         public int InitBot;
         public int StartBot;
         public int MiddleBot;
