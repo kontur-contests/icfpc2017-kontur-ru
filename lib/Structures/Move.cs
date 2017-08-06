@@ -12,7 +12,7 @@ namespace lib.Structures
 
         public static Move Claim(int punter, int source, int target)
         {
-            return new Move { claim = new ClaimMove { punter = punter, source = source, target = target } };
+            return new Move {claim = new ClaimMove {punter = punter, source = source, target = target}};
         }
 
         public static Move Pass(int punter)
@@ -22,7 +22,7 @@ namespace lib.Structures
 
         public static Move Splurge(int punter, int[] siteIds)
         {
-            return new Move {splurger = new SplurgerMove{punter = punter, route = siteIds}};
+            return new Move {splurger = new SplurgerMove {punter = punter, route = siteIds}};
         }
 
         public override string ToString()
@@ -40,7 +40,7 @@ namespace lib.Structures
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return Equals(claim, other.claim) && Equals(pass, other.pass);
+            return Equals(claim, other.claim) && Equals(pass, other.pass) && Equals(splurger, other.splurger);
         }
 
         public override bool Equals(object obj)
@@ -82,10 +82,24 @@ namespace lib.Structures
         public void EncodeTo(BinaryWriter w)
         {
             if (claim == null) return;
-            w.Write((byte)1);
+            w.Write((byte) 1);
             w.Write(claim.punter);
             w.Write(claim.source);
             w.Write(claim.target);
+        }
+    }
+
+    public static class MoveExtension
+    {
+        public static int GetPunter(this Move move)
+        {
+            if (move.claim != null)
+                return move.claim.punter;
+            if (move.pass != null)
+                return move.pass.punter;
+            if (move.splurger != null)
+                return move.splurger.punter;
+            return -1;
         }
     }
 }
