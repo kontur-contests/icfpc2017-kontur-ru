@@ -30,7 +30,7 @@ namespace lib.Strategies.EdgeWeighting
             var notConnectedMines = graph.Mines.Keys.Except(connectedComponents.SelectMany(x => x.Mines));
             foreach (var mine in notConnectedMines)
             {
-                var connectedComponent = new ConnectedComponent(connectedComponents.Count);
+                var connectedComponent = new ConnectedComponent(connectedComponents.Count, PunterId);
                 connectedComponent.Mines.Add(mine);
                 connectedComponent.Vertices.Add(mine);
                 connectedComponents.Add(connectedComponent);
