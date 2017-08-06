@@ -8,7 +8,7 @@ namespace lib.viz
     public class AiFactoryRegistry
     {
         public static readonly AiFactory[] Factories;
-        private static readonly AiFactory[] ForOnlineRunsFactories;
+        public static readonly AiFactory[] ForOnlineRunsFactories;
 
         static AiFactoryRegistry()
         {

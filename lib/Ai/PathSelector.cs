@@ -33,7 +33,10 @@ namespace lib.Ai
             {
                 var mine = map.Mines[0];
                 var candidates = map.Sites.Where(s => Math.Abs(minDists.GetDist(mine, s.Id) - length) < length/10).MaxListBy(f => graph.Vertexes[f.Id].Edges.Count);
-                var future = candidates[Math.Min(rand.Next(candidates.Count), candidates.Count - 1)].Id;
+                if (!candidates.Any())
+                    return new List<int>();
+
+                var future = candidates[rand.Next(candidates.Count)].Id;
                 return minDists.GetReversedPath(mine, future).Reverse().ToList();
             }
             if (map.Mines.Length == 2)

@@ -28,7 +28,7 @@ namespace lib.Ai
 //            nameof(MeetInTheMiddleAi)
         };
 
-        private static IEnumerable<TestCaseData> TestCases => AiFactoryRegistry.Factories
+        private static IEnumerable<TestCaseData> TestCases => AiFactoryRegistry.ForOnlineRunsFactories
             .Where(factory => !Exceptions.Contains(factory.Name))
             .Select(factory => new TestCaseData(factory).SetName(factory.Name));
 
