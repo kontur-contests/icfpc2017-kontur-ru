@@ -20,7 +20,7 @@ namespace lib.viz
             startGameConfigPanel.SetAis(AiFactoryRegistry.Factories);
 
 
-            var rightPanel = new ReplayerPanel()
+            var rightPanel = new ReplayerPanel
             {
                 Dock = DockStyle.Fill
             };
@@ -35,6 +35,7 @@ namespace lib.viz
             {
                 UpdateMap(rightPanel);
             };
+            startGameConfigPanel.AiAtIndexRemoved += _ => UpdateMap(rightPanel);
 
             Controls.Add(rightPanel);
             Controls.Add(startGameConfigPanel);

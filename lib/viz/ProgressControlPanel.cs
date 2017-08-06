@@ -71,6 +71,8 @@ namespace lib.viz
             states.Clear();
             current = -1;
             nextStateGenerator = generator;
+            gameProgress.Value = 0;
+            gameProgress.Maximum = 0;
 
             if (isReplay)
                 while (TryGenerateNextState())
