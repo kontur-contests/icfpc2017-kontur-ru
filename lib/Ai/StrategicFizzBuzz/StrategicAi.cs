@@ -30,8 +30,7 @@ namespace lib.Ai.StrategicFizzBuzz
             var turns = strategy.NextTurns();
             if (!turns.Any())
                 return AiMoveDecision.Pass(state.punter);
-            var bestTurn = turns.MaxBy(x => x.Estimation);
-            return AiMoveDecision.Claim(state.punter, bestTurn.River.Source, bestTurn.River.Target);
+            return turns.MaxBy(x => x.Estimation).Move;
         }
     }
 }

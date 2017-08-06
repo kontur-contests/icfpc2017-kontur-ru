@@ -25,7 +25,7 @@ namespace lib.Ai
 
         private static readonly string[] Exceptions =
         {
-            nameof(MeetInTheMiddleAi)
+//            nameof(MeetInTheMiddleAi)
         };
 
         private static IEnumerable<TestCaseData> TestCases => AiFactoryRegistry.Factories

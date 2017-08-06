@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using lib.Ai;
 using lib.GraphImpl;
 using lib.StateImpl;
 
@@ -38,7 +39,7 @@ namespace lib.Strategies
                         new TurnResult
                         {
                             Estimation = Random.Value.NextDouble(),
-                            River = edge.River,
+                            Move = AiMoveDecision.Claim(PunterId, edge.River.Source, edge.River.Target, "Because I'm crazy!")
                         });
             }
             return result;
