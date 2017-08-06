@@ -126,6 +126,7 @@ namespace worker
 
                     logger.Info($"Running game on port {match.Port}");
                     var metaAndData = interaction.RunGame(ai);
+                    logger.Info($"Finished game on port {match.Port}, {metaAndData.Item1.PunterCount} players");
                     metaAndData.Item1.CommitHash = commitHash;
                     new ReplayRepo().SaveReplay(metaAndData.Item1, metaAndData.Item2);
                     logger.Info($"Saved replay {metaAndData.Item1.Scores.ToDelimitedString(", ")}");
