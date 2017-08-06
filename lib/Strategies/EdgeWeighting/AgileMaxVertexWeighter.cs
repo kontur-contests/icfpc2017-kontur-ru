@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using lib.GraphImpl;
@@ -7,9 +7,9 @@ using MoreLinq;
 
 namespace lib.Strategies.EdgeWeighting
 {
-    public class MaxVertextWeighterWithConnectedComponents : IEdgeWeighter
+    public class AgileMaxVertexWeighter : IEdgeWeighter
     {
-        public MaxVertextWeighterWithConnectedComponents(double mineMultiplier, MineDistCalculator mineDistCalculator)
+        public AgileMaxVertexWeighter(double mineMultiplier, MineDistCalculator mineDistCalculator)
         {
             MineDistCalculator = mineDistCalculator;
             MineMultiplier = mineMultiplier;
@@ -31,16 +31,38 @@ namespace lib.Strategies.EdgeWeighting
             SubGraphWeight = new Dictionary<int, double>();
 
             VertexComponent = connectedComponents
-                .SelectMany(x => x.Vertices, (component, vertex) => new {component, vertex})
+                .SelectMany(x => x.Vertices, (component, vertex) => new { component, vertex })
                 .ToDictionary(x => x.vertex, x => x.component);
             MutualComponentWeights = new Dictionary<Tuple<int, int>, long>();
-            var maxComponent = connectedComponents.MaxBy(comp => comp.Vertices.Count);
-            CurrentComponent = maxComponent;
-            SpGraph = ShortestPathGraph.Build(Graph, maxComponent.Vertices);
-            ClaimedMineIds = maxComponent.Mines;
-            foreach (var vertex in maxComponent.Vertices)
-                SubGraphWeight[vertex] = CalcSubGraphWeight(vertex);
+            var orderedComponents = connectedComponents.OrderByDescending(comp => comp.Vertices.Count).ToList();
 
+            var bestComponent = new { component = orderedComponents[0], SubGraphWeight, weight = 0.0 };
+
+            foreach (var component in orderedComponents)
+            {
+                SubGraphWeight = new Dictionary<int, double>();
+                MutualComponentWeights.Clear();
+
+                CurrentComponent = component;
+                SpGraph = ShortestPathGraph.Build(Graph, (ICollection<int>)component.Vertices);
+                ClaimedMineIds = component.Mines;
+                foreach (var vertex in component.Vertices)
+                    SubGraphWeight[vertex] = CalcSubGraphWeight(vertex);
+                var maxWeight = SubGraphWeight.Max(pair => pair.Value);
+
+                if (maxWeight > bestComponent.weight)
+                {
+                    bestComponent = new
+                    {
+                        component = component,
+                        SubGraphWeight = SubGraphWeight,
+                        weight = maxWeight
+                    };
+                }
+            }
+
+            CurrentComponent = bestComponent.component;
+            SubGraphWeight = bestComponent.SubGraphWeight;
         }
 
         public double EstimateWeight(Edge edge)
@@ -54,7 +76,7 @@ namespace lib.Strategies.EdgeWeighting
                 return weight;
             weight = CalcVertexScore(vertexId);
             foreach (var edge in SpGraph.Vertexes[vertexId].Edges)
-//                weight = weight + CalcSubGraphWeight(edge.To);
+                //                weight = weight + CalcSubGraphWeight(edge.To);
                 weight = Math.Max(weight, CalcSubGraphWeight(edge.To));
             SubGraphWeight[vertexId] = weight;
             return weight;
@@ -72,7 +94,7 @@ namespace lib.Strategies.EdgeWeighting
             }
             var vertexWeight = CalcProperVertexScore(vertexId, ClaimedMineIds);
             if (Graph.Mines.ContainsKey(vertexId))
-                return (long)(MineMultiplier*vertexWeight) + CurrentComponent.Vertices.Sum(v => CalcProperVertexScore(v, new [] {vertexId}));
+                return (long)(MineMultiplier * vertexWeight) + CurrentComponent.Vertices.Sum(v => CalcProperVertexScore(v, new[] { vertexId }));
             return vertexWeight;
         }
 

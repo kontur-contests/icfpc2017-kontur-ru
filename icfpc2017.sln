@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "worker", "worker\worker.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VizApp", "VizApp\VizApp.csproj", "{2452A47E-D56C-4D48-8D19-01461B1B0526}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleApp", "ConsoleApp\ConsoleApp.csproj", "{A57A4286-58CB-4D82-BB8F-D3DA51A2B656}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BrutalTesterApp", "BrutalTesterApp\BrutalTesterApp.csproj", "{A57A4286-58CB-4D82-BB8F-D3DA51A2B656}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "punter", "punter\punter.csproj", "{CFC0C684-CF50-427A-B9F9-37628994D3D0}"
 EndProject

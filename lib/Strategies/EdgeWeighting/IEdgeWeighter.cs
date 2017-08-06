@@ -7,5 +7,6 @@ namespace lib.Strategies.EdgeWeighting
     {
         void Init(Graph graph, List<ConnectedComponent> connectedComponents);
         double EstimateWeight(Edge edge);
+        ConnectedComponent CurrentComponent { get; }
     }
 }
