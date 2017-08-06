@@ -65,7 +65,7 @@ namespace lib
             {
                 var ai = factory.Create();
                 SelectedAis.Add(ai);
-                selectedAisList.Items.Add(ai);
+                selectedAisList.Items.Add($"{ai.Name}:{ai.Version}");
             };
             AiAtIndexRemoved += index =>
             {
