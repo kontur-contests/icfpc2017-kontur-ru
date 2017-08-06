@@ -119,6 +119,7 @@ class Fluent:
                 for key in player['Params']:
                     if key not in self.param_names:
                         self.param_names.append(key)
+
         return self
 
     def store_pointwise(self, filename, mode='w', header=True):
