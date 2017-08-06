@@ -74,8 +74,8 @@ namespace lib.Ai
 
         private double MinesToDefendablesRatio(IEnumerable<int> component)
         {
-            double mines;
-            double defendables;
+            double mines = 0;
+            double defendables = 0;
             foreach (var vertex in component)
             {
                 mines += map.Mines.Contains(vertex) ? 1 : 0;
