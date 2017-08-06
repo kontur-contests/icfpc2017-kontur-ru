@@ -74,8 +74,8 @@ namespace OnlineGameMonitor
                     .ZipLongest(
                         suitableStatuses.Take(60), (a, b) =>
                         {
-                            var playedByUsStatus = $"{a ?? "",-80}";
-                            var suitableStatus = $"{b ?? "",-80}";
+                            var playedByUsStatus = $"{a ?? "",-73}";
+                            var suitableStatus = $"{b ?? "",-60}";
                             return $"{playedByUsStatus}{suitableStatus}";
                         })
                     .ForEach(x => Console.WriteLine(x));
