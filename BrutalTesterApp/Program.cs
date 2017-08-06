@@ -1,20 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using ConsoleApp;
 using lib;
 using lib.Ai;
 using lib.Ai.StrategicFizzBuzz;
 using lib.Scores.Simple;
-using lib.Strategies;
 using lib.Structures;
 using lib.viz;
 using MoreLinq;
 
-namespace ConsoleApp
+namespace BrutalTesterApp
 {
     class Program
     {
-        static Random random = new Random();
+        static Random random = new Random(122);
         static void Main(string[] args)
         {
             int minMapPlayersCount = 1;
@@ -27,8 +27,8 @@ namespace ConsoleApp
                 AiFactoryRegistry.CreateFactory<ConnectClosestMinesAi>(),
                 //AiFactoryRegistry.CreateFactory<LochDinicKiller>(),
                 AiFactoryRegistry.CreateFactory<LochMaxVertexWeighterKillerAi>(),
-                AiFactoryRegistry.CreateFactory<Podnaserator2000Ai>(),
-                AiFactoryRegistry.CreateFactory<LochKillerAi>(),
+               // AiFactoryRegistry.CreateFactory<Podnaserator2000Ai>(),
+                //AiFactoryRegistry.CreateFactory<LochKillerAi>(),
                 AiFactoryRegistry.CreateFactory<GreedyAi>(),
             }
             .Select(f => new PlayerTournamentResult(f)).ToList();
@@ -38,7 +38,7 @@ namespace ConsoleApp
                 foreach (var map in maps)
                 {
                     var matchPlayers = ais.Shuffle(random).Repeat().Take(map.PlayersCount).ToList();
-                    var gameSimulator = new GameSimulatorRunner(new SimpleScoreCalculator(), true, true);
+                    var gameSimulator = new GameSimulatorRunner(new SimpleScoreCalculator(), true, false);
                     var gamers = matchPlayers.Select(p => p.Factory.Create()).ToList();
                     var results = gameSimulator.SimulateGame(gamers, map.Map, new Settings())
                         .OrderByDescending(r => r.Score).ToList();

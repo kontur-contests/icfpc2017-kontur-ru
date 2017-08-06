@@ -88,7 +88,7 @@ namespace lib
                 reason = moveDecision.reason
             };
 
-            map = map.ApplyMove(moveDecision.move);
+            map = map.ApplyMove(state.lastAiMoveDecision);
             turnMoves[currentPunter] = moveDecision.move;
             moves.Add(moveDecision.move);
             currentPunter = (currentPunter + 1) % punters.Count;
