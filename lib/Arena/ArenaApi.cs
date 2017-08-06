@@ -29,6 +29,7 @@ namespace lib.Arena
                     else if (statusCellText.Contains("progress"))
                     {
                         match.Status = ArenaMatch.MatchStatus.InProgress;
+                        
                     }
                     else if (statusCellText.Contains("waiting"))
                     {

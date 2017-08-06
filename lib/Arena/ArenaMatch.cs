@@ -6,10 +6,10 @@
         
         public enum MatchStatus
         {
-            Waiting,
-            InProgress,
-            Offline,
-            Unknown
+            Waiting = 1,
+            InProgress = 2,
+            Offline = 3,
+            Unknown = 4
         }
 
         public MatchStatus Status;
