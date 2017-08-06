@@ -85,13 +85,13 @@ namespace StatisticsService.Models
                                         return sizes[g.MapHash];
                                     })
                                 .ToDictionary(g => g.Key, g => g.Count()),
-                            e.Count(g => g.Scores.OrderByDescending(t => t.Score).IndexOf(t => t.Punter == g.OurPunter) == 0),
+                            e.Count(g => g.Scores.OrderByDescending(t => t.score).IndexOf(t => t.punter == g.OurPunter) == 0),
                             e.GroupBy(g => g.AiName).ToDictionary(
                                 g => g.Key,
-                                g => g.Count(gg => gg.Scores.OrderByDescending(t => t.Score).IndexOf(t => t.Punter == gg.OurPunter) == 0)),
+                                g => g.Count(gg => gg.Scores.OrderByDescending(t => t.score).IndexOf(t => t.punter == gg.OurPunter) == 0)),
                             e.GroupBy(g => sizes[g.MapHash]).ToDictionary(
                                 g => g.Key,
-                                g => g.Count(gg => gg.Scores.OrderByDescending(t => t.Score).IndexOf(t => t.Punter == gg.OurPunter) == 0)));
+                                g => g.Count(gg => gg.Scores.OrderByDescending(t => t.score).IndexOf(t => t.punter == gg.OurPunter) == 0)));
                     })
                 .ToArray();
         }
