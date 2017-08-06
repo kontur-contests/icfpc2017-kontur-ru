@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net461</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>foreman</AssemblyName>
+    <RootNamespace>foreman</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Confluent.Kafka" Version="0.11.0" />
+    <PackageReference Include="librdkafka.redist" Version="0.11.0" />
+    <PackageReference Include="NLog" Version="4.4.11" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\lib\lib.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="NLog.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+</Project>

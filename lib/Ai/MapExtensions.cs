@@ -79,5 +79,6 @@ namespace lib.Ai
         }
 
         public bool ShowFutures { get; set; }
+        public int SelectedPlayerIndex { get; set; } = -1;
     }
 }

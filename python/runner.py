@@ -26,7 +26,7 @@ def test_historical():
 
     (magic.Fluent()
          .create_historical_players(7)
-         .battles_on_map_set(maps,30)
+         .battles_on_map_set(maps,50)
          .experiment('Historical')
          .run().dump()
     )
@@ -48,10 +48,11 @@ def assemble(fname,*args):
     magic.Fluent().restore_dump(*args).store_pointwise(fname)
     pass
 
-assemble('future.csv',45820,41308,35379,31603,48105,16426)
+#assemble('future.csv',45820,41308,35379,31603,48105,16426)
 #test_parameter_future()
 
-#test_historical();assemble('hist',12152,27372)
+#test_historical();
+assemble('hist',46229,86839,85957)
 #assemble('future',14139,58033,61678,93832);test_parameter_future()
 
 #assemble('historical_4')

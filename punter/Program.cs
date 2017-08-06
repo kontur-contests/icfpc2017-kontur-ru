@@ -74,13 +74,7 @@ namespace punter
 
         private static GameplayOut DoGameplay(Move[] moves, State state)
         {
-            foreach (var move in moves)
-                state.map = state.map.ApplyMove(move);
-            state.turns.Add(new TurnState
-            {
-                moves = moves,
-                aiMoveDecision = state.lastAiMoveDecision
-            });
+            state.ApplyMoves(moves);
             try
             {
                 var moveDecision = ai.GetNextMove(state, new Services(state));

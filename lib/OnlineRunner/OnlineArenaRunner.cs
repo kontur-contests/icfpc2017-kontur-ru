@@ -48,7 +48,7 @@ namespace lib.OnlineRunner
                 && match.Players.Count(x => orgBoxNames.Contains(x)) != match.TotalSeats - 1;
         }
         
-        private static ArenaMatch GetNextMatch()
+        public static ArenaMatch GetNextMatch()
         {
             var matches = new ArenaApi().GetArenaMatchesAsync()
                 .ConfigureAwait(false).GetAwaiter()

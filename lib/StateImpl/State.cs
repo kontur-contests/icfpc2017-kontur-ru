@@ -11,6 +11,7 @@ namespace lib.StateImpl
         public int punters;
         public Settings settings = new Settings();
         public Map map;
+        public Dictionary<int, int> credits = new Dictionary<int, int>();
 
         public AiInfoSetupDecision aiSetupDecision;
         public AiInfoMoveDecision lastAiMoveDecision;

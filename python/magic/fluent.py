@@ -119,6 +119,7 @@ class Fluent:
                 for key in player['Params']:
                     if key not in self.param_names:
                         self.param_names.append(key)
+
         return self
 
     def store_pointwise(self, filename, mode='w', header=True):
@@ -140,6 +141,9 @@ class Fluent:
                 ))
             file.write('\n')
             for game_number, game in enumerate(self.results):
+                if game['Error'] is not None:
+                    print(game['Error'])
+                    continue
                 for player_index in range(len(game['Results'])):
                     player = game['Task']['Players'][player_index]
                     result = game['Results'][player_index]
