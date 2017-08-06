@@ -32,7 +32,7 @@ namespace foreman
                     {
                         match = OnlineArenaRunner.GetNextMatch();
                         Thread.Sleep(1000);
-                    } while (lockedPorts.ContainsKey(match.Port) && lockedPorts[match.Port] > DateTime.UtcNow);
+                    } while (match == null || lockedPorts.ContainsKey(match.Port) && lockedPorts[match.Port] > DateTime.UtcNow);
                     
                     lockedPorts[match.Port] = DateTime.UtcNow + TimeSpan.FromMinutes(1); 
                     
