@@ -32,8 +32,7 @@ namespace BrutalTesterApp
             {
                 AiFactoryRegistry.CreateFactory<FutureIsNow>(),
             //    AiFactoryRegistry.CreateFactory<ConnectClosestMinesAi>(),
-                AiFactoryRegistry.CreateFactory<LochDinicKiller>(),
-                AiFactoryRegistry.CreateFactory<AgileMaxVertexWeighterAi>(),
+                AiFactoryRegistry.CreateFactory<LochDinicKillerAi>(),
                 //AiFactoryRegistry.CreateFactory<LochMaxVertexWeighterKillerAi>(),
                 AiFactoryRegistry.CreateFactory<AllComponentsMaxReachableVertexWeightAi>(),
                 //AiFactoryRegistry.CreateFactory<MaxReachableVertexWeightAi>(),

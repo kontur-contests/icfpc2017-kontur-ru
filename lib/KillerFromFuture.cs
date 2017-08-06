@@ -12,7 +12,7 @@ namespace lib.Ai
 {
     public class KillerFromFuture : IAi
     {
-        private IAi Base = new AgileMaxVertexWeighterAi();
+        private IAi Base = new AllComponentsMaxReachableVertexWeightAi();
 
         private Random rand = new Random();
         public string Name => GetType().Name;
