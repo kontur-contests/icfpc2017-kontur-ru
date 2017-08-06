@@ -95,7 +95,7 @@ namespace lib.viz
             {
                 var lvItem = listView.Items.Add(meta.Timestamp.ToString("T"));
                 lvItem.Tag = meta;
-                lvItem.SubItems.Add(meta.AiName);
+                lvItem.SubItems.Add($"{meta.AiName}:{meta.AiVersion}");
                 var ourScore = meta.Scores.First(s => s.punter == meta.OurPunter).score;
                 var count = meta.Scores.Count(s => s.score < ourScore) + 1;
                 lvItem.SubItems.Add(count.ToString());
