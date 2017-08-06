@@ -25,20 +25,19 @@ namespace lib.Strategies.EdgeWeighting
         public ConnectedComponent CurrentComponent { get; private set; }
         private Dictionary<Tuple<int, int>, long> MutualComponentWeights { get; set; }
 
-        public void Init(Graph graph, List<ConnectedComponent> connectedComponents)
+        public void Init(Graph graph, List<ConnectedComponent> connectedComponents, ConnectedComponent currentComponent)
         {
             Graph = graph;
             SubGraphWeight = new Dictionary<int, double>();
-
+            CurrentComponent = currentComponent;
             VertexComponent = connectedComponents
                 .SelectMany(x => x.Vertices, (component, vertex) => new {component, vertex})
                 .ToDictionary(x => x.vertex, x => x.component);
             MutualComponentWeights = new Dictionary<Tuple<int, int>, long>();
-            var maxComponent = connectedComponents.MaxBy(comp => comp.Vertices.Count);
-            CurrentComponent = maxComponent;
-            SpGraph = ShortestPathGraph.Build(Graph, maxComponent.Vertices);
-            ClaimedMineIds = maxComponent.Mines;
-            foreach (var vertex in maxComponent.Vertices)
+            
+            SpGraph = ShortestPathGraph.Build(Graph, CurrentComponent.Vertices);
+            ClaimedMineIds = CurrentComponent.Mines;
+            foreach (var vertex in CurrentComponent.Vertices)
                 SubGraphWeight[vertex] = CalcSubGraphWeight(vertex);
 
         }

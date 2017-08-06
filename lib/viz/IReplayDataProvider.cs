@@ -17,10 +17,10 @@ namespace lib.viz
         private readonly List<IAi> ais;
         private readonly GameSimulator simulator;
 
-        public SimulatorReplayDataProvider(List<IAi> ais, Map map)
+        public SimulatorReplayDataProvider(List<IAi> ais, Map map, Settings settings)
         {
             this.ais = ais;
-            simulator = new GameSimulator(map, new Settings());
+            simulator = new GameSimulator(map, settings);
             simulator.StartGame(ais);
         }
 

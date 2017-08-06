@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using lib.GraphImpl;
 using lib.StateImpl;
+using lib.Structures;
 using lib.viz;
 using MoreLinq;
 
@@ -16,6 +17,12 @@ namespace lib.Ai
         {
             var graph = services.Get<GraphService>(state).Graph;
             var mineDists = services.Get<MineDistCalculator>(state);
+
+            if (state.settings == null || !state.settings.futures)
+            {
+                return AiSetupDecision.Create(new Future[0]);
+            }
+
             var length = 5 * state.punters;
             var path = new PathSelector(state.map, mineDists.impl, length).SelectPath();
             var futures = new FuturesPositioner(state.map, graph, path, mineDists.impl).GetFutures();
