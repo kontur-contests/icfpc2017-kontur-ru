@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using lib;
 using lib.Ai;
+using lib.Ai.StrategicFizzBuzz;
 using lib.StateImpl;
 using lib.Structures;
 using Newtonsoft.Json;
@@ -78,20 +79,21 @@ namespace punter
             try
             {
                 var moveDecision = ai.GetNextMove(state, new Services(state));
-                moveDecision = ValidateMove(state.map, moveDecision);
-                state.lastAiMoveDecision = new AiInfoMoveDecision
+                var aiInfoMoveDecision = new AiInfoMoveDecision
                 {
                     name = ai.Name,
                     version = ai.Version,
                     move = moveDecision.move,
                     reason = moveDecision.reason
                 };
+                state.ValidateMove(aiInfoMoveDecision);
+                state.lastAiMoveDecision = aiInfoMoveDecision;
                 return new GameplayOut(moveDecision.move, state);
             }
             catch (Exception e)
             {
                 Console.Error.WriteLine(e);
-                var moveDecision = AiMoveDecision.Pass(state.punter, "exception");
+                var moveDecision = AiMoveDecision.Pass(state.punter, (e as InvalidDecisionException)?.Reason ?? "exception");
                 state.lastAiMoveDecision = new AiInfoMoveDecision
                 {
                     name = ai.Name,
@@ -107,29 +109,6 @@ namespace punter
         {
             foreach (var scoreModel in scores)
                 Console.Error.WriteLine($"{scoreModel.punter}={scoreModel.score}");
-        }
-
-        private static AiMoveDecision ValidateMove(Map map, AiMoveDecision decision)
-        {
-            var move = decision.move;
-            if (move.claim == null)
-                return decision;
-
-            foreach (var river in map.Rivers)
-            {
-                if (river.Source == move.claim.source && river.Target == move.claim.target || river.Target == move.claim.source && river.Source == move.claim.target)
-                {
-                    if (river.Owner != -1)
-                    {
-                        Console.Error.WriteLine($"BUG in Ai {ai.Name} - river.Owner != -1 for move: {move}");
-                        return AiMoveDecision.Pass(move.claim.punter, "invalid move");
-                    }
-                    return decision;
-                }
-            }
-
-            Console.Error.WriteLine($"BUG in Ai {ai.Name} - Couldn't find river for move: {move}");
-            return AiMoveDecision.Pass(move.claim.punter, "invalid move");
         }
 
         private static void Write<T>(T obj)

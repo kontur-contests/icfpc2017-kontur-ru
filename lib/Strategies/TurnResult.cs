@@ -1,8 +1,11 @@
-﻿namespace lib.Strategies
+﻿using lib.Ai;
+using lib.Structures;
+
+namespace lib.Strategies
 {
     public class TurnResult
     {
         public double Estimation { get; set; }
-        public River River { get; set; }
+        public AiMoveDecision Move { get; set; }
     }
 }

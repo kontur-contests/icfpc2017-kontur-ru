@@ -26,6 +26,7 @@ namespace lib.Ai
             {
                 futures.Add(new Future(mine, meetingPoint));
             }
+            futures = futures.Where(f => f.source != f.target).ToList();
 
             return AiSetupDecision.Create(futures.ToArray(), $"meet in {meetingPoint}");
         }
@@ -35,31 +36,41 @@ namespace lib.Ai
             var meetingPoint = services.Get<MeetingPointService>().MeetingPoint;
 
             var graph = services.Get<Graph>();
-            var toDo = ConnectClosestMinesAi.GetNotMyMines(state, graph)
+            var toDo = graph.GetNotOwnedMines(state.punter)
                 .Select(x => x.Id);
 
             var myVerts = graph.Vertexes.Values
                 .Where(v => 
                     v.Edges.Any(e => e.Owner == state.punter) || v.Id == meetingPoint)
                 .Select(x => x.Id)
-                .ToArray();
+                .ToList();
 
-            var shortest = ShortestPathGraph.Build(graph, myVerts);
+            var shortest = new ShortestPathFinder(graph, state.punter, myVerts);
+
+            var skip = false;
 
             foreach (var mine in toDo)
             {
-                var len = shortest[mine].Distance;
-                //if len < ...
-                var path = shortest[mine].Edges;
-                foreach (var edge in path)
+                var path = shortest.GetPath(mine);
+                if (path == null)
+                    continue;
+
+                int len = path.Count - 1;
+                if (len > state.credits[state.punter])
                 {
-                    
+                    skip = true;
+                    continue;
                 }
+                
+                return AiMoveDecision.Splurge(state.punter, path.ToArray());
             }
 
-            AiMoveDecision move;
-            if (ConnectClosestMinesAi.TryExtendAnything(state, services, out move))
-                return move;
+            if (skip)
+                return AiMoveDecision.Pass(state.punter, "wait");
+
+//            AiMoveDecision move;
+//            if (ConnectClosestMinesAi.TryExtendAnything(state, services, out move))
+//                return move;
             return AiMoveDecision.Pass(state.punter);
         }
     }

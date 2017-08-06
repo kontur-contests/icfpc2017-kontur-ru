@@ -19,10 +19,19 @@ namespace lib.Strategies.EdgeWeighting
         private IDictionary<Tuple<int, int>, ShortestPathGraph> ComponentsCache { get; } = new Dictionary<Tuple<int, int>, ShortestPathGraph>();
         private IDictionary<int, ShortestPathGraph> VertexesCache { get; } = new Dictionary<int, ShortestPathGraph>();
 
-        public ShortestPathGraph ForComponent(ConnectedComponent component)
+        public ShortestPathGraph ForComponent(ConnectedComponent component, Dictionary<int, ConnectedComponent> vertexComponent, int punter)
         {
             return ComponentsCache.GetOrCreate(
-                Tuple.Create(component.OwnerPunterId, component.Id), key => ShortestPathGraph.Build(Graph, component.Vertices));
+                Tuple.Create(component.OwnerPunterId, component.Id), key => ShortestPathGraph.Build(Graph, edge =>
+                {
+                    if (edge.Owner == -1)
+                        return true;
+                    if (edge.Owner != punter)
+                        return false;
+                    if (vertexComponent.ContainsKey(edge.To) && vertexComponent.ContainsKey(edge.From) && vertexComponent[edge.To] == vertexComponent[edge.From])
+                        return false;
+                    return true;
+                }, component.Vertices));
         }
 
         public ShortestPathGraph ForVertex(int vertexId)

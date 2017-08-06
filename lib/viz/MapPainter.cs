@@ -80,16 +80,31 @@ namespace lib.viz
 
         private void HightlightLastMove(Graphics g, Move move, float zoomScale)
         {
-            var m = move?.claim;
-            if (m != null)
+            var claims = new List<int>();
+            if (move?.claim != null)
             {
-                var start = map.SiteById[m.source];
-                var end = map.SiteById[m.target];
-                var radius = 7 / zoomScale;
-                using (var pen = new Pen(Color.GreenYellow, radius))
+                claims.Add(move.claim.source);
+                claims.Add(move.claim.target);
+            }
+            else if (move?.splurge != null)
+            {
+                claims.AddRange(move.splurge.route);
+            }
+
+            if (claims.Count >= 2)
+            {
+                var old = claims[0];
+                foreach (var vertex in claims.Skip(1))
                 {
-                    var center = 0.5f * (new VF(start.Point()) + new VF(end.Point())) - new VF(radius, radius);
-                    g.DrawEllipse(pen, (float) center.X, (float) center.Y, 2 * radius, 2 * radius);
+                    var start = map.SiteById[old];
+                    var end = map.SiteById[vertex];
+                    old = vertex;
+                    var radius = 7 / zoomScale;
+                    using (var pen = new Pen(Color.GreenYellow, radius))
+                    {
+                        var center = 0.5f * (new VF(start.Point()) + new VF(end.Point())) - new VF(radius, radius);
+                        g.DrawEllipse(pen, (float)center.X, (float)center.Y, 2 * radius, 2 * radius);
+                    }
                 }
             }
         }

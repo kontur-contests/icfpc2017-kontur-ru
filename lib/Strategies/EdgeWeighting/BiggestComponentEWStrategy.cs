@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using lib.Ai;
 using lib.GraphImpl;
 using lib.StateImpl;
 using MoreLinq;
@@ -40,7 +41,7 @@ namespace lib.Strategies.EdgeWeighting
                         e => new TurnResult
                         {
                             Estimation = 1,
-                            River = e.River
+                            Move = AiMoveDecision.Claim(PunterId, e.River.Source, e.River.Target, "No edges yet, selecting first mine")
                         })
                     .ToList();
 
@@ -54,7 +55,7 @@ namespace lib.Strategies.EdgeWeighting
                     e => new TurnResult
                     {
                         Estimation = EdgeWeighter.EstimateWeight(e),
-                        River = e.River
+                        Move = AiMoveDecision.Claim(PunterId, e.River.Source, e.River.Target)
                     })
                 .Where(t => t.Estimation > 0)
                 .ToList();

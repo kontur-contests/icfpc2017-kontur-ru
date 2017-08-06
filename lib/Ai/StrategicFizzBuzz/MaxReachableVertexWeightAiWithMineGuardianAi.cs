@@ -13,12 +13,11 @@ namespace lib.Ai.StrategicFizzBuzz
 
         public MaxReachableVertexWeightAiWithMineGuardianAi(int outEdgesWarningLevel, int guardedComponentSizeThreshold, int mineMultiplier)
             : base(
-                (state, services) => new AllComponentsEWStrategy(
-                    new MineGuardianEdgeWeighter(state, services, outEdgesWarningLevel, guardedComponentSizeThreshold), state, services),
-                (state, services) => new BiggestComponentEWStrategy(new MaxVertextWeighter(mineMultiplier, state, services), state, services))
+                (state, services) => new AllComponentsEWStrategy(new MineGuardianEdgeWeighter(state, services, outEdgesWarningLevel, guardedComponentSizeThreshold), state, services),
+                (state, services) => new AllComponentsEWStrategy(new MaxVertextWeighter(mineMultiplier, state, services), state, services))
         {
         }
 
-        public override string Version => "1.0";
+        public override string Version => "1.1";
     }
 }

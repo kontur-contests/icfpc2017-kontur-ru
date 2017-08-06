@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using FluentAssertions;
 using System.Linq;
@@ -22,9 +23,19 @@ namespace lib.Ai
             this.length = length;
         }
 
+        [ThreadStatic]
+        static Random rand;
         public List<int> SelectPath()
         {
-            if (map.Mines.Length <= 1) return new List<int>();
+            rand = rand ?? new Random();
+            if (map.Mines.Length == 0) return new List<int>();
+            if (map.Mines.Length == 1)
+            {
+                var mine = map.Mines[0];
+                var candidates = map.Sites.Where(s => Math.Abs(minDists.GetDist(mine, s.Id) - length) < length/10).MaxListBy(f => graph.Vertexes[f.Id].Edges.Count);
+                var future = candidates[Math.Min(rand.Next(candidates.Count), candidates.Count - 1)].Id;
+                return minDists.GetReversedPath(mine, future).Reverse().ToList();
+            }
             if (map.Mines.Length == 2)
             {
                 var allPairs =
@@ -39,7 +50,7 @@ namespace lib.Ai
             else
             {
                 var minesPaths = map.Mines.Select(GreedyGrowPath).ToList();
-                var bestMinesPath = minesPaths.MaxBy(EstimatePath);
+                var bestMinesPath = minesPaths.MaxBy(EstimatePathByDinic);
                 var fullPath = bestMinesPath
                     .Pairwise((a, b) => minDists.GetReversedPath(a, b).Reverse().Skip(1)).SelectMany(z => z)
                     .Take(length)
@@ -54,7 +65,12 @@ namespace lib.Ai
             int firstLastDist = minDists.GetDist(minesPath.First(), minesPath.Last());
             return minesPath.Count + firstLastDist / length + minesPath.Min(m => graph.Vertexes[m].Edges.Count) / 100;
         }
-
+        
+        private double EstimatePathByDinic(List<int> minesPath)
+        {
+            return new Dinic(graph, 0, minesPath.First(), minesPath.Last(), out int flow).GetMinCut().Count * 100000 + EstimatePath(minesPath);
+        }
+        
         private List<int> GreedyGrowPath(int startMine)
         {
             List<int> path = new List<int>(){startMine};

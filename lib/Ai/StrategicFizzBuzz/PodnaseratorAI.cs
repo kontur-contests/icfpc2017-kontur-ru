@@ -65,7 +65,7 @@ namespace lib.Ai.StrategicFizzBuzz
             }
             if (bestTurn.Estimation < 0)
                 return AiMoveDecision.Pass(state.punter);
-            return AiMoveDecision.Claim(state.punter, bestTurn.River.Source, bestTurn.River.Target);
+            return bestTurn.Move;
         }
 
         private TurnResult GetMyBestTurn(IStrategy myStrategy)
