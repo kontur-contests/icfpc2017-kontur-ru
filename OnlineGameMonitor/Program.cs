@@ -71,7 +71,7 @@ namespace OnlineGameMonitor
                     })
                     .ForEach(x => Console.WriteLine(x));
 
-                Thread.Sleep(3000);
+                Thread.Sleep(5000);
                 Console.Clear();
                 Console.SetCursorPosition(0, 0);
             }
