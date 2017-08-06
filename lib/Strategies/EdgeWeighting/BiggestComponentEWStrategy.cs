@@ -1,26 +1,31 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using lib.GraphImpl;
+using lib.StateImpl;
 using MoreLinq;
 
 namespace lib.Strategies.EdgeWeighting
 {
     public class BiggestComponentEWStrategy : IStrategy
     {
-        public BiggestComponentEWStrategy(int punterId, IEdgeWeighter edgeWeighter, MineDistCalculator mineDistCalculator)
+        public BiggestComponentEWStrategy(IEdgeWeighter edgeWeighter, State state, IServices services)
         {
-            PunterId = punterId;
+            PunterId = state.punter;
             EdgeWeighter = edgeWeighter;
-            MineDistCalulator = mineDistCalculator;
+            MineDistCalulator = services.Get<MineDistCalculator>(state);
+            ConnectedComponentsService = services.Get<ConnectedComponentsService>(state);
+            GraphService = services.Get<GraphService>(state);
         }
 
         private MineDistCalculator MineDistCalulator { get; }
         private IEdgeWeighter EdgeWeighter { get; }
         private int PunterId { get; }
+        private ConnectedComponentsService ConnectedComponentsService { get; }
+        private GraphService GraphService { get; }
 
-
-        public List<TurnResult> Turn(Graph graph)
+        public List<TurnResult> NextTurns()
         {
+            var graph = GraphService.Graph;
             var claimedVertexes = graph.Vertexes.Values
                 .SelectMany(x => x.Edges)
                 .Where(edge => edge.Owner == PunterId)
@@ -40,9 +45,9 @@ namespace lib.Strategies.EdgeWeighting
                         })
                     .ToList();
 
-            var connectedComponents = ConnectedComponent.GetComponents(graph, PunterId);
+            var connectedComponents = ConnectedComponentsService.For(PunterId);
             var maxComponent = connectedComponents.MaxBy(comp => comp.Vertices.Count);
-            EdgeWeighter.Init(graph, connectedComponents, maxComponent);
+            EdgeWeighter.Init(connectedComponents, maxComponent);
             return maxComponent.Vertices
                 .SelectMany(v => graph.Vertexes[v].Edges)
                 .Where(e => e.Owner == -1)

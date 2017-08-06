@@ -28,9 +28,7 @@ namespace lib.Ai.StrategicFizzBuzz
 
         public AiMoveDecision GetNextMove(State state, IServices services)
         {
-            var strategy = StrategyProvider(state, services);
-            var graph = services.Get<GraphService>(state).Graph;
-            var turns = strategy.Turn(graph);
+            var turns = StrategyProvider(state, services).NextTurns();
             if (!turns.Any())
                 return AiMoveDecision.Pass(state.punter);
             var bestTurn = turns.MaxBy(x => x.Estimation);

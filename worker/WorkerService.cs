@@ -48,7 +48,7 @@ namespace worker
             arenaThread = new Thread(
                 () =>
                 {
-                    for (var i = 0; i < 3; i++)
+                    for (var i = 0; i < 5; i++)
                         System.Threading.Tasks.Task.Run(() =>
                         {
                             while (!cancelled)

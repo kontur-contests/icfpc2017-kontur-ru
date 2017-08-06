@@ -12,7 +12,7 @@ namespace lib.Ai.StrategicFizzBuzz
         }
 
         public MaxReachableVertexWeightAi(double mineWeight)
-            : base((state, services) => new MaxVertextWeighter(mineWeight, services.Get<MineDistCalculator>(state)))
+            : base((state, services) => new MaxVertextWeighter(mineWeight, state, services))
         {
         }
 

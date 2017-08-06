@@ -35,7 +35,7 @@ namespace lib.Ai
             return AiMoveDecision.Pass(state.punter);
         }
 
-        private bool TryExtendAnything(State state, IServices services, out AiMoveDecision nextMove)
+        public static bool TryExtendAnything(State state, IServices services, out AiMoveDecision nextMove)
         {
             var graph = services.Get<GraphService>(state).Graph;
             var mineDistCalculator = services.Get<MineDistCalculator>(state);
@@ -78,7 +78,7 @@ namespace lib.Ai
             return false;
         }
 
-        private bool TryExtendComponent(State state, IServices services, out AiMoveDecision move)
+        public static bool TryExtendComponent(State state, IServices services, out AiMoveDecision move)
         {
             //TODO Сейчас увеличивает первую попавшуюся компоненту. А может быть нужно расширять самую большую компоненту.
             var graph = services.Get<GraphService>(state).Graph;
@@ -128,7 +128,7 @@ namespace lib.Ai
             return graph.Mines.Values.Where(v => v.Edges.All(e => e.Owner != state.punter));
         }
 
-        private bool TryBuildNewComponent(State state, IServices services, out AiMoveDecision move)
+        public static bool TryBuildNewComponent(State state, IServices services, out AiMoveDecision move)
         {
             var graph = services.Get<GraphService>(state).Graph;
             var queue = new Queue<BuildQueueItem>();
@@ -188,7 +188,7 @@ namespace lib.Ai
             return false;
         }
 
-        private long Calc(MineDistCalculator mineDistCalculator, HashSet<int> mineIds, int vertexId)
+        private static long Calc(MineDistCalculator mineDistCalculator, HashSet<int> mineIds, int vertexId)
         {
             return mineIds.Sum(
                 mineId =>
