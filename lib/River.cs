@@ -11,15 +11,18 @@ namespace lib
 
         [JsonProperty("owner", Order = 3)] public int Owner = -1;
 
+        [JsonProperty("optionOwner", Order = 3)] public int OptionOwner = -1;
+
         public River()
         {
         }
 
-        public River(int source, int target, int owner = -1)
+        public River(int source, int target, int owner = -1, int optionOwner = -1)
         {
             Source = source;
             Target = target;
             Owner = owner;
+            OptionOwner = optionOwner;
         }
 
         public bool Equals(River other)

@@ -6,8 +6,8 @@ namespace lib.viz.Detalization
     public class RiverPainterData
     {
         public Color Color;
+        public Color OptionColor;
         public string HoverText;
         public float PenWidth;
-        public DashStyle DashStyle;
     }
 }

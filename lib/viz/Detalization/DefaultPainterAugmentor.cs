@@ -70,9 +70,9 @@ namespace lib.viz.Detalization
             var data = new RiverPainterData
             {
                 Color = FadeBySelectedOwner(river.Owner == -1 ? Color.LightGray : Colors[river.Owner], river.Owner),
+                OptionColor = FadeBySelectedOwner(river.OptionOwner == -1 ? Color.Transparent : Colors[river.OptionOwner], river.OptionOwner),
                 PenWidth = river.Owner == -1 ? 1 : 3,
                 HoverText = river.Owner >= 0 ? "Owner " + river.Owner : "",
-                DashStyle = DashStyle.Solid
             };
             return data;
         }

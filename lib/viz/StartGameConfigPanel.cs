@@ -142,7 +142,7 @@ namespace lib
         public List<IAi> SelectedAis { get; } = new List<IAi>();
         public NamedMap SelectedMap { get; private set; }
 
-        public Settings Settings { get; private set; } = new Settings(true, false);
+        public Settings Settings { get; private set; } = new Settings(true, true, true);
 
         public event Action<NamedMap> MapChanged;
         public event Action<AiFactory> AiSelected;

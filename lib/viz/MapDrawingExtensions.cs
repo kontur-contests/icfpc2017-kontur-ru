@@ -13,7 +13,7 @@ namespace lib.viz
                 .ToArray()
                 .NormalizeCoordinates(targetSize, padding);
             var normalizeSites = map.Sites.Zip(normalizeCoordinates, (s, p) => new Site(s.Id, p.X, p.Y)).ToArray();
-            return new Map(normalizeSites, map.Rivers, map.Mines);
+            return new Map(normalizeSites, map.RiversList, map.Mines, map.OptionsUsed);
         }
 
         public static IEnumerable<PointF> NormalizeCoordinates(this PointF[] points, SizeF targetSize, SizeF padding)

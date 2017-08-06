@@ -2,25 +2,25 @@ using System;
 
 namespace lib.Structures
 {
-    public class ClaimMove : IEquatable<ClaimMove>
+    public class OptionMove : IEquatable<OptionMove>
     {
         public int punter;
         public int source;
         public int target;
 
-        public bool Equals(ClaimMove other)
+        public bool Equals(OptionMove other)
         {
-            if (Object.ReferenceEquals(null, other)) return false;
-            if (Object.ReferenceEquals(this, other)) return true;
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
             return punter == other.punter && (source == other.source && target == other.target || source == other.target && target == other.source);
         }
 
         public override bool Equals(object obj)
         {
-            if (Object.ReferenceEquals(null, obj)) return false;
-            if (Object.ReferenceEquals(this, obj)) return true;
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != GetType()) return false;
-            return Equals((ClaimMove)obj);
+            return Equals((OptionMove)obj);
         }
 
         public override int GetHashCode()
@@ -41,19 +41,20 @@ namespace lib.Structures
             }
         }
 
-        public static bool operator ==(ClaimMove left, ClaimMove right)
+        public static bool operator ==(OptionMove left, OptionMove right)
         {
-            return Object.Equals(left, right);
+            return Equals(left, right);
         }
 
-        public static bool operator !=(ClaimMove left, ClaimMove right)
+        public static bool operator !=(OptionMove left, OptionMove right)
         {
-            return !Object.Equals(left, right);
+            return !Equals(left, right);
         }
 
         public override string ToString()
         {
-            return $"Claim id:{punter} {source}-{target}";
+            return $"Option id:{punter} {source}-{target}";
         }
     }
+
 }
