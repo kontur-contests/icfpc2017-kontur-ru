@@ -7,15 +7,13 @@ using lib.Structures;
 
 namespace lib.Strategies
 {
-    public class MeetInTheMiddleStrategy : IStrategy
+    public class MeetInTheMiddleSetupStrategy : ISetupStrategy
     {
-        private readonly State state;
         private readonly Graph graph;
         private readonly MeetingPointService meetingPointService;
 
-        public MeetInTheMiddleStrategy(State state, Graph graph, MeetingPointService meetingPointService)
+        public MeetInTheMiddleSetupStrategy(Graph graph, MeetingPointService meetingPointService)
         {
-            this.state = state;
             this.graph = graph;
             this.meetingPointService = meetingPointService;
         }
@@ -33,6 +31,20 @@ namespace lib.Strategies
 
             return AiSetupDecision.Create(futures.ToArray(), $"meet in {meetingPoint}");
         }
+    }
+
+    public class MeetInTheMiddleStrategy : IStrategy
+    {
+        private readonly State state;
+        private readonly Graph graph;
+        private readonly MeetingPointService meetingPointService;
+
+        public MeetInTheMiddleStrategy(State state, Graph graph, MeetingPointService meetingPointService)
+        {
+            this.state = state;
+            this.graph = graph;
+            this.meetingPointService = meetingPointService;
+        }
 
         public List<TurnResult> NextTurns()
         {
@@ -46,11 +58,11 @@ namespace lib.Strategies
         {
             var meetingPoint = meetingPointService.MeetingPoint;
 
-            var toDo = Enumerable.Select<Vertex, int>(graph.GetNotOwnedMines(state.punter), x => x.Id);
+            var toDo = graph.GetNotOwnedMines(state.punter).Select(x => x.Id);
 
-            var myVerts = Enumerable.Where<Vertex>(
-                    graph.Vertexes.Values, v =>
-                    Enumerable.Any<Edge>(v.Edges, e => e.Owner == state.punter) || v.Id == meetingPoint)
+            var myVerts = graph.Vertexes.Values.Where(
+                    v =>
+                    v.Edges.Any(e => e.Owner == state.punter) || v.Id == meetingPoint)
                 .Select(x => x.Id)
                 .ToList();
 
@@ -78,6 +90,5 @@ namespace lib.Strategies
                 return AiMoveDecision.Pass(state.punter, "wait");
             return null;
         }
-
     }
 }

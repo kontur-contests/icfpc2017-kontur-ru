@@ -13,6 +13,13 @@ namespace lib.Ai.StrategicFizzBuzz
             StrategyProviders = strategyProviders;
         }
 
+        protected CompositeStrategicAi(Func<State, IServices, ISetupStrategy> setupStrategyProvider, params Func<State, IServices, IStrategy>[] strategyProviders)
+        {
+            SetupStrategyProvider = setupStrategyProvider;
+            StrategyProviders = strategyProviders;
+        }
+
+        private Func<State, IServices, ISetupStrategy> SetupStrategyProvider { get; }
         private Func<State, IServices, IStrategy>[] StrategyProviders { get; }
 
         public string Name => GetType().Name;
@@ -20,16 +27,12 @@ namespace lib.Ai.StrategicFizzBuzz
 
         public AiSetupDecision Setup(State state, IServices services)
         {
-            AiSetupDecision firstDecision = null;
             foreach (var strategyProvider in StrategyProviders)
-            {
-                var strategy = strategyProvider(state, services);
-                var decision = strategy.Setup();
-                firstDecision = firstDecision ?? decision;
-            }
+                strategyProvider(state, services);
+            var setupDecision = SetupStrategyProvider?.Invoke(state, services)?.Setup();
             if (!state.settings.futures)
                 return AiSetupDecision.Empty();
-            return firstDecision ?? AiSetupDecision.Empty();
+            return setupDecision ?? AiSetupDecision.Empty();
         }
 
         public AiMoveDecision GetNextMove(State state, IServices services)

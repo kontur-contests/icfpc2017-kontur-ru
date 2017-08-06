@@ -27,8 +27,8 @@ namespace BrutalTesterApp
             int roundsCount = 100000;
             bool failOnExceptions = false;
 
-            //var ais = AiFactoryRegistry.Factories
-            var ais = new List<AiFactory>()
+            var ais = AiFactoryRegistry.ForOnlineRunsFactories
+            /*var ais = new List<AiFactory>()
             {
                 AiFactoryRegistry.CreateFactory<FutureIsNowAi>(),
             //    AiFactoryRegistry.CreateFactory<ConnectClosestMinesAi>(),
@@ -49,7 +49,7 @@ namespace BrutalTesterApp
             //    AiFactoryRegistry.CreateFactory<GreedierAi>(),
             //    AiFactoryRegistry.CreateFactory<AgileMaxVertexWeighterAi>(),
             //    AiFactoryRegistry.CreateFactory<AgileMaxVertexWeighterAi>(),
-            }
+            }*/
             .Select(f => new PlayerTournamentResult(f)).ToList();
             var maps = MapLoader.LoadOnlineMaps().Where(map => map.PlayersCount.InRange(minMapPlayersCount, maxMapPlayersCount)).ToList();
 

@@ -12,7 +12,8 @@ namespace lib.Ai.StrategicFizzBuzz
 
         public FutureIsNowAi(double pathMultiplier, double mineWeight)
             : base(
-                (state, services) => new FutureIsNowStrategy(pathMultiplier, state, services.Get<Graph>(), services.Get<MineDistCalculator>()),
+                (state, services) => new FutureIsNowSetupStrategy(pathMultiplier, state, services.Get<Graph>(), services.Get<MineDistCalculator>()),
+                (state, services) => new FutureIsNowStrategy(state, services.Get<Graph>()),
                 (state, services) => new BiggestComponentEWStrategy(new MaxVertextWeighter(mineWeight, state, services), state, services))
         {
         }

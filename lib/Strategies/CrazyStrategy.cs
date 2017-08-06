@@ -23,11 +23,6 @@ namespace lib.Strategies
         private MineDistCalculator MineDistCalculator { get; }
         private int PunterId { get; }
 
-        public AiSetupDecision Setup()
-        {
-            return null;
-        }
-
         public List<TurnResult> NextTurns()
         {
             var result = new List<TurnResult>();

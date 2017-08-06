@@ -17,11 +17,6 @@ namespace lib.Strategies
             this.graph = graph;
         }
 
-        public AiSetupDecision Setup()
-        {
-            return null;
-        }
-
         public List<TurnResult> NextTurns()
         {
             AiMoveDecision move;

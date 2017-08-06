@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using lib.Ai;
@@ -10,26 +9,13 @@ namespace lib.Strategies
 {
     public class FutureIsNowStrategy : IStrategy
     {
-        private readonly double pathMultiplier;
         private readonly State state;
         private readonly Graph graph;
-        private readonly MineDistCalculator mineDistCalculator;
-
-        public FutureIsNowStrategy(double pathMultiplier, State state, Graph graph, MineDistCalculator mineDistCalculator)
+        
+        public FutureIsNowStrategy(State state, Graph graph)
         {
-            this.pathMultiplier = pathMultiplier;
             this.state = state;
             this.graph = graph;
-            this.mineDistCalculator = mineDistCalculator;
-        }
-
-        public AiSetupDecision Setup()
-        {
-            var graphDiameterEstimation = (int)Math.Round(pathMultiplier * Math.Sqrt(state.map.Sites.Length));
-            var length = graphDiameterEstimation;
-            var path = new PathSelector(state.map, mineDistCalculator, length).SelectPath();
-            var futures = new FuturesPositioner(state.map, graph, path, mineDistCalculator).GetFutures();
-            return AiSetupDecision.Create(futures);
         }
 
         public List<TurnResult> NextTurns()

@@ -21,7 +21,8 @@ namespace lib.Ai.StrategicFizzBuzz
         public AiSetupDecision Setup(State state, IServices services)
         {
             var strategy = StrategyProvider(state, services);
-            var decision = strategy.Setup();
+            var setupStrategy = strategy as ISetupStrategy;
+            var decision = setupStrategy?.Setup();
             if (!state.settings.futures)
                 return AiSetupDecision.Empty();
             return decision ?? AiSetupDecision.Empty();

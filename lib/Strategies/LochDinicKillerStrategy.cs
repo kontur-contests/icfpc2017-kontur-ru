@@ -22,11 +22,6 @@ namespace lib.Strategies
         private Graph Graph { get; }
         private int PunterId { get; }
 
-        public AiSetupDecision Setup()
-        {
-            return null;
-        }
-
         public List<TurnResult> NextTurns()
         {
             Init();
