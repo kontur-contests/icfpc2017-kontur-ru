@@ -100,7 +100,7 @@ namespace lib.Ai.StrategicFizzBuzz
                 (punterId, state, services) => 
                 new BiggestComponentEWStrategy(
                     punterId,
-                    new MaxVertextWeighterWithConnectedComponents(mineMultiplier, services.Get<MineDistCalculator>(state)),
+                    new MaxVertextWeighter(mineMultiplier, services.Get<MineDistCalculator>(state)),
                     services.Get<MineDistCalculator>(state)))
         {
         }

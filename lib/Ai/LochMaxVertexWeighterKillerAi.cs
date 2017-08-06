@@ -8,7 +8,7 @@ namespace lib.Ai
 {
     public class LochMaxVertexWeighterKillerAi : IAi
     {
-        private IAi Base = new MaxReachableVertexWithConnectedComponentsWeightAi();
+        private IAi Base = new MaxReachableVertexWeightAi();
 
         private Random rand = new Random();
         public string Name => nameof(LochMaxVertexWeighterKillerAi);
