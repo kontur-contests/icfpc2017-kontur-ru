@@ -7,18 +7,20 @@ namespace lib.Strategies
 {
     public class GreedyStrategy : IStrategy
     {
-        public GreedyStrategy(int punterId, MineDistCalculator mineDistCalculator)
+        public GreedyStrategy(State state, IServices services)
         {
-            PunterId = punterId;
-            MineDistCalulator = mineDistCalculator;
+            PunterId = state.punter;
+            MineDistCalulator = services.Get<MineDistCalculator>(state);
+            GraphService = services.Get<GraphService>(state);
         }
 
         private MineDistCalculator MineDistCalulator { get; }
         private int PunterId { get; }
+        private GraphService GraphService { get; }
 
-        public List<TurnResult> Turn(State state, IServices services)
+        public List<TurnResult> NextTurns()
         {
-            var graph = services.Get<GraphService>(state).Graph;
+            var graph = GraphService.Graph;
 
             var calculator = new ConnectedCalculator(graph, PunterId);
             var result = new List<TurnResult>();
