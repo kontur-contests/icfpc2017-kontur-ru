@@ -14,7 +14,7 @@ namespace lib.StateImpl
                 if (move.pass != null)
                     state.credits[move.pass.punter] = state.credits.GetOrDefault(move.pass.punter, 0) + 1;
                 else if (move.splurge != null)
-                    state.credits[move.splurge.punter] -= move.splurge.SplurgeLength() - 1;
+                    state.credits[move.splurge.punter] = state.credits.GetOrDefault(move.splurge.punter, 0) - (move.splurge.SplurgeLength() - 1);
             }
             state.turns.Add(new TurnState
             {
