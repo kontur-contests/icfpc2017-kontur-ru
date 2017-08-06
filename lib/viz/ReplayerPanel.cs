@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using lib.GraphImpl;
@@ -14,7 +13,6 @@ namespace lib.viz
         private readonly MapPainter mapPainter;
         private readonly ScorePanel scorePanel;
         private IReplayDataProvider provider;
-        private readonly List<GameState> states = new List<GameState>();
         private FuturesPanel futuresPanel;
 
         public ReplayerPanel()
@@ -28,61 +26,6 @@ namespace lib.viz
                 Dock = DockStyle.Fill
             };
             scorePanel = new ScorePanel {Dock = DockStyle.Top, Height = 40};
-
-            var navigationPanel = new TableLayoutPanel {Dock = DockStyle.Bottom};
-
-            var revertStepButton = new Button
-            {
-                Dock = DockStyle.Fill,
-                Text = "REVERT STEP"
-            };
-            gameProgress = new TrackBar
-            {
-                Dock = DockStyle.Fill,
-                Maximum = 0,
-                Minimum = 0
-            };
-            var makeStepButton = new Button
-            {
-                Dock = DockStyle.Fill,
-                Text = "MAKE STEP"
-            };
-
-            navigationPanel.ColumnStyles.Add(new ColumnStyle {SizeType = SizeType.Percent, Width = 0.2f});
-            navigationPanel.ColumnStyles.Add(new ColumnStyle {SizeType = SizeType.Percent, Width = 0.6f});
-            navigationPanel.ColumnStyles.Add(new ColumnStyle {SizeType = SizeType.Percent, Width = 0.2f});
-            navigationPanel.Controls.Add(revertStepButton, 0, 0);
-            navigationPanel.Controls.Add(gameProgress, 1, 0);
-            navigationPanel.Controls.Add(makeStepButton, 2, 0);
-
-            makeStepButton.Click += (_, args) =>
-            {
-                if (provider == null) return;
-                if (current + 1 >= states.Count)
-                    if (!TryGenerateNextState())
-                        return;
-                current++;
-                mapPainter.GameState = states[current];
-                mapPanel.Refresh();
-                gameProgress.Value = current;
-            };
-            gameProgress.ValueChanged += (_, args) =>
-            {
-                current = gameProgress.Value;
-                if (current < 0 || current >= states.Count)
-                    return;
-                mapPainter.GameState = states[current];
-                mapPanel.Refresh();
-            };
-            revertStepButton.Click += (_, args) =>
-            {
-                if (current <= 0)
-                    return;
-                current--;
-                mapPainter.GameState = states[current];
-                mapPanel.Refresh();
-                gameProgress.Value = current;
-            };
             Controls.Add(scorePanel);
 
             futuresPanel = new FuturesPanel();
@@ -96,15 +39,18 @@ namespace lib.viz
             middlePanel.Controls.Add(futuresPanel, 1, 0);
             Controls.Add(middlePanel);
 
-            Controls.Add(navigationPanel);
+            progressPanel = new ProgressControlPanel();
+            progressPanel.CurrentStateUpdated += state => mapPainter.GameState = state;
+            progressPanel.CurrentStateUpdated += _ => mapPanel.Refresh();
+            progressPanel.CurrentStateUpdated += state => futuresPanel.UpdateFuturesStats(state.CurrentMap);
+            Controls.Add(progressPanel);
             timer = new Timer {Interval = 500};
             timer.Tick += OnTick;
             timer.Start();
         }
 
         private bool liveScoreUpdate;
-        private int current;
-        private readonly TrackBar gameProgress;
+        private ProgressControlPanel progressPanel;
 
         public bool LiveScoreUpdate
         {
@@ -126,33 +72,16 @@ namespace lib.viz
         {
             provider = newProvider;
 
-            current = -1;
-            states.Clear();
-
             var playersCount = newProvider.PunterNames.Length;
             mapPainter.Futures = Enumerable.Range(0, playersCount).ToDictionary(i => i, newProvider.GetPunterFutures);
-            futuresPanel.SetFutures(mapPainter.Futures, new Graph(map));
+            futuresPanel.SetFutures(mapPainter.Futures, map);
 
             mapPainter.Map = map;
             mapPainter.GameState = null;
             scorePanel.SetPlayers(newProvider.PunterNames);
             Refresh();
 
-            if (newProvider is LogReplayDataProvider)
-            {
-                while (TryGenerateNextState())
-                { }
-                current = 0;
-            }
-        }
-
-        private bool TryGenerateNextState()
-        {
-            if (states.Count != 0 && states.Last().IsGameOver)
-                return false;
-            states.Add(provider.NextMove());
-            gameProgress.Maximum = states.Count - 1;
-            return true;
+            progressPanel.SetNextStateGenerator(newProvider.NextMove, newProvider is LogReplayDataProvider);
         }
 
         private void OnTick(object sender, EventArgs e)

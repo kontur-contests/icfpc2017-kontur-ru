@@ -43,6 +43,9 @@
     <Compile Update="viz\FuturesPanel.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Update="viz\ProgressControlPanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Update="viz\ReplayerPanel.cs">
       <SubType>Component</SubType>
     </Compile>
