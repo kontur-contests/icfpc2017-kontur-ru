@@ -27,9 +27,8 @@ namespace lib.Strategies.EdgeWeighting
         private ConnectedComponent CurrentComponent { get; set; }
         private Dictionary<Tuple<int, int>, long> MutualComponentWeights { get; set; }
 
-        public void Init(Graph graph, List<ConnectedComponent> connectedComponents, ConnectedComponent currentComponent)
+        public void Init(State state, IServices services, List<ConnectedComponent> connectedComponents, ConnectedComponent currentComponent)
         {
-            Graph = graph;
             SubGraphWeight = new Dictionary<int, double>();
             CurrentComponent = currentComponent;
             VertexComponent = connectedComponents

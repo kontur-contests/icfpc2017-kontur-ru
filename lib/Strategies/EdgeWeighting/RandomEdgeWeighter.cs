@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using lib.GraphImpl;
+using lib.StateImpl;
 
 namespace lib.Strategies.EdgeWeighting
 {
@@ -10,7 +11,7 @@ namespace lib.Strategies.EdgeWeighting
         private static ThreadLocal<Random> Random { get; } = new ThreadLocal<Random>(() => new Random(Guid.NewGuid().GetHashCode()));
         public ConnectedComponent CurrentComponent => null;
 
-        public void Init(Graph graph, List<ConnectedComponent> connectedComponents, ConnectedComponent currentComponent)
+        public void Init(State state, IServices services, List<ConnectedComponent> connectedComponents, ConnectedComponent currentComponent)
         {
         }
 
