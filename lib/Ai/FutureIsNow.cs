@@ -59,7 +59,7 @@ namespace lib.Ai
                 from c in components
                 let neighbours = GetFreeNeighbours(c)
                 select new{c, neighbours};
-            var weakComponent = q.MinBy(t => t.neighbours.Count);
+            var weakComponent = q.MinBy(t => t.neighbours.Count - MinesToDefendablesRatio(t.c));
             var otherComponents = components.Where(c => c != weakComponent.c).ToHashSet();
             var res = Bfs(weakComponent.neighbours, otherComponents.SelectMany(c=>c).ToHashSet());
             var candidateSites = res.MaxListBy(r => -r.Value);
@@ -70,6 +70,18 @@ namespace lib.Ai
                 return graph.Vertexes[neighbourToGo].Edges.First(e => weakComponentSiteIds.Contains(e.To));
             }
             return null;
+        }
+
+        private double MinesToDefendablesRatio(IEnumerable<int> component)
+        {
+            double mines;
+            double defendables;
+            foreach (var vertex in component)
+            {
+                mines += map.Mines.Contains(vertex) ? 1 : 0;
+                defendables += sitesToDefend.Contains(vertex) ? 1 : 0;
+            }
+            return mines / defendables;
         }
 
         private Dictionary<int, int> Bfs(List<int> neighbours, HashSet<int> destinationSiteIds)
