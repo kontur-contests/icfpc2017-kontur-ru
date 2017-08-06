@@ -5,6 +5,7 @@ using lib.StateImpl;
 using lib.Strategies;
 using lib.Strategies.EdgeWeighting;
 using MoreLinq;
+using static lib.Strategies.EdgeWeighting.MetaStrategyHelpers;
 
 namespace lib.Ai.StrategicFizzBuzz
 {
@@ -22,14 +23,14 @@ namespace lib.Ai.StrategicFizzBuzz
 
     public abstract class PodnaseratorAi : IAi
     {
-        protected PodnaseratorAi(PodnaseratorSettings settings, Func<int, State, IServices, IStrategy> strategyProvider)
+        protected PodnaseratorAi(PodnaseratorSettings settings, Func<State, IServices, IStrategy> strategyProvider)
         {
             Settings = settings;
             StrategyProvider = strategyProvider;
         }
 
         public PodnaseratorSettings Settings { get; }
-        private Func<int, State, IServices, IStrategy> StrategyProvider { get; }
+        private Func<State, IServices, IStrategy> StrategyProvider { get; }
         public string Name => GetType().Name;
         public abstract string Version { get; }
 
@@ -37,17 +38,17 @@ namespace lib.Ai.StrategicFizzBuzz
         {
             services.Setup<Graph>();
             Enumerable.Range(0, state.punters)
-                .Select(punterId => StrategyProvider(punterId, state, services))
+                .Select(punterId => StrategyProvider(state, services))
                 .Consume();
             return AiSetupDecision.Empty();
         }
 
         public AiMoveDecision GetNextMove(State state, IServices services)
         {
-            var myStrategy = StrategyProvider(state.punter, state, services);
+            var myStrategy = StrategyProvider(state, services);
             var enemyStrategies = Enumerable.Range(0, state.punters)
                 .Except(new[] { state.punter })
-                .Select(enemyId => StrategyProvider(enemyId, state, services))
+                .Select(enemyId => StrategyProvider(state, services))
                 .ToArray();
             var bestTurn = GetMyBestTurn(myStrategy);
             var enemyBestTurns = enemyStrategies
@@ -80,6 +81,7 @@ namespace lib.Ai.StrategicFizzBuzz
         }
     }
 
+    [Obsolete("Broken. Can't run strategy for different punter ids")]
     public class Podnaserator2000Ai : PodnaseratorAi
     {
         public Podnaserator2000Ai()
@@ -93,10 +95,7 @@ namespace lib.Ai.StrategicFizzBuzz
             int mineMultiplier)
             : base(
                 new PodnaseratorSettings(enemyTurnEstimationDifferenceWeight, myTurnEsimationWeight),
-                (punterId, state, services) =>
-                    new BiggestComponentEWStrategy(
-                        new MaxVertextWeighter(mineMultiplier, state, services),
-                        state, services))
+                BiggestComponentEWStrategy((state, services) => new MaxVertextWeighter(mineMultiplier, state, services)))
         {
         }
 

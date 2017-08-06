@@ -1,5 +1,6 @@
 using JetBrains.Annotations;
 using lib.Strategies.EdgeWeighting;
+using static lib.Strategies.EdgeWeighting.MetaStrategyHelpers;
 
 namespace lib.Ai.StrategicFizzBuzz
 {
@@ -13,8 +14,8 @@ namespace lib.Ai.StrategicFizzBuzz
 
         public MaxReachableVertexWeightAiWithMineGuardianAi(int outEdgesWarningLevel, int guardedComponentSizeThreshold, int mineMultiplier)
             : base(
-                (state, services) => new AllComponentsEWStrategy(new MineGuardianEdgeWeighter(state, services, outEdgesWarningLevel, guardedComponentSizeThreshold), state, services),
-                (state, services) => new AllComponentsEWStrategy(new MaxVertextWeighter(mineMultiplier, state, services), state, services))
+                AllComponentsEWStrategy((state, services) => new MineGuardianEdgeWeighter(state, services, outEdgesWarningLevel, guardedComponentSizeThreshold)),
+                AllComponentsEWStrategy((state, services) => new MaxVertextWeighter(mineMultiplier, state, services)))
         {
         }
 

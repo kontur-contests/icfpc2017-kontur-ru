@@ -1,4 +1,5 @@
 using lib.Strategies.EdgeWeighting;
+using static lib.Strategies.EdgeWeighting.MetaStrategyHelpers;
 
 namespace lib.Ai.StrategicFizzBuzz
 {
@@ -6,8 +7,8 @@ namespace lib.Ai.StrategicFizzBuzz
     {
         public LochMaxVertexWeighterKillerAi()
             : base(
-                (state, services) => new AllComponentsEWStrategy(new LochKillerEdgeWeighter(state, services), state, services),
-                (state, services) => new BiggestComponentEWStrategy(new MaxVertextWeighter(100, state, services), state, services))
+                AllComponentsEWStrategy((state, services) => new LochKillerEdgeWeighter(state, services)),
+                BiggestComponentEWStrategy((state, services) => new MaxVertextWeighter(100, state, services)))
         {
         }
 
