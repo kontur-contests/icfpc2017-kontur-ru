@@ -34,7 +34,7 @@ namespace lib.Strategies.EdgeWeighting
             EdgeWeighter.Init(connectedComponents, currentComponent);
             return currentComponent.Vertices
                 .SelectMany(v => graph.Vertexes[v].Edges)
-                .Where(e => e.Owner == -1 && !AreConnected(currentComponent, e.From, e.To))
+                .Where(e => e.Owner == -1 && !AreConnected(currentComponent, e.From, e.To)) //Options
                 .Select(
                     e => new TurnResult
                     {

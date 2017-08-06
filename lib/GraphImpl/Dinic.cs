@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
 using NUnit.Framework;
+#pragma warning disable 618
 
 namespace lib.GraphImpl
 {

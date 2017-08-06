@@ -81,7 +81,9 @@ namespace lib.Strategies.EdgeWeighting
 
         private int CalcProperVertexScore(int vertexId, ICollection<int> claimedMineIds)
         {
-            return claimedMineIds.Select(mineId => MineDistCalculator.GetDist(mineId, vertexId)).Sum(x => GetScore(claimedMineIds, x, vertexId));
+            return claimedMineIds.Select(
+                mineId => MineDistCalculator.GetDist(mineId, vertexId))
+                    .Sum(x => GetScore(claimedMineIds, x, vertexId));
         }
 
         private int GetScore(ICollection<int> claimedMineIds, int length, int vertexId)
