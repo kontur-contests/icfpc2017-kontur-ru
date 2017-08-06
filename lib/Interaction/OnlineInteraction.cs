@@ -78,14 +78,8 @@ namespace lib.Interaction
                 var gameplay = JsonConvert.SerializeObject(serverResponse, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore});
 
                 allMoves.AddRange(moves);
-                foreach (var move in moves)
-                    state.map = state.map.ApplyMove(move);
 
-                state.turns.Add(new TurnState
-                {
-                    moves = moves,
-                    aiMoveDecision = state.lastAiMoveDecision
-                });
+                state.ApplyMoves(moves);
 
                 AiMoveDecision moveDecision;
                 try
