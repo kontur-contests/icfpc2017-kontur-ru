@@ -18,7 +18,7 @@ namespace lib.Ai
             services.Setup<MineDistCalculator>();
             services.Setup<MeetingPointService>();
 
-            var meetingPoint = state.mps.meetingPoint;
+            var meetingPoint = services.Get<MeetingPointService>().MeetingPoint;
 
             var graph = services.Get<Graph>();
             var futures = new List<Future>();
@@ -32,7 +32,7 @@ namespace lib.Ai
 
         public AiMoveDecision GetNextMove(State state, IServices services)
         {
-            var meetingPoint = state.mps.meetingPoint;
+            var meetingPoint = services.Get<MeetingPointService>().MeetingPoint;
 
             var graph = services.Get<Graph>();
             var toDo = ConnectClosestMinesAi.GetNotMyMines(state, graph)
