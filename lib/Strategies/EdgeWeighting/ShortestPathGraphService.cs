@@ -15,8 +15,8 @@ namespace lib.Strategies.EdgeWeighting
 
         public ShortestPathGraphService(Graph graph, ConnectedComponentsService connectedComponentsService)
         {
-            this.graph = graph;
-            this.connectedComponentsService = connectedComponentsService;
+            Graph = graph;
+            ConnectedComponentsService = connectedComponentsService;
         }
 
         public ShortestPathGraph ForComponent(int punterId, int componentId)
@@ -24,8 +24,8 @@ namespace lib.Strategies.EdgeWeighting
             return ComponentsCache.GetOrCreate(
                 Tuple.Create(punterId, componentId), key =>
                 {
-                    var components = connectedComponentsService.For(punterId);
-                    return ShortestPathGraph.Build(graph, components[componentId].Vertices);
+                    var components = ConnectedComponentsService.For(punterId);
+                    return ShortestPathGraph.Build(Graph, components[componentId].Vertices);
                 });
         }
 
