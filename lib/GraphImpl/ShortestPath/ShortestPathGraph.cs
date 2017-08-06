@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace lib.GraphImpl.ShortestPath
@@ -14,12 +15,23 @@ namespace lib.GraphImpl.ShortestPath
         public ShortestPathVertex this[int vertexId] => vertexes.TryGetValue(vertexId, out var vertex) ? vertex : new ShortestPathVertex(vertexId, -1);
         public ICollection<ShortestPathVertex> Vertexes => vertexes.Values;
 
+
         public static ShortestPathGraph Build(Graph graph, params int[] sourceVertexes)
         {
             return Build(graph, (ICollection<int>)sourceVertexes);
         }
 
         public static ShortestPathGraph Build(Graph graph, ICollection<int> sourceVertexes)
+        {
+            return Build(graph, edge => edge.Owner == -1, (ICollection<int>)sourceVertexes);
+        }
+
+        public static ShortestPathGraph Build(Graph graph, Func<Edge, bool> takeEdge, params int[] sourceVertexes)
+        {
+            return Build(graph, takeEdge, (ICollection<int>)sourceVertexes);
+        }
+
+        public static ShortestPathGraph Build(Graph graph, Func<Edge, bool> takeEdge, ICollection<int> sourceVertexes)
         {
             var spGraph = new ShortestPathGraph();
             var queue = new Queue<ShortestPathVertex>();
@@ -31,7 +43,7 @@ namespace lib.GraphImpl.ShortestPath
                 var from = queue.Dequeue();
                 foreach (var edge in graph.Vertexes[from.Id].Edges)
                 {
-                    if (edge.Owner != -1)
+                    if (!takeEdge(edge))
                         continue;
                     if (spGraph.vertexes.ContainsKey(edge.To))
                     {

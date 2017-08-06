@@ -40,7 +40,7 @@ namespace lib.Strategies.EdgeWeighting
                 .SelectMany(x => x.Vertices, (component, vertex) => new {component, vertex})
                 .ToDictionary(x => x.vertex, x => x.component);
             MutualComponentWeights = new Dictionary<Tuple<int, int>, long>();
-            SpGraph = SpGraphService.ForComponent(CurrentComponent);
+            SpGraph = SpGraphService.ForComponent(CurrentComponent, VertexComponent, State.punter);
             ClaimedMineIds = CurrentComponent.Mines;
             foreach (var vertex in CurrentComponent.Vertices)
                 SubGraphWeight[vertex] = CalcSubGraphWeight(vertex);
@@ -81,12 +81,15 @@ namespace lib.Strategies.EdgeWeighting
 
         private int CalcProperVertexScore(int vertexId, ICollection<int> claimedMineIds)
         {
-            return claimedMineIds.Select(mineId => MineDistCalculator.GetDist(mineId, vertexId)).Sum(x => x * x);
+            return claimedMineIds.Select(mineId => MineDistCalculator.GetDist(mineId, vertexId)).Sum(x => GetScore(claimedMineIds, x, vertexId));
         }
 
-        private int GetScore(int length, int vertexId)
+        private int GetScore(ICollection<int> claimedMineIds, int length, int vertexId)
         {
-            return 0;//State.settings.futures && State.
+            if (State.settings.futures && State.aiSetupDecision.futures
+                    .Any(future => claimedMineIds.Contains(future.source) && future.target == vertexId))
+                return length * length * length + length * length;
+            return length * length;
         }
 
         private long CalcMutualComponentWeight(ConnectedComponent x, ConnectedComponent y)
