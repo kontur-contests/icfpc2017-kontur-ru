@@ -1,6 +1,5 @@
 ﻿using JetBrains.Annotations;
 using lib.Ai.StrategicFizzBuzz;
-using lib.GraphImpl;
 using lib.Strategies.EdgeWeighting;
 
 namespace lib.Ai
@@ -13,7 +12,7 @@ namespace lib.Ai
         }
 
         public AgileMaxVertexWeighterAi(double mineWeight)
-            : base((state, services) => new MaxVertextWeighter(mineWeight, services.Get<MineDistCalculator>(state)))
+            : base((state, services) => new MaxVertextWeighter(mineWeight, state, services))
         {
         }
 

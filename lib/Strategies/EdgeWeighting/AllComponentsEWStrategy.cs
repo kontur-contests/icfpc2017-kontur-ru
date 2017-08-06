@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using lib.GraphImpl;
+using lib.StateImpl;
 
 namespace lib.Strategies.EdgeWeighting
 {
@@ -18,11 +19,12 @@ namespace lib.Strategies.EdgeWeighting
         private int PunterId { get; }
 
 
-        public List<TurnResult> Turn(Graph graph)
+        public List<TurnResult> Turn(State state, IServices services)
         {
+            var graph = services.Get<GraphService>(state).Graph;
             var connectedComponents = ConnectedComponent.GetComponents(graph, PunterId);
             FillMines(graph, connectedComponents);
-            return connectedComponents.SelectMany(x => GetTurnsForComponents(graph, connectedComponents, x)).ToList();
+            return connectedComponents.SelectMany(x => GetTurnsForComponents(state, services, connectedComponents, x)).ToList();
         }
 
         private void FillMines(Graph graph, List<ConnectedComponent> connectedComponents)
@@ -30,16 +32,17 @@ namespace lib.Strategies.EdgeWeighting
             var notConnectedMines = graph.Mines.Keys.Except(connectedComponents.SelectMany(x => x.Mines));
             foreach (var mine in notConnectedMines)
             {
-                var connectedComponent = new ConnectedComponent(connectedComponents.Count);
+                var connectedComponent = new ConnectedComponent(connectedComponents.Count, PunterId);
                 connectedComponent.Mines.Add(mine);
                 connectedComponent.Vertices.Add(mine);
                 connectedComponents.Add(connectedComponent);
             }
         }
 
-        private List<TurnResult> GetTurnsForComponents(Graph graph, List<ConnectedComponent> connectedComponents, ConnectedComponent maxComponent)
+        private List<TurnResult> GetTurnsForComponents(State state, IServices services, List<ConnectedComponent> connectedComponents, ConnectedComponent maxComponent)
         {
-            EdgeWeighter.Init(graph, connectedComponents, maxComponent);
+            var graph = services.Get<GraphService>(state).Graph;
+            EdgeWeighter.Init(state, services, connectedComponents, maxComponent);
             return maxComponent.Vertices
                 .SelectMany(v => graph.Vertexes[v].Edges)
                 .Where(e => e.Owner == -1)
