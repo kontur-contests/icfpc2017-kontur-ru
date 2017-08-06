@@ -36,7 +36,7 @@ namespace lib.Ai.StrategicFizzBuzz
 
         public AiSetupDecision Setup(State state, IServices services)
         {
-            services.Setup<GraphService>(state);
+            services.Setup<Graph>();
             StrategyProvider(state.punter, state, services);
             Enumerable.Range(0, state.punters)
                 .Except(new[] { state.punter })
@@ -100,7 +100,7 @@ namespace lib.Ai.StrategicFizzBuzz
                 new BiggestComponentEWStrategy(
                     punterId,
                     new MaxVertextWeighter(mineMultiplier, state, services),
-                    services.Get<MineDistCalculator>(state)))
+                    services.Get<MineDistCalculator>()))
         {
         }
 

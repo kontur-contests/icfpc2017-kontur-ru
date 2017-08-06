@@ -44,8 +44,7 @@ namespace lib.Interaction
 
             try
             {
-                var services = new Services();
-                setupDecision = ai.Setup(state, services);
+                setupDecision = ai.Setup(state, new Services(state));
             }
             catch
             {
@@ -89,8 +88,7 @@ namespace lib.Interaction
                 AiMoveDecision moveDecision;
                 try
                 {
-                    var services = new Services();
-                    moveDecision = ai.GetNextMove(state, services);
+                    moveDecision = ai.GetNextMove(state, new Services(state));
                 }
                 catch
                 {

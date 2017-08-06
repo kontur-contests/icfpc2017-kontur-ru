@@ -16,7 +16,7 @@ namespace lib.Ai
 
         public AiSetupDecision Setup(State state, IServices services)
         {
-            services.Setup<GraphService>(state);
+            services.Setup<Graph>();
             return Base.Setup(state, services);
         }
 
@@ -27,7 +27,7 @@ namespace lib.Ai
             //if (map.Sites.Length / puntersCount < 150)
             //  return Base.GetNextMove(prevMoves, map);
 
-            var graph = services.Get<GraphService>(state).Graph;
+            var graph = services.Get<Graph>();
 
             var nearMinesEdge = state.map.Mines
                 .Select(mine => new {mine, edges = graph.Vertexes[mine].Edges.Select(edge => edge.River).ToList()})

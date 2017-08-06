@@ -19,15 +19,15 @@ namespace lib.Ai
         
         public AiSetupDecision Setup(State state, IServices services)
         {
-            services.Setup<GraphService>(state);
-            services.Setup<MineDistCalculator>(state);
+            services.Setup<Graph>();
+            services.Setup<MineDistCalculator>();
             return AiSetupDecision.Empty();
         }
 
         public AiMoveDecision GetNextMove(State state, IServices services)
         {
-            var graph = services.Get<GraphService>(state).Graph;
-            var mineDistCalculator = services.Get<MineDistCalculator>(state);
+            var graph = services.Get<Graph>();
+            var mineDistCalculator = services.Get<MineDistCalculator>();
             var connectedCalculator = new ConnectedCalculator(graph, state.punter);
             GreedyAiHelper.TryExtendAnything(state.punter, graph, connectedCalculator, mineDistCalculator, out Move nextMove);
             return AiMoveDecision.Move(nextMove);

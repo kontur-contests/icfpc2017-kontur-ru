@@ -15,7 +15,7 @@ namespace lib.Strategies.EdgeWeighting
 
         public void Init(State state, IServices services, List<ConnectedComponent> connectedComponents, ConnectedComponent currentComponent)
         {
-            var graph = services.Get<GraphService>(state).Graph;
+            var graph = services.Get<Graph>();
 
             int maxCount = 10;
             Dictionary<Tuple<int, int>, double> edgesToBlock = new Dictionary<Tuple<int, int>, double>();

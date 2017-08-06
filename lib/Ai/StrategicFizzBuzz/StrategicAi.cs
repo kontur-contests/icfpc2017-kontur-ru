@@ -21,7 +21,7 @@ namespace lib.Ai.StrategicFizzBuzz
 
         public AiSetupDecision Setup(State state, IServices services)
         {
-            services.Setup<GraphService>(state);
+            services.Setup<Graph>();
             StrategyProvider(state, services);
             return AiSetupDecision.Empty();
         }
@@ -29,7 +29,7 @@ namespace lib.Ai.StrategicFizzBuzz
         public AiMoveDecision GetNextMove(State state, IServices services)
         {
             var strategy = StrategyProvider(state, services);
-            var graph = services.Get<GraphService>(state).Graph;
+            var graph = services.Get<Graph>();
             var turns = strategy.Turn(state, services);
             if (!turns.Any())
                 return AiMoveDecision.Pass(state.punter);

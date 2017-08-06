@@ -11,8 +11,8 @@ namespace lib.Strategies.EdgeWeighting
     {
         public MaxVertextWeighter(double mineMultiplier, State state, IServices services)
         {
-            MineDistCalculator = services.Get<MineDistCalculator>(state);
-            SpGraphService = services.Get<ShortestPathGraphService>(state);
+            MineDistCalculator = services.Get<MineDistCalculator>();
+            SpGraphService = services.Get<ShortestPathGraphService>();
             MineMultiplier = mineMultiplier;
         }
 

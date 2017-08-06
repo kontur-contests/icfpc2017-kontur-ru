@@ -18,7 +18,7 @@ namespace lib.Ai
 
         public AiSetupDecision Setup(State state, IServices services)
         {
-            services.Setup<GraphService>(state);
+            services.Setup<Graph>();
             return Base.Setup(state, services);
         }
 
@@ -29,7 +29,7 @@ namespace lib.Ai
 
         public AiMoveDecision GetNextMove(State state, IServices services)
         {
-            var graph = services.Get<GraphService>(state).Graph;
+            var graph = services.Get<Graph>();
 
             int maxCount = 10;
             Dictionary<Tuple<int, int>, double> edgesToBlock = new Dictionary<Tuple<int, int>, double>();

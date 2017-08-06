@@ -8,7 +8,7 @@ namespace lib.Ai.StrategicFizzBuzz
     public abstract class AllComponentsEWStrategicAi : StrategicAi
     {
         protected AllComponentsEWStrategicAi(Func<State, IServices, IEdgeWeighter> edgeWeighterProvider)
-            : base((state, services) => new AllComponentsEWStrategy(state.punter, edgeWeighterProvider(state, services), services.Get<MineDistCalculator>(state)))
+            : base((state, services) => new AllComponentsEWStrategy(state.punter, edgeWeighterProvider(state, services), services.Get<MineDistCalculator>()))
         {
         }
     }

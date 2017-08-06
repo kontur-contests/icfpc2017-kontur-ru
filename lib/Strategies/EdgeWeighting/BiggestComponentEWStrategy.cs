@@ -22,7 +22,7 @@ namespace lib.Strategies.EdgeWeighting
 
         public List<TurnResult> Turn(State state, IServices services)
         {
-            var graph = services.Get<GraphService>(state).Graph;
+            var graph = services.Get<Graph>();
             var claimedVertexes = graph.Vertexes.Values
                 .SelectMany(x => x.Edges)
                 .Where(edge => edge.Owner == PunterId)

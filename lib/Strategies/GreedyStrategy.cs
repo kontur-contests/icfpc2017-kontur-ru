@@ -18,7 +18,7 @@ namespace lib.Strategies
 
         public List<TurnResult> Turn(State state, IServices services)
         {
-            var graph = services.Get<GraphService>(state).Graph;
+            var graph = services.Get<Graph>();
 
             var calculator = new ConnectedCalculator(graph, PunterId);
             var result = new List<TurnResult>();

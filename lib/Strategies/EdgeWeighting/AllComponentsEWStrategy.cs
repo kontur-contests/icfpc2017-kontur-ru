@@ -21,7 +21,7 @@ namespace lib.Strategies.EdgeWeighting
 
         public List<TurnResult> Turn(State state, IServices services)
         {
-            var graph = services.Get<GraphService>(state).Graph;
+            var graph = services.Get<Graph>();
             var connectedComponents = ConnectedComponent.GetComponents(graph, PunterId);
             FillMines(graph, connectedComponents);
             return connectedComponents.SelectMany(x => GetTurnsForComponents(state, services, connectedComponents, x)).ToList();
@@ -41,7 +41,7 @@ namespace lib.Strategies.EdgeWeighting
 
         private List<TurnResult> GetTurnsForComponents(State state, IServices services, List<ConnectedComponent> connectedComponents, ConnectedComponent maxComponent)
         {
-            var graph = services.Get<GraphService>(state).Graph;
+            var graph = services.Get<Graph>();
             EdgeWeighter.Init(state, services, connectedComponents, maxComponent);
             return maxComponent.Vertices
                 .SelectMany(v => graph.Vertexes[v].Edges)

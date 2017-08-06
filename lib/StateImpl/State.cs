@@ -1,6 +1,5 @@
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using lib.Ai;
+using System.Linq;
 using lib.GraphImpl;
 using lib.Structures;
 
@@ -10,14 +9,15 @@ namespace lib.StateImpl
     {
         public int punter;
         public int punters;
-        public Settings settings;
+        public Settings settings = new Settings();
         public Map map;
 
         public AiInfoSetupDecision aiSetupDecision;
         public AiInfoMoveDecision lastAiMoveDecision;
         public List<TurnState> turns = new List<TurnState>();
+        public bool IsSetupStage() => !turns.Any();
 
-        public MineDistCalculator.ServiceState mdc;
-        public MeetingPointService.ServiceState mps;
+        public MineDistCalculator.ServiceState mdc = new MineDistCalculator.ServiceState();
+        public MeetingPointService.ServiceState mps = new MeetingPointService.ServiceState();
     }
 }

@@ -12,13 +12,13 @@ namespace lib.Ai
 
         public AiSetupDecision Setup(State state, IServices services)
         {
-            services.Setup<GraphService>(state);
-            services.Setup<MineDistCalculator>(state);
-            services.Setup<MeetingPointService>(state);
+            services.Setup<Graph>();
+            services.Setup<MineDistCalculator>();
+            services.Setup<MeetingPointService>();
 
             var meetingPoint = state.mps.meetingPoint;
 
-            var graph = services.Get<GraphService>(state).Graph;
+            var graph = services.Get<Graph>();
             var futures = new List<Future>();
             foreach (var mine in graph.Mines.Keys)
             {
