@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using AngleSharp;
@@ -46,8 +45,8 @@ namespace lib.Arena
 
                     match.Players = cells[1].TextContent.Split(',').Select(y => y.Trim()).ToArray();
                     match.Extensions = cells[2].TextContent.Split(',').Select(y => y.Trim()).ToArray();
-                    int.TryParse(cells[3].TextContent, out match.Port);
-                    match.MapName = cells[4].QuerySelector("a").TextContent;
+                    int.TryParse(cells[4].TextContent, out match.Port);
+                    match.MapName = cells[5].QuerySelector("a").TextContent;
 
                     return match;
                 }).ToArray();
