@@ -61,9 +61,11 @@ namespace lib.Ai
                     continue;
                 if (flow > maxCount)
                     continue;
-
+                
                 foreach (var edge in dinic.GetMinCut().Select(ConvertToTuple))
                 {
+                    if(bannedMines.Contains(edge.Item1) || bannedMines.Contains(edge.Item2))
+                        continue;
                     edgesToBlock[edge] = edgesToBlock.GetOrDefault(edge, 0) + 1.0 / flow;
                 }
             }
