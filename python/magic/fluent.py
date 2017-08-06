@@ -30,8 +30,10 @@ class Fluent:
         self.param_names = ['Age']
         return self;
 
-    def create_nigga_players(self, mine_weight, others_mine_weight=100):
-        self.players = [{ 'Name' : 'xxx', 'Params': {'MineWeight': others_mine_weight}}]
+    def create_nigga_players(self, mine_weight, players_number, default_mine_weight=100):
+        self.players = [{ 'Name' : player_index, 'Params': {'MineWeight': default_mine_weight}}
+                        for player_index
+                        in range(players_number)]
         self.players[-1]['Params']['MineWeight'] = mine_weight
         return self
 
@@ -57,7 +59,7 @@ class Fluent:
 
     def battles_on_map(self, map, player_count, battles_count):
         for _ in range(battles_count):
-            players = [ self.players[np.random.randint(0,len(self.players))] for __ in range(player_count)]
+            players = [np.random.choice(self.players) for _ in range(player_count)]
             self.battles_on_maps.append((players,map))
         return self
 
