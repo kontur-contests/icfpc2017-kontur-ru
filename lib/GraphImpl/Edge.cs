@@ -30,5 +30,10 @@ namespace lib.GraphImpl
             Forward,
             Backward
         }
+
+        public override string ToString()
+        {
+            return $"{nameof(From)}: {From}, {nameof(To)}: {To}, {nameof(Owner)}: {Owner}";
+        }
     }
 }

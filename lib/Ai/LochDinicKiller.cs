@@ -33,8 +33,9 @@ namespace lib.Ai
                 .FirstOrDefault(mine => mine.Value.Edges.Count(edge => edge.Owner < 0) < state.punters).Value;
             if (mineToSave != null)
             {
-                var edgeToSave = mineToSave.Edges.OrderBy(_ => rand.Next()).First(edge => edge.Owner < 0);
-                return AiMoveDecision.Claim(state.punter, edgeToSave.From, edgeToSave.To);
+                var edgeToSave = mineToSave.Edges.OrderBy(_ => rand.Next()).FirstOrDefault(edge => edge.Owner < 0);
+                if (edgeToSave != null)
+                    return AiMoveDecision.Claim(state.punter, edgeToSave.From, edgeToSave.To);
             }
 
             var bannedMines = graph.Mines
