@@ -15,11 +15,11 @@ def execute_tasks(tasks_to_do, token):
         auto_offset_reset=OffsetType.LATEST,
         zookeeper_connect='icfpc-broker.dev.kontur.ru:2181'
     )
-    print(str(len(tasks_to_do))+' to go')
+    print(str(len(tasks_to_do))+' to go, token '+str(token))
 
     with tasks.get_sync_producer() as producer:
         for index, task in enumerate(tasks_to_do):
-            print('\rsending '+str(index), end='')
+            print('\rsending '+str(index)+'      \r', end='')
             producer.produce(json.dumps(task).encode('utf-8'))
 
     results = []
@@ -35,7 +35,7 @@ def execute_tasks(tasks_to_do, token):
                 results.append(data)
         if not remaining_answers:
             break
-        print('\rremaining ' + str(remaining_answers), end='     ')
+        print('\rremaining ' + str(remaining_answers) + '      \r', '')
 
     return results
 

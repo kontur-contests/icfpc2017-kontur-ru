@@ -3,14 +3,26 @@ import json
 import numpy as np
 
 def test_historical_2():
-    runner = magic.Fluent()
-    (runner
-    .create_historical_players(5)
-    .battles_on_map('sample.json', 2, 3)
-    .battles_on_map('Sierpinski-triangle.json', 3, 4)
-    .battles_on_map('gothenburg-sparse.json', 8, 6)
-    .experiment('Historical')
-    .preview())
+    maps = {
+        'sample.json': 2,
+        'Sierpinski-triangle.json': 3,
+        'randomSparse.json': 4,
+        'lambda.json': 4,
+        'circle.json': 4,
+        'randomMedium.json': 4,
+        'boston-sparse.json': 8,
+        'tube.json': 8,
+        'edinburgh-sparse.json': 16,
+        'oxford-sparse.json': 16,
+        'gothenburg-sparse.json': 16,
+    }
+    (magic.Fluent()
+         .create_historical_players(6)
+         .battles_on_map_set(maps,200)
+         .experiment('Historical')
+         .run().dump().store_pointwise('historical_4')
+    )
+
 
 def test_parameter():
     runner = magic.Fluent()
@@ -24,8 +36,8 @@ def test_parameter():
      )
     print(runner.token)
 
-test_parameter()
 
 
-#test_historical_2()
+
+test_historical_2()
 
