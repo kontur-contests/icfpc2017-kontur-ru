@@ -48,8 +48,8 @@ def assemble(fname,*args):
     magic.Fluent().restore_dump(*args).store_pointwise(fname)
     pass
 
-assemble('future.csv',45820,41308,35379,31603,48105)
-test_parameter_future()
+assemble('future.csv',45820,41308,35379,31603,48105,16426)
+#test_parameter_future()
 
 #test_historical();assemble('hist',12152,27372)
 #assemble('future',14139,58033,61678,93832);test_parameter_future()
