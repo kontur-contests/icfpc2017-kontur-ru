@@ -5,7 +5,7 @@ using lib.Strategies.EdgeWeighting;
 namespace lib.Ai.StrategicFizzBuzz
 {
     [UsedImplicitly]
-    public class MaxReachableVertexWeightAi : EdgeWeightingStrategicAi
+    public class MaxReachableVertexWeightAi : BiggestComponentEWStrategicAi
     {
         public MaxReachableVertexWeightAi() : this(100)
         {

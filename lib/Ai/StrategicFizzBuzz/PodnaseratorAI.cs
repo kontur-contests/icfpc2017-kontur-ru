@@ -98,7 +98,7 @@ namespace lib.Ai.StrategicFizzBuzz
             : base(
                 new PodnaseratorSettings(enemyTurnEstimationDifferenceWeight, myTurnEsimationWeight),
                 (punterId, state, services) => 
-                new EdgeWeightingStrategy(
+                new BiggestComponentEWStrategy(
                     punterId,
                     new MaxVertextWeighterWithConnectedComponents(mineMultiplier, services.Get<MineDistCalculator>(state)),
                     services.Get<MineDistCalculator>(state)))
