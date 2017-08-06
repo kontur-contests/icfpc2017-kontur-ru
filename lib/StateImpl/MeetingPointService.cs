@@ -21,6 +21,9 @@ namespace lib.StateImpl
 
                 foreach (var vertex in graph.Vertexes)
                 {
+                    if (vertex.Value.IsMine)
+                        continue;
+
                     var value = 0;
                     var count = 0;
                     foreach (var mine in graph.Mines)

@@ -42,17 +42,18 @@ namespace lib
         {
             if (move.claim != null)
                 return ApplyClaim(move.claim.punter, move.claim.source, move.claim.target);
+
+            var map = this;
             if (move.splurger != null && move.splurger.route.Length >= 2)
             {
                 var old = move.splurger.route[0];
-                var current = this;
                 foreach (var step in move.splurger.route.Skip(1))
                 {
-                    current.ApplyClaim(move.splurger.punter, old, step);
+                    map = map.ApplyClaim(move.splurger.punter, old, step);
                     old = step;
                 }
             }
-            return this;
+            return map;
         }
 
         private Map ApplyClaim(int punterId, int source, int target)
