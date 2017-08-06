@@ -36,7 +36,7 @@ namespace lib.Ai
             var meetingPoint = services.Get<MeetingPointService>().MeetingPoint;
 
             var graph = services.Get<Graph>();
-            var toDo = ConnectClosestMinesAi.GetNotMyMines(state, graph)
+            var toDo = graph.GetNotOwnedMines(state.punter)
                 .Select(x => x.Id);
 
             var myVerts = graph.Vertexes.Values
@@ -68,9 +68,9 @@ namespace lib.Ai
             if (skip)
                 return AiMoveDecision.Pass(state.punter, "wait");
 
-            AiMoveDecision move;
-            if (ConnectClosestMinesAi.TryExtendAnything(state, services, out move))
-                return move;
+//            AiMoveDecision move;
+//            if (ConnectClosestMinesAi.TryExtendAnything(state, services, out move))
+//                return move;
             return AiMoveDecision.Pass(state.punter);
         }
     }
