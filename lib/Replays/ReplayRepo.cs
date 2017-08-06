@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Firebase.Auth;
 using Firebase.Database;
 using Firebase.Database.Query;
-using lib.Firebase;
-using Newtonsoft.Json.Linq;
 
 namespace lib.Replays
 {

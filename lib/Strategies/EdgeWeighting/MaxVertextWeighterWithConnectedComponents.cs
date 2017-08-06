@@ -9,9 +9,9 @@ namespace lib.Strategies.EdgeWeighting
 {
     public class MaxVertextWeighterWithConnectedComponents : IEdgeWeighter
     {
-        public MaxVertextWeighterWithConnectedComponents(Map map, double mineMultiplier)
+        public MaxVertextWeighterWithConnectedComponents(double mineMultiplier, MineDistCalculator mineDistCalculator)
         {
-            MineDistCalculator = new MineDistCalculator(new Graph(map));
+            MineDistCalculator = mineDistCalculator;
             MineMultiplier = mineMultiplier;
         }
 
@@ -22,7 +22,7 @@ namespace lib.Strategies.EdgeWeighting
         private Dictionary<int, double> SubGraphWeight { get; set; }
         private ICollection<int> ClaimedMineIds { get; set; }
         private Dictionary<int, ConnectedComponent> VertexComponent { get; set; }
-        private ConnectedComponent CurrentComponent { get; set; }
+        public ConnectedComponent CurrentComponent { get; private set; }
         private Dictionary<Tuple<int, int>, long> MutualComponentWeights { get; set; }
 
         public void Init(Graph graph, List<ConnectedComponent> connectedComponents)
@@ -40,6 +40,7 @@ namespace lib.Strategies.EdgeWeighting
             ClaimedMineIds = maxComponent.Mines;
             foreach (var vertex in maxComponent.Vertices)
                 SubGraphWeight[vertex] = CalcSubGraphWeight(vertex);
+
         }
 
         public double EstimateWeight(Edge edge)

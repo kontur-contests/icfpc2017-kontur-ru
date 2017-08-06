@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using FluentAssertions;
 using Newtonsoft.Json;
 using NUnit.Framework;
 
@@ -16,6 +18,21 @@ namespace lib
             Assert.AreEqual(8, x.Sites.Length);
             Assert.AreEqual(12, x.Rivers.Length);
             Assert.AreEqual(new[]{1,5}, x.Mines);
+        }
+
+        [Test]
+        public void TestSer()
+        {
+            var dct = new Dictionary<int, int>
+            {
+                {1, 2 },
+                {10, 20 }
+            };
+            var serialized = JsonConvert.SerializeObject(dct);
+            Console.Out.WriteLine(serialized);
+
+            var newDct = JsonConvert.DeserializeObject<Dictionary<int, int>>(serialized);
+            newDct.ShouldBeEquivalentTo(dct);
         }
     }
 }

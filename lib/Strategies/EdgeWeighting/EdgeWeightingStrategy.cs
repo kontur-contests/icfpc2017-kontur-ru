@@ -7,11 +7,11 @@ namespace lib.Strategies.EdgeWeighting
 {
     public class EdgeWeightingStrategy : IStrategy
     {
-        public EdgeWeightingStrategy(Map map, int punterId, IEdgeWeighter edgeWeighter)
+        public EdgeWeightingStrategy(int punterId, IEdgeWeighter edgeWeighter, MineDistCalculator mineDistCalculator)
         {
             PunterId = punterId;
             EdgeWeighter = edgeWeighter;
-            MineDistCalulator = new MineDistCalculator(new Graph(map));
+            MineDistCalulator = mineDistCalculator;
         }
 
         private MineDistCalculator MineDistCalulator { get; }
@@ -42,7 +42,7 @@ namespace lib.Strategies.EdgeWeighting
 
             var connectedComponents = ConnectedComponent.GetComponents(graph, PunterId);
             EdgeWeighter.Init(graph, connectedComponents);
-            var maxComponent = connectedComponents.MaxBy(comp => comp.Vertices.Count);
+            var maxComponent = EdgeWeighter.CurrentComponent ?? connectedComponents.MaxBy(comp => comp.Vertices.Count);
             return maxComponent.Vertices
                 .SelectMany(v => graph.Vertexes[v].Edges)
                 .Where(e => e.Owner == -1)

@@ -1,19 +1,15 @@
-using lib.Strategies;
+using System;
+using lib.GraphImpl;
+using lib.StateImpl;
 using lib.Strategies.EdgeWeighting;
-using lib.Structures;
 
 namespace lib.Ai.StrategicFizzBuzz
 {
     public abstract class EdgeWeightingStrategicAi : StrategicAi
     {
-        private IStrategy strategy;
-        protected override IStrategy Strategy => strategy;
-        public override Future[] StartRound(int punterId, int puntersCount, Map map, Settings settings)
+        protected EdgeWeightingStrategicAi(Func<State, IServices, IEdgeWeighter> edgeWeighterProvider)
+            : base((state, services) => new EdgeWeightingStrategy(state.punter, edgeWeighterProvider(state, services), services.Get<MineDistCalculator>(state)))
         {
-            strategy = new EdgeWeightingStrategy(map, punterId, CreateEdgeWeighter(punterId, puntersCount, map, settings));
-            return base.StartRound(punterId, puntersCount, map, settings);
         }
-
-        protected abstract IEdgeWeighter CreateEdgeWeighter(int punterId, int puntersCount, Map map, Settings settings);
     }
 }

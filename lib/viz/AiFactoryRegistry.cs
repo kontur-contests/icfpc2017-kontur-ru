@@ -15,8 +15,17 @@ namespace lib.viz
                 .Where(
                     x => typeof(IAi).IsAssignableFrom(x) && x.GetConstructor(Type.EmptyTypes) != null &&
                          Attribute.GetCustomAttribute(x, typeof(ShoulNotRunOnlineAttribute)) == null);
-            Factories = types.Select(type => new AiFactory(type.Name, () => (IAi) Activator.CreateInstance(type)))
+            Factories = types.Select(CreateFactory)
                 .ToArray();
+        }
+
+        public static AiFactory CreateFactory(Type type)
+        {
+            return new AiFactory(type.Name, () => (IAi)Activator.CreateInstance(type));
+        }
+        public static AiFactory CreateFactory<TAi>()  where TAi : IAi
+        {
+            return CreateFactory(typeof(TAi));
         }
 
         public static IAi GetNextAi()

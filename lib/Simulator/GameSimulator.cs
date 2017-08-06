@@ -1,6 +1,9 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using lib.Ai;
+using lib.StateImpl;
 using lib.Structures;
 using MoreLinq;
 
@@ -10,30 +13,56 @@ namespace lib
     {
         private Map map;
         private readonly Settings settings;
-        private List<IAi> punters;
+        private readonly bool eatExceptions;
+        private Dictionary<IAi, Exception> lastException = new Dictionary<IAi, Exception>();
+        private List<Tuple<IAi, State, IServices>> punters;
         private int currentPunter = 0;
         private readonly List<Move> moves;
         private int turnsAmount;
+        private Move[] turnMoves;
+
+        [CanBeNull]
+        public Exception GetLastException(IAi ai)
+        {
+            return lastException.TryGetValue(ai, out var ex) ? ex : null;
+        }
 
         public IList<Future[]> Futures { get; }
 
-        public GameSimulator(Map map, Settings settings)
+        public GameSimulator(Map map, Settings settings, bool eatExceptions = false)
         {
             this.map = map;
             this.settings = settings;
-            punters = new List<IAi>();
+            this.eatExceptions = eatExceptions;
             moves = new List<Move>();
             Futures = new List<Future[]>();
         }
 
         public void StartGame(List<IAi> gamers)
         {
-            punters = gamers;
+            lastException.Clear();
+            turnMoves = gamers.Select((_, i) => Move.Pass(i)).ToArray();
+            punters = gamers.Select((g, i) => Tuple.Create(g, new State
+            {
+                map = map,
+                punter = i,
+                punters = gamers.Count,
+                settings = settings
+            }, (IServices)new Services())).ToList();
             for (int i = 0; i < punters.Count; i++)
             {
-                var punterFutures = punters[i].StartRound(i, punters.Count, map, settings);
-
-                Futures.Add(ValidateFutures(punterFutures));
+                var ai = punters[i].Item1;
+                var state = punters[i].Item2;
+                var services = punters[i].Item3;
+                var setupDecision = ai.Setup(state, services);
+                Futures.Add(ValidateFutures(setupDecision.futures));
+                state.aiSetupDecision = new AiInfoSetupDecision
+                {
+                    name = ai.Name,
+                    version = ai.Version,
+                    futures = setupDecision.futures,
+                    reason = setupDecision.reason
+                };
             }
 
             turnsAmount = map.Rivers.Length;
@@ -44,12 +73,44 @@ namespace lib
             if (turnsAmount <= 0)
                 return new GameState(map, moves.TakeLast(punters.Count).ToList(), true);
 
-            var nextMove = punters[currentPunter].GetNextMove(moves.ToArray(), map);
-            map = map.ApplyMove(nextMove);
-            moves.Add(nextMove);
+            var ai = punters[currentPunter].Item1;
+            var state = punters[currentPunter].Item2;
+            var services = punters[currentPunter].Item3;
+            state.map = map;
+            state.turns.Add(new TurnState{moves = turnMoves.ToArray(), aiMoveDecision = state.lastAiMoveDecision});
+            services.ApplyNextState(state);
+            var moveDecision = GetNextMove(ai, state, services, eatExceptions, lastException);
+            state.lastAiMoveDecision = new AiInfoMoveDecision
+            {
+                name = ai.Name,
+                version = ai.Version,
+                move = moveDecision.move,
+                reason = moveDecision.reason
+            };
+
+            map = map.ApplyMove(moveDecision.move);
+            turnMoves[currentPunter] = moveDecision.move;
+            moves.Add(moveDecision.move);
             currentPunter = (currentPunter + 1) % punters.Count;
             turnsAmount--;
             return new GameState(map, moves.TakeLast(punters.Count).ToList(), false);
+        }
+
+        private static AiMoveDecision GetNextMove(IAi ai, State state, IServices services, bool eatExceptions, Dictionary<IAi, Exception> lastException)
+        {
+            try
+            {
+                return ai.GetNextMove(state, services);
+            }
+            catch (Exception e)
+            {
+                lastException[ai] = e;
+                if (eatExceptions)
+                {
+                    return AiMoveDecision.Pass(state.punter, e.ToString());
+                }
+                else throw;
+            }
         }
 
         private Future[] ValidateFutures(Future[] futures)

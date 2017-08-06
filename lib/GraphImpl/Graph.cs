@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace lib.GraphImpl
@@ -9,7 +10,6 @@ namespace lib.GraphImpl
 
         public Graph()
         {
-            
         }
 
         public Graph(Map map)
@@ -30,6 +30,7 @@ namespace lib.GraphImpl
             }
         }
 
+        [Obsolete("test purposes only")]
         public void AddVertex(int v, bool isMine = false)
         {
             if (Vertexes.ContainsKey(v))
@@ -39,6 +40,7 @@ namespace lib.GraphImpl
                 Mines.Add(v, new Vertex(v, true));
         }
 
+        [Obsolete("test purposes only")]
         public void AddEdge(int v, int u, int owner = -1)
         {
             var river = new River(v, u, owner);

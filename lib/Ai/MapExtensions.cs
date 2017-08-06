@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 using lib.Structures;
 using lib.viz;
@@ -10,14 +11,20 @@ namespace lib.Ai
 {
     public static class MapExtensions
     {
-        public static void ShowWithPath(this Map map, int[] pathSiteIds)
+        public static void ShowWithPath(this Map map, List<int> pathSiteIds, Future[] futures)
         {
             var form = new Form()
             {
                 Text = pathSiteIds.ToDelimitedString(" - "),
                 WindowState = FormWindowState.Maximized
             };
-            var panel = new ScaledViewPanel(new MapPainter { Map = map, PainterAugmentor = new PathAugmentor(pathSiteIds, new DefaultPainterAugmentor()) })
+            var mapPainter = new MapPainter
+            {
+                Map = map,
+                PainterAugmentor = new PathAugmentor(pathSiteIds, new DefaultPainterAugmentor()){ShowFutures = true},
+                Futures = new Dictionary<int, Future[]> { { 0, futures } },
+            };
+            var panel = new ScaledViewPanel(mapPainter)
             {
                 Dock = DockStyle.Fill
             };
@@ -46,6 +53,7 @@ namespace lib.Ai
             set
             {
                 map = value;
+                var badSegments = riversPath.Where(r => !map.Rivers.Contains(r)).ToList();
                 fallbackAugmentor.Map = value;
             }
         }

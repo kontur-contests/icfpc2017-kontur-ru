@@ -8,10 +8,10 @@ namespace lib.Strategies.EdgeWeighting
 {
     public class MaxVertextWeighter : IEdgeWeighter
     {
-        public MaxVertextWeighter(Map map, double mineWeight)
+        public MaxVertextWeighter(MineDistCalculator mineDistCalculator, double mineWeight)
         {
             MineWeight = mineWeight;
-            MineDistCalculator = new MineDistCalculator(new Graph(map));
+            MineDistCalculator = mineDistCalculator;
         }
 
         private double MineWeight { get; }
@@ -20,6 +20,8 @@ namespace lib.Strategies.EdgeWeighting
         private ShortestPathGraph SpGraph { get; set; }
         private Dictionary<int, double> SubGraphWeight { get; set; }
         private int[] ClaimedMineIds { get; set; }
+
+        public ConnectedComponent CurrentComponent => null;
 
         public void Init(Graph graph, List<ConnectedComponent> connectedComponents)
         {

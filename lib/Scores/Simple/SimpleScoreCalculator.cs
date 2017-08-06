@@ -8,7 +8,7 @@ namespace lib.Scores.Simple
         public long GetScore(int punter, Map map, Future[] futures)
         {
             var graph = new Graph(map);
-            var distCalc = new MineDistCalculator(graph);
+            var distCalc = new MineDistCalculator.Impl(graph);
             var minesCalc = new ConnectedCalculator(graph, punter);
 
             long res = 0;

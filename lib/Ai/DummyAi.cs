@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Linq;
-using lib.Structures;
+using lib.StateImpl;
 
 namespace lib.Ai
 {
     public class DummyAi : IAi
     {
-        private int myPunterId;
         private readonly double moveProbability;
 
         public DummyAi(double moveProbability)
@@ -17,29 +16,27 @@ namespace lib.Ai
         public string Name { get; set; } = "Dummy";
         public string Version => "0.1";
 
-        public Future[] StartRound(int punterId, int puntersCount, Map map, Settings settings)
+        public AiSetupDecision Setup(State state, IServices services)
         {
-            myPunterId = punterId;
-
-            return new Future[0];
+            return AiSetupDecision.Empty();
         }
 
-        public Move GetNextMove(Move[] prevMoves, Map map)
+        public AiMoveDecision GetNextMove(State state, IServices services)
         {
             var random = new Random();
 
             if (random.NextDouble() < moveProbability)
             {
-                var river = map.Rivers
+                var river = state.map.Rivers
                     .Where(e => e.Owner == -1)
                     .Shuffle(random)
                     .FirstOrDefault();
 
                 if (river != null)
-                    return Move.Claim(myPunterId, river.Source, river.Target);
+                    return AiMoveDecision.Claim(state.punter, river.Source, river.Target, moveProbability.ToString());
             }
 
-            return Move.Pass(myPunterId);
+            return AiMoveDecision.Pass(state.punter);
         }
 
         public string SerializeGameState()

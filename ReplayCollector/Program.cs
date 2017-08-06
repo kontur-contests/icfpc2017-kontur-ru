@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using lib.Arena;
+using lib.OnlineRunner;
 
 namespace ReplayCollector
 {
@@ -10,7 +10,7 @@ namespace ReplayCollector
 
         public static void Main(string[] args)
         {
-            threadCount = 1;
+            threadCount = 32;
             for (var i = 0; i < threadCount; i++)
             {
                 var index = i;
@@ -19,7 +19,7 @@ namespace ReplayCollector
                     () =>
                     {
                         while (true)
-                            if (!ArenaRunner.TryCompeteOnArena(index.ToString())) return;
+                            if (!OnlineArenaRunner.TryCompeteOnArena(index.ToString())) return;
                     });
             }
 

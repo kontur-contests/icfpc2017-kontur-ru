@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using lib.GraphImpl;
-using lib.Structures;
+using lib.StateImpl;
 
 namespace lib.Ai
 {
@@ -13,21 +13,22 @@ namespace lib.Ai
         public string Name => nameof(LochKillerAi);
         public string Version => "0.1";
 
-        public Future[] StartRound(int punterId, int puntersCount, Map map, Settings settings)
+        public AiSetupDecision Setup(State state, IServices services)
         {
-            return Base.StartRound(punterId, puntersCount, map, settings);
+            services.Setup<GraphService>(state);
+            return Base.Setup(state, services);
         }
 
-        public Move GetNextMove(Move[] prevMoves, Map map)
+        public AiMoveDecision GetNextMove(State state, IServices services)
         {
-            if (map.Sites.Length < 300)
-                return Base.GetNextMove(prevMoves, map);
+            if (state.map.Sites.Length < 300)
+                return Base.GetNextMove(state, services);
 
-            var graph = new Graph(map);
+            var graph = services.Get<GraphService>(state).Graph;
 
-            var playersCount = map.Rivers.Select(river => river.Owner).Distinct().Count(i => i >= 0);
+            var playersCount = state.map.Rivers.Select(river => river.Owner).Distinct().Count(i => i >= 0);
 
-            var nearMinesEdge = map.Mines
+            var nearMinesEdge = state.map.Mines
                 .Select(mine => new {mine, edges = graph.Vertexes[mine].Edges.Select(edge => edge.River).ToList()})
                 .Where(mine => mine.edges.Select(edge => edge.Owner).Distinct().Count() < playersCount + 1)
                 .OrderBy(mine => Tuple.Create(mine.edges.Select(edge => edge.Owner).Distinct().Count(), rand.Next()))
@@ -35,18 +36,8 @@ namespace lib.Ai
                 .SelectMany(mine => mine.edges)
                 .FirstOrDefault(edge => edge.Owner < 0);
             if (nearMinesEdge == null)
-                return Base.GetNextMove(prevMoves, map);
-            return Move.Claim(Base.punterId, nearMinesEdge.Source, nearMinesEdge.Target);
-        }
-
-        public string SerializeGameState()
-        {
-            return Base.SerializeGameState();
-        }
-
-        public void DeserializeGameState(string gameState)
-        {
-            Base.DeserializeGameState(gameState);
+                return Base.GetNextMove(state, services);
+            return AiMoveDecision.Claim(state.punter, nearMinesEdge.Source, nearMinesEdge.Target);
         }
     }
 }

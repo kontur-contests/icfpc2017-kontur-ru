@@ -29,9 +29,9 @@ namespace lib.Interaction.Internal
             }
         }
 
-        public In ReadSetup(int? timeout = null)
+        public In ReadSetup()
         {
-            var @in = transport.Read<In>(timeout);
+            var @in = transport.Read<In>();
             if (!@in.IsSetup())
                 throw new InvalidOperationException("Invalid response. Expected setup");
             return @in;

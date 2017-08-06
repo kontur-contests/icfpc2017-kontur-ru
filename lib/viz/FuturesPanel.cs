@@ -9,15 +9,26 @@ namespace lib.viz
 {
     public class FuturesPanel : TableLayoutPanel
     { 
-        public  void SetFutures(Dictionary<int, Future[]> futures, Graph graph)
+        public  void SetFutures(Dictionary<int, Future[]> futures, Map map)
         {
-            var calculator = new MineDistCalculator(graph);
+            this.futures = futures;
+            var graph = new Graph(map);
+            futureToListIndex.Clear();
             futuresList.Items.Clear();
+            var calculator = new MineDistCalculator.Impl(graph);
+            var i = 0;
             foreach (var futuresGroup in futures)
             {
                 var id = futuresGroup.Key;
-                futuresList.Items.AddRange(futuresGroup.Value.Select(f => $"{id}:\t{f.source}->{f.target}\t|{CalculateCost(f, calculator)}").Cast<object>().ToArray());
+                foreach (var future in futuresGroup.Value)
+                {
+                    var str = $"{id}:\t{future.source}->{future.target}\t|{CalculateCost(future, calculator)}";
+                    futuresList.Items.Add(str, false);
+                    futureToListIndex[future] = i++;
+                }
             }
+
+            UpdateFuturesStats(map);
         }
 
         public event Action<bool> FuturesVisibleChanged;
@@ -33,9 +44,10 @@ namespace lib.viz
                 CheckState = CheckState.Checked
             };
             show.CheckStateChanged += (_, __) => FuturesVisibleChanged?.Invoke(show.Checked);
-            futuresList = new ListBox
+            futuresList = new CheckedListBox
             {
-                Dock = DockStyle.Fill
+                Dock = DockStyle.Fill,
+                SelectionMode = SelectionMode.None
             };
 
             RowStyles.Add(new RowStyle { SizeType = SizeType.Absolute, Height = 40 });
@@ -44,7 +56,23 @@ namespace lib.viz
             Controls.Add(futuresList, 0, 3);
         }
 
-        private static int CalculateCost(Future future, MineDistCalculator calculator)
+        public void UpdateFuturesStats(Map map)
+        {
+            var graph = new Graph(map);
+            foreach (var futuresGroup in futures)
+            {
+                var connectedCalc = new ConnectedCalculator(graph, futuresGroup.Key);
+                foreach (var future in futuresGroup.Value)
+                {
+                    var connected = connectedCalc.GetConnectedMines(future.source).Contains(future.target) ||
+                                    connectedCalc.GetConnectedMines(future.target).Contains(future.source);
+
+                    futuresList.SetItemChecked(futureToListIndex[future], connected);
+                }
+            }
+        }
+
+        private static int CalculateCost(Future future, MineDistCalculator.Impl calculator)
         {
             var dist = 0;
 
@@ -67,6 +95,8 @@ namespace lib.viz
             return dist * dist * dist;
         }
 
-        private readonly ListBox futuresList;
+        private readonly CheckedListBox futuresList;
+        private Dictionary<int, Future[]> futures;
+        private Dictionary<Future, int> futureToListIndex = new Dictionary<Future, int>();
     }
 }

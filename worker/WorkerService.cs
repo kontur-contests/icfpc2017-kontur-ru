@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading;
 using Confluent.Kafka;
 using Confluent.Kafka.Serialization;
-using lib.Arena;
+using lib.OnlineRunner;
 using Newtonsoft.Json;
 using NLog;
 
@@ -48,10 +48,12 @@ namespace worker
             arenaThread = new Thread(
                 () =>
                 {
-                    while (!cancelled)
-                    {
-                        ArenaRunner.TryCompeteOnArena("TCWorker", commitHash);
-                    }
+                    for (var i = 0; i < 3; i++)
+                        System.Threading.Tasks.Task.Run(() =>
+                        {
+                            while (!cancelled)
+                                OnlineArenaRunner.TryCompeteOnArena("TCWorker", commitHash);
+                        });
                 });
             arenaThread.Start();
 
@@ -98,27 +100,31 @@ namespace worker
 
                             try
                             {
-                                var task = JsonConvert.DeserializeObject<Task>(msg.Value);
-                                Result result = null;
-                                try
-                                {
-                                    result = experiment.Play(task);
-                                }
-                                catch (Exception exception)
-                                {
-                                    result = new Result {Error = exception.Message};
-                                }
-                                result.Task = task;
-                                result.Token = task.Token;
-                                var resultString = JsonConvert.SerializeObject(result);
-
-                                var deliveryReport = producer.ProduceAsync(outputTopicName, null, resultString);
-
-                                deliveryReport.ContinueWith(
-                                    x =>
+                                System.Threading.Tasks.Task.Run(
+                                    () =>
                                     {
-                                        logger.Info(
-                                            $"Sent result | Partition: {x.Result.Partition}, Offset: {x.Result.Offset}");
+                                        var task = JsonConvert.DeserializeObject<Task>(msg.Value);
+                                        Result result = null;
+                                        try
+                                        {
+                                            result = experiment.Play(task);
+                                        }
+                                        catch (Exception exception)
+                                        {
+                                            result = new Result {Error = exception.Message};
+                                        }
+                                        result.Task = task;
+                                        result.Token = task.Token;
+                                        var resultString = JsonConvert.SerializeObject(result);
+
+                                        var deliveryReport = producer.ProduceAsync(outputTopicName, null, resultString);
+
+                                        deliveryReport.ContinueWith(
+                                            x =>
+                                            {
+                                                logger.Info(
+                                                    $"Sent result | Partition: {x.Result.Partition}, Offset: {x.Result.Offset}");
+                                            });
                                     });
                             }
                             catch (Exception e)
@@ -135,7 +141,7 @@ namespace worker
 
         public void Stop()
         {
-            cancelled = true;
+            cancelled = true;  
             workerThread.Join();
             arenaThread.Join();
         }
