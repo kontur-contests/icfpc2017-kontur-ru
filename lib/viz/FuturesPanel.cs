@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Windows.Forms;
 using lib.GraphImpl;
 using lib.Structures;
@@ -15,7 +14,7 @@ namespace lib.viz
             var graph = new Graph(map);
             futureToListIndex.Clear();
             futuresList.Items.Clear();
-            var calculator = new MineDistCalculator.Impl(graph);
+            var calculator = new MineDistCalculator(graph);
             var i = 0;
             foreach (var futuresGroup in futures)
             {
@@ -72,7 +71,7 @@ namespace lib.viz
             }
         }
 
-        private static int CalculateCost(Future future, MineDistCalculator.Impl calculator)
+        private static int CalculateCost(Future future, MineDistCalculator calculator)
         {
             var dist = 0;
 

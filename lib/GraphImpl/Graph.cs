@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
+using lib.StateImpl;
 
 namespace lib.GraphImpl
 {
-    public class Graph
+    public class Graph : IService
     {
         public readonly Dictionary<int, Vertex> Vertexes = new Dictionary<int, Vertex>();
         public readonly Dictionary<int, Vertex> Mines = new Dictionary<int, Vertex>();

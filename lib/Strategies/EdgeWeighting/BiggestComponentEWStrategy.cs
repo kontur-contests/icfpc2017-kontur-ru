@@ -8,22 +8,24 @@ namespace lib.Strategies.EdgeWeighting
 {
     public class BiggestComponentEWStrategy : IStrategy
     {
-        public BiggestComponentEWStrategy(int punterId, IEdgeWeighter edgeWeighter, MineDistCalculator mineDistCalculator)
+        public BiggestComponentEWStrategy(IEdgeWeighter edgeWeighter, State state, IServices services)
         {
-            PunterId = punterId;
+            PunterId = state.punter;
             EdgeWeighter = edgeWeighter;
-            MineDistCalulator = mineDistCalculator;
+            MineDistCalulator = services.Get<MineDistCalculator>();
+            ConnectedComponentsService = services.Get<ConnectedComponentsService>();
+            Graph = services.Get<Graph>();
         }
 
         private MineDistCalculator MineDistCalulator { get; }
         private IEdgeWeighter EdgeWeighter { get; }
         private int PunterId { get; }
+        private ConnectedComponentsService ConnectedComponentsService { get; }
+        private Graph Graph { get; }
 
-
-        public List<TurnResult> Turn(State state, IServices services)
+        public List<TurnResult> NextTurns()
         {
-            var graph = services.Get<GraphService>(state).Graph;
-            var claimedVertexes = graph.Vertexes.Values
+            var claimedVertexes = Graph.Vertexes.Values
                 .SelectMany(x => x.Edges)
                 .Where(edge => edge.Owner == PunterId)
                 .SelectMany(edge => new[] {edge.From, edge.To})
@@ -31,7 +33,7 @@ namespace lib.Strategies.EdgeWeighting
                 .ToArray();
 
             if (claimedVertexes.Length == 0)
-                return graph.Mines.Values
+                return Graph.Mines.Values
                     .SelectMany(v => v.Edges)
                     .Where(e => e.Owner == -1)
                     .Select(
@@ -42,12 +44,12 @@ namespace lib.Strategies.EdgeWeighting
                         })
                     .ToList();
 
-            var connectedComponents = ConnectedComponent.GetComponents(graph, PunterId);
+            var connectedComponents = ConnectedComponentsService.For(PunterId);
             var maxComponent = connectedComponents.MaxBy(comp => comp.Vertices.Count);
-            EdgeWeighter.Init(state, services, connectedComponents, maxComponent);
+            EdgeWeighter.Init(connectedComponents, maxComponent);
             return maxComponent.Vertices
-                .SelectMany(v => graph.Vertexes[v].Edges)
-                .Where(e => e.Owner == -1)
+                .SelectMany(v => Graph.Vertexes[v].Edges)
+                .Where(e => e.Owner == -1 && !AreConnected(maxComponent, e.From, e.To))
                 .Select(
                     e => new TurnResult
                     {
@@ -55,6 +57,11 @@ namespace lib.Strategies.EdgeWeighting
                         River = e.River
                     })
                 .ToList();
+        }
+
+        private bool AreConnected(ConnectedComponent currentComponent, int fromId, int toId)
+        {
+            return currentComponent.Vertices.Contains(fromId) && currentComponent.Vertices.Contains(toId);
         }
     }
 }

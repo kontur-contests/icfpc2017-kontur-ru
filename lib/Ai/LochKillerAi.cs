@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using lib.Ai.StrategicFizzBuzz;
 using lib.GraphImpl;
 using lib.StateImpl;
 
@@ -15,7 +16,7 @@ namespace lib.Ai
 
         public AiSetupDecision Setup(State state, IServices services)
         {
-            services.Setup<GraphService>(state);
+            services.Setup<Graph>();
             return Base.Setup(state, services);
         }
 
@@ -24,7 +25,7 @@ namespace lib.Ai
             if (state.map.Sites.Length < 300)
                 return Base.GetNextMove(state, services);
 
-            var graph = services.Get<GraphService>(state).Graph;
+            var graph = services.Get<Graph>();
 
             var playersCount = state.map.Rivers.Select(river => river.Owner).Distinct().Count(i => i >= 0);
 

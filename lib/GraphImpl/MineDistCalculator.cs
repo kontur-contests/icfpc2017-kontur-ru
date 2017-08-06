@@ -8,42 +8,23 @@ using Shouldly;
 
 namespace lib.GraphImpl
 {
-    public class MineDistanceInfo
-    {
-        public MineDistanceInfo(int distance, int prevSiteId)
-        {
-            Distance = distance;
-            PrevSiteId = prevSiteId;
-        }
-
-        public int Distance;
-        public int PrevSiteId;
-    }
-
     public class MineDistCalculator : IService
     {
-        public Impl impl;
+        private readonly Graph graph;
+        private readonly Dictionary<int, Dictionary<int, MineDistanceInfo>> distFromMines;
 
         public class ServiceState
         {
             public Dictionary<int, Dictionary<int, MineDistanceInfo>> distFromMines;
         }
 
-        public class Impl
+        public MineDistCalculator(Graph graph, State state = null)
         {
-            private readonly Graph graph;
-            public readonly Dictionary<int, Dictionary<int, MineDistanceInfo>> distFromMines;
-
-            public Impl(Graph graph, Dictionary<int, Dictionary<int, MineDistanceInfo>> distFromMines)
+            this.graph = graph;
+            if (state != null && !state.IsSetupStage())
+                distFromMines = state.mdc.distFromMines;
+            if (state == null || state.IsSetupStage())
             {
-                this.graph = graph;
-                this.distFromMines = distFromMines;
-            }
-
-            public Impl(Graph graph)
-            {
-                this.graph = graph;
-
                 distFromMines = new Dictionary<int, Dictionary<int, MineDistanceInfo>>();
                 foreach (var vertex in graph.Vertexes.Values)
                 {
@@ -53,86 +34,75 @@ namespace lib.GraphImpl
                         distFromMines.Add(vertex.Id, dists);
                     }
                 }
+                if (state != null)
+                    state.mdc.distFromMines = distFromMines;
             }
-
-            public int GetDist(int mineId, int vertexId)
-            {
-                if (!distFromMines.ContainsKey(mineId))
-                    throw new InvalidOperationException();
-                if (!distFromMines[mineId].ContainsKey(vertexId))
-                    return -1;
-                return distFromMines[mineId][vertexId].Distance;
-            }
-
-            public IEnumerable<int> GetReversedPath(int mineId, int vertexId)
-            {
-                var current = vertexId;
-                while (current >= 0)
-                {
-                    var info = GetInfo(mineId, current);
-                    if (info == null) yield break;
-                    yield return current;
-                    current = info.PrevSiteId;
-                }
-            }
-
-            public MineDistanceInfo GetInfo(int mineId, int vertexId)
-            {
-                if (!distFromMines.ContainsKey(mineId))
-                    throw new InvalidOperationException();
-                if (!distFromMines[mineId].ContainsKey(vertexId))
-                    return null;
-                return distFromMines[mineId][vertexId];
-            }
-
-            //(v, dist)
-
-            private Dictionary<int, MineDistanceInfo> CalcDist(int start)
-            {
-                var dist = new Dictionary<int, MineDistanceInfo>();
-                var queue = new Queue<int>();
-
-                dist[start] = new MineDistanceInfo(0, -1);
-                queue.Enqueue(start);
-
-                while (queue.Any())
-                {
-                    int v = queue.Dequeue();
-                    foreach (var edge in graph.Vertexes[v].Edges)
-                    {
-                        int u = edge.To;
-                        if (dist.ContainsKey(u))
-                            continue;
-                        dist.Add(u, new MineDistanceInfo(dist[v].Distance + 1, v));
-                        queue.Enqueue(u);
-                    }
-                }
-
-                return dist;
-            }
-        }
-
-        public void Setup(State state, IServices services)
-        {
-            var graph = services.Get<GraphService>(state).Graph;
-            impl = new Impl(graph);
-            state.mdc = new ServiceState { distFromMines = impl.distFromMines };
-        }
-
-        public void ApplyNextState(State state, IServices services)
-        {
-            var graph = services.Get<GraphService>(state).Graph;
-            impl = impl ?? new Impl(graph, state.mdc.distFromMines);
         }
 
         public int GetDist(int mineId, int vertexId)
         {
-            return impl.GetDist(mineId, vertexId);
+            if (!distFromMines.ContainsKey(mineId))
+                throw new InvalidOperationException();
+            if (!distFromMines[mineId].ContainsKey(vertexId))
+                return -1;
+            return distFromMines[mineId][vertexId].Distance;
         }
 
         public IEnumerable<int> GetReversedPath(int mineId, int vertexId)
         {
-            return impl.GetReversedPath(mineId, vertexId);
+            var current = vertexId;
+            while (current >= 0)
+            {
+                var info = GetInfo(mineId, current);
+                if (info == null) yield break;
+                yield return current;
+                current = info.PrevSiteId;
+            }
+        }
+
+        public MineDistanceInfo GetInfo(int mineId, int vertexId)
+        {
+            if (!distFromMines.ContainsKey(mineId))
+                throw new InvalidOperationException();
+            if (!distFromMines[mineId].ContainsKey(vertexId))
+                return null;
+            return distFromMines[mineId][vertexId];
+        }
+
+        private Dictionary<int, MineDistanceInfo> CalcDist(int start)
+        {
+            var dist = new Dictionary<int, MineDistanceInfo>();
+            var queue = new Queue<int>();
+
+            dist[start] = new MineDistanceInfo(0, -1);
+            queue.Enqueue(start);
+
+            while (queue.Any())
+            {
+                int v = queue.Dequeue();
+                foreach (var edge in graph.Vertexes[v].Edges)
+                {
+                    int u = edge.To;
+                    if (dist.ContainsKey(u))
+                        continue;
+                    dist.Add(u, new MineDistanceInfo(dist[v].Distance + 1, v));
+                    queue.Enqueue(u);
+                }
+            }
+
+            return dist;
+        }
+
+        public class MineDistanceInfo
+        {
+            public MineDistanceInfo(int distance, int prevSiteId)
+            {
+                Distance = distance;
+                PrevSiteId = prevSiteId;
+            }
+
+            public int Distance;
+            public int PrevSiteId;
         }
     }
 
@@ -148,7 +118,7 @@ namespace lib.GraphImpl
             graph.AddVertex(1, true);
             graph.AddVertex(2);
 
-            var calculator = new MineDistCalculator.Impl(graph);
+            var calculator = new MineDistCalculator(graph);
             Assert.AreEqual(-1, calculator.GetDist(1, 2));
         }
 
@@ -170,7 +140,7 @@ namespace lib.GraphImpl
             graph.AddEdge(2, 3);
             graph.AddEdge(3, 5);
 
-            var calculator = new MineDistCalculator.Impl(graph);
+            var calculator = new MineDistCalculator(graph);
 
             Assert.AreEqual(1, calculator.GetDist(3, 1));
             Assert.AreEqual(1, calculator.GetDist(3, 2));

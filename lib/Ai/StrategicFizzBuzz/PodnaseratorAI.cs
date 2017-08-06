@@ -4,7 +4,6 @@ using lib.GraphImpl;
 using lib.StateImpl;
 using lib.Strategies;
 using lib.Strategies.EdgeWeighting;
-using lib.Structures;
 using MoreLinq;
 
 namespace lib.Ai.StrategicFizzBuzz
@@ -36,12 +35,10 @@ namespace lib.Ai.StrategicFizzBuzz
 
         public AiSetupDecision Setup(State state, IServices services)
         {
-            services.Setup<GraphService>(state);
-            StrategyProvider(state.punter, state, services);
+            services.Setup<Graph>();
             Enumerable.Range(0, state.punters)
-                .Except(new[] { state.punter })
-                .Select(enemyId => StrategyProvider(enemyId, state, services))
-                .ToArray();
+                .Select(punterId => StrategyProvider(punterId, state, services))
+                .Consume();
             return AiSetupDecision.Empty();
         }
 
@@ -52,9 +49,9 @@ namespace lib.Ai.StrategicFizzBuzz
                 .Except(new[] { state.punter })
                 .Select(enemyId => StrategyProvider(enemyId, state, services))
                 .ToArray();
-            var bestTurn = GetMyBestTurn(state, services, myStrategy);
+            var bestTurn = GetMyBestTurn(myStrategy);
             var enemyBestTurns = enemyStrategies
-                .Select(s => s.Turn(state, services))
+                .Select(s => s.NextTurns())
                 .Where(ts => ts.Count >= 2)
                 .Select(ts => ts.OrderByDescending(x => x.Estimation).Take(2).ToArray())
                 .ToArray();
@@ -71,9 +68,9 @@ namespace lib.Ai.StrategicFizzBuzz
             return AiMoveDecision.Claim(state.punter, bestTurn.River.Source, bestTurn.River.Target);
         }
         
-        private TurnResult GetMyBestTurn(State state, IServices services, IStrategy myStrategy)
+        private TurnResult GetMyBestTurn(IStrategy myStrategy)
         {
-            var turns = myStrategy.Turn(state, services);
+            var turns = myStrategy.NextTurns();
             if (!turns.Any())
                 return new TurnResult
                 {
@@ -98,9 +95,8 @@ namespace lib.Ai.StrategicFizzBuzz
                 new PodnaseratorSettings(enemyTurnEstimationDifferenceWeight, myTurnEsimationWeight),
                 (punterId, state, services) => 
                 new BiggestComponentEWStrategy(
-                    punterId,
                     new MaxVertextWeighter(mineMultiplier, state, services),
-                    services.Get<MineDistCalculator>(state)))
+                    state, services))
         {
         }
 

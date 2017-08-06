@@ -9,20 +9,26 @@ using lib.StateImpl;
 
 namespace lib.Strategies.EdgeWeighting
 {
-    class DinicWeighter : IEdgeWeighter
+    public class DinicWeighter : IEdgeWeighter
     {
         private Random rand = new Random();
+        private Graph Graph { get; }
+        private int PunterId { get; }
 
-        public void Init(State state, IServices services, List<ConnectedComponent> connectedComponents, ConnectedComponent currentComponent)
+        public DinicWeighter(State state, IServices services)
         {
-            var graph = services.Get<GraphService>(state).Graph;
-
+            Graph = services.Get<Graph>();
+            PunterId = state.punter;
+        }
+        
+        public void Init(ConnectedComponent[] connectedComponents, ConnectedComponent currentComponent)
+        {
             int maxCount = 10;
             Dictionary<Tuple<int, int>, double> edgesToBlock = new Dictionary<Tuple<int, int>, double>();
 
-            var mineToSave = graph.Mines
-                .Where(mine => mine.Value.Edges.All(edge => edge.Owner != state.punter))
-                .FirstOrDefault(mine => mine.Value.Edges.Count(edge => edge.Owner < 0) < state.punters).Value;
+            var mineToSave = Graph.Mines
+                .Where(mine => mine.Value.Edges.All(edge => edge.Owner != PunterId))
+                .FirstOrDefault(mine => mine.Value.Edges.Count(edge => edge.Owner < 0) < PunterId).Value;
             if (mineToSave != null)
             {
                 var edgeToSave = mineToSave.Edges.OrderBy(_ => rand.Next()).FirstOrDefault(edge => edge.Owner < 0);
@@ -30,8 +36,8 @@ namespace lib.Strategies.EdgeWeighting
                 //    return AiMoveDecision.Claim(state.punter, edgeToSave.From, edgeToSave.To);
             }
 
-            var bannedMines = graph.Mines
-                .Where(mine => mine.Value.Edges.Select(edge => edge.Owner).Distinct().Count() == state.punters + 1)
+            var bannedMines = Graph.Mines
+                .Where(mine => mine.Value.Edges.Select(edge => edge.Owner).Distinct().Count() == PunterId + 1)
                 .Select(mine => mine.Key)
                 .ToHashSet();
         }

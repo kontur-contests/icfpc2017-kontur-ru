@@ -6,22 +6,17 @@ namespace lib.Strategies.EdgeWeighting
 {
     public class ConnectedComponentsService : IService
     {
-        private Graph Graph { get; set; }
-        private IDictionary<int, List<ConnectedComponent>> Cache { get; } = new Dictionary<int, List<ConnectedComponent>>();
+        private readonly Graph graph;
+        private readonly IDictionary<int, ConnectedComponent[]> cache = new Dictionary<int, ConnectedComponent[]>();
 
-        public void Setup(State state, IServices services)
+        public ConnectedComponentsService(Graph graph)
         {
-            services.Setup<GraphService>(state);
+            this.graph = graph;
         }
-
-        public void ApplyNextState(State state, IServices services)
+        
+        public ConnectedComponent[] For(int punterId)
         {
-            Graph = services.Get<GraphService>(state).Graph;
-        }
-
-        public List<ConnectedComponent> For(int punterId)
-        {
-            return Cache.GetOrCreate(punterId, key => ConnectedComponent.GetComponents(Graph, punterId));
+            return cache.GetOrCreate(punterId, key => ConnectedComponent.GetComponents(graph, punterId).ToArray());
         }
     }
 }

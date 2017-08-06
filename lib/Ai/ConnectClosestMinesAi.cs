@@ -18,8 +18,8 @@ namespace lib.Ai
 
         public AiSetupDecision Setup(State state, IServices services)
         {
-            services.Setup<GraphService>(state);
-            services.Setup<MineDistCalculator>(state);
+            services.Setup<Graph>();
+            services.Setup<MineDistCalculator>();
             return AiSetupDecision.Empty();
         }
 
@@ -37,8 +37,8 @@ namespace lib.Ai
 
         public static bool TryExtendAnything(State state, IServices services, out AiMoveDecision nextMove)
         {
-            var graph = services.Get<GraphService>(state).Graph;
-            var mineDistCalculator = services.Get<MineDistCalculator>(state);
+            var graph = services.Get<Graph>();
+            var mineDistCalculator = services.Get<MineDistCalculator>();
             var calculator = new ConnectedCalculator(graph, state.punter);
             var maxAddScore = long.MinValue;
             Edge bestEdge = null;
@@ -81,7 +81,7 @@ namespace lib.Ai
         public static bool TryExtendComponent(State state, IServices services, out AiMoveDecision move)
         {
             //TODO Сейчас увеличивает первую попавшуюся компоненту. А может быть нужно расширять самую большую компоненту.
-            var graph = services.Get<GraphService>(state).Graph;
+            var graph = services.Get<Graph>();
             var queue = new Queue<ExtendQueueItem>();
             var used = new HashSet<int>();
             foreach (var mineV in GetNotMyMines(state, graph))
@@ -123,14 +123,14 @@ namespace lib.Ai
             return false;
         }
 
-        private static IEnumerable<Vertex> GetNotMyMines(State state, Graph graph)
+        public static IEnumerable<Vertex> GetNotMyMines(State state, Graph graph)
         {
             return graph.Mines.Values.Where(v => v.Edges.All(e => e.Owner != state.punter));
         }
 
         public static bool TryBuildNewComponent(State state, IServices services, out AiMoveDecision move)
         {
-            var graph = services.Get<GraphService>(state).Graph;
+            var graph = services.Get<Graph>();
             var queue = new Queue<BuildQueueItem>();
             var used = new Dictionary<int, BuildQueueItem>();
             foreach (var mineV in GetNotMyMines(state, graph))
@@ -225,16 +225,16 @@ namespace lib.Ai
         {
             var ai = new ConnectClosestMinesAi();
             var state = new State{punter = 0, punters = 1, map = MapLoader.LoadMap(Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\..\maps\sample.json")).Map };
-            ai.Setup(state, new Services());
-            var moveDecision = ai.GetNextMove(state, new Services());
+            ai.Setup(state, new Services(state));
+            var moveDecision = ai.GetNextMove(state, new Services(state));
             Assert.That(moveDecision.move, Is.EqualTo(Move.Claim(0, 5, 3)));
             state.map = state.map.ApplyMove(moveDecision.move);
             state.turns.Add(new TurnState());
-            moveDecision = ai.GetNextMove(state, new Services());
+            moveDecision = ai.GetNextMove(state, new Services(state));
             Assert.That(moveDecision.move, Is.EqualTo(Move.Claim(0, 1, 3)));
             state.map = state.map.ApplyMove(moveDecision.move);
             state.turns.Add(new TurnState());
-            moveDecision = ai.GetNextMove(state, new Services());
+            moveDecision = ai.GetNextMove(state, new Services(state));
             Assert.That(moveDecision.move, Is.EqualTo(Move.Claim(0, 0, 1)));
         }
         
