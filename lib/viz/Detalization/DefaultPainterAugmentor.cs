@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
+using lib.GraphImpl;
 using lib.Structures;
 
 namespace lib.viz.Detalization
@@ -36,8 +37,10 @@ namespace lib.viz.Detalization
     {
         private const float defaultRadius = 30f;
         private static Color[] Colors = ColorsPalette.Colors;
+        private readonly Dictionary<int, ConnectedCalculator> connectedCalcs = new Dictionary<int, ConnectedCalculator>();
 
         private IndexedMap map;
+        private Graph graph;
         private float radius;
 
         public IndexedMap Map
@@ -47,6 +50,8 @@ namespace lib.viz.Detalization
             {
                 map = value;
                 radius = Math.Max(0.5f, Math.Min(defaultRadius, CalcMinDistance() / 5));
+                connectedCalcs.Clear();
+                graph = new Graph(map.Map);
             }
         }
 
@@ -73,10 +78,16 @@ namespace lib.viz.Detalization
 
         public FuturePainterData GetData(int punderId, Future future)
         {
+            if (!connectedCalcs.ContainsKey(punderId))
+                connectedCalcs.Add(punderId, new ConnectedCalculator(graph, punderId));
+            var calc = connectedCalcs[punderId];
+            var conected = calc.GetConnectedMines(future.source).Contains(future.target) ||
+                           calc.GetConnectedMines(future.target).Contains(future.source);
             return new FuturePainterData
             {
                 Color = Colors[punderId],
-                PenWidth = 5
+                PenWidth = conected ? 1 : 2,
+                DashStyle = DashStyle.Solid
             };
         }
 

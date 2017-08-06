@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
@@ -125,10 +126,11 @@ namespace lib.viz
             var pen = new Pen(data.Color, data.PenWidth)
             {
                 StartCap = LineCap.ArrowAnchor,
-                EndCap = LineCap.RoundAnchor
+                EndCap = LineCap.RoundAnchor,
+                DashStyle = data.DashStyle
             };
             using (pen)
-                g.DrawLine(pen, source.Point(), target.Point());
+                g.DrawBezier(pen, source.Point(), target.Point(), punderId*3 + 12);
         }
 
         private void DrawSiteText(Graphics g, Site site)
@@ -180,5 +182,61 @@ namespace lib.viz
             var pb = start + b * v;
             return (point - pb).LengthSquared();
         }
+    }
+
+    public static class ArcDrawerHelper
+    {
+        public static void DrawBezier(this Graphics g, Pen pen, PointF source, PointF target, int radius)
+        {
+            var mid = FindMidPoints(source, target, radius);
+            g.DrawBezier(pen, source, mid.Item1, mid.Item2, target);
+        }
+
+        private static Tuple<PointF, PointF> FindMidPoints(PointF f, PointF s, float distance)
+        {
+            var abc = FindABC(f, s);
+            var a = abc.Item1;
+            var b = abc.Item2;
+            var n = new SizeF(a, b).Normalize();
+            var d = new SizeF(s.X - f.X, s.Y- f.Y);
+            var fc = f + d.Mul(1f/3);
+            var sc = f + d.Mul(2f/3);
+            return Tuple.Create(fc + n.Mul(distance), sc + n.Mul(distance));
+        }
+        
+        private static Tuple<float, float, float> FindABC(PointF f, PointF s)
+        {
+            var dx = f.X - s.X;
+            var dy = f.Y - s.Y;
+            if (Math.Abs(dx) < Epsilon && Math.Abs(dy) < Epsilon)
+                return null;
+            if (Math.Abs(dx) < Epsilon)
+            {
+                return Tuple.Create(1f, 0f, f.X); //vertical
+            }
+            else if (Math.Abs(dy) < Epsilon)
+            {
+                return Tuple.Create(0f, 1f, f.Y); //horizontal
+            }
+            else
+            {
+                var k = dy / dx;
+                var c = k * f.X - f.Y;
+                return Tuple.Create(-k, 1f, c);
+            }
+        }
+
+        private static SizeF Normalize(this SizeF size)
+        {
+            var l = Math.Sqrt(size.Height * size.Height + size.Width * size.Width);
+            return Math.Abs(l) < Epsilon ? size : size.Mul(1f / (float)l);
+        }
+
+        private static SizeF Mul(this SizeF size, float k)
+        {
+            return new SizeF(size.Width*k, size.Height*k);
+        }
+
+        private const float Epsilon = 0.0001f;
     }
 }
