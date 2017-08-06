@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using lib.Ai.StrategicFizzBuzz;
 using lib.GraphImpl;
 using lib.StateImpl;
 using lib.Structures;
@@ -12,10 +13,10 @@ namespace lib.Ai
     {
         private readonly double pathMultiplier;
         public string Name => "Futurer";
-        public string Version => "0";
+        public string Version => "1";
 
         public FutureIsNow()
-            :this(0.2)
+            :this(1)
         {
         }
         public FutureIsNow(double pathMultiplier)
@@ -45,7 +46,7 @@ namespace lib.Ai
             var edge = new MovesSelector(state.map, graph, sitesToDefend, state.punter).GetNeighbourToGo();
             if (edge == null)
             {
-                return new ConnectClosestMinesAi().GetNextMove(state, services);
+                return new MaxReachableVertexWeightAi().GetNextMove(state, services);
             }
             return AiMoveDecision.Claim(state.punter, edge.From, edge.To, "futures cant wait!!1");
         }
