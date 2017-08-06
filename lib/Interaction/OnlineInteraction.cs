@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
 using lib.Ai;
 using lib.Interaction.Internal;
 using lib.Replays;
@@ -33,7 +31,6 @@ namespace lib.Interaction
         {
             var setup = connection.ReadSetup();
 
-            var services = new Services();
             var state = new State
             {
                 map = setup.map,
@@ -46,6 +43,7 @@ namespace lib.Interaction
 
             try
             {
+                var services = new Services();
                 setupDecision = ai.Setup(state, services);
             }
             catch
@@ -87,11 +85,10 @@ namespace lib.Interaction
                     aiMoveDecision = state.lastAiMoveDecision
                 });
 
-                services.ApplyNextState(state);
-
                 AiMoveDecision moveDecision;
                 try
                 {
+                    var services = new Services();
                     moveDecision = ai.GetNextMove(state, services);
                 }
                 catch

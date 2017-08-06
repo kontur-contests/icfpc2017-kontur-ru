@@ -27,7 +27,7 @@ namespace lib
         [Test]
         public void OwnRiverTest()
         {
-            var gamer = new Ai();
+            var gamer = new Ai(Move.Claim(0, 0, 1));
             simulator.StartGame(new List<IAi> {gamer});
 
             var state = simulator.NextMove();
@@ -38,7 +38,7 @@ namespace lib
         [Test]
         public void MakeTwoMoves()
         {
-            var gamer1 = new Ai();
+            var gamer1 = new Ai(Move.Claim(0, 0, 1), Move.Claim(0, 0, 7));
             simulator.StartGame(new List<IAi> {gamer1});
 
             Action a = () => simulator.NextMove();
@@ -50,8 +50,15 @@ namespace lib
         [ShoulNotRunOnline]
         private class Ai : IAi
         {
+            private readonly Move[] moves;
+            private int index;
             public string Name { get; }
             public string Version { get; }
+
+            public Ai(params Move[] moves)
+            {
+                this.moves = moves;
+            }
 
             public AiSetupDecision Setup(State state, IServices services)
             {
@@ -60,7 +67,7 @@ namespace lib
 
             public AiMoveDecision GetNextMove(State state, IServices services)
             {
-                return AiMoveDecision.Claim(0, 0, 1);
+                return AiMoveDecision.Move(moves.ElementAtOrDefault(index++) ?? Move.Pass(state.punter));
             }
         }
     }
