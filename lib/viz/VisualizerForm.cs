@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
+using lib.Structures;
 using NUnit.Framework;
 
 namespace lib.viz
@@ -37,6 +38,8 @@ namespace lib.viz
             };
             startGameConfigPanel.AiAtIndexRemoved += _ => UpdateMap(rightPanel);
 
+            startGameConfigPanel.EnableFuturesChanged += _ => UpdateMap(rightPanel);
+
             Controls.Add(rightPanel);
             Controls.Add(startGameConfigPanel);
         }
@@ -44,7 +47,8 @@ namespace lib.viz
         private void UpdateMap(ReplayerPanel rightPanel)
         {
             var map = startGameConfigPanel.SelectedMap.Map;
-            rightPanel.SetDataProvider(map, new SimulatorReplayDataProvider(startGameConfigPanel.SelectedAis, map));
+            var settings = startGameConfigPanel.Settings;
+            rightPanel.SetDataProvider(map, new SimulatorReplayDataProvider(startGameConfigPanel.SelectedAis, map, settings));
         }
         
     }

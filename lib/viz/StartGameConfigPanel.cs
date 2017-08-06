@@ -57,9 +57,23 @@ namespace lib
                 Dock = DockStyle.Bottom,
                 Height = 100
             };
+            var enableFutures = new CheckBox
+            {
+                Text = "ENABLE FUTURES",
+                Dock = DockStyle.Bottom,
+                CheckState = CheckState.Checked
+            };
+            enableFutures.CheckStateChanged += (sender, args) =>
+            {
+                EnableFuturesChanged?.Invoke(enableFutures.Checked);
+            };
             selectedAisList.DoubleClick += (sender, args) =>
             {
                 AiAtIndexRemoved?.Invoke(selectedAisList.SelectedIndex);
+            };
+            EnableFuturesChanged += enable =>
+            {
+                Settings = new Settings(enable);
             };
             AiSelected += factory =>
             {
@@ -79,14 +93,18 @@ namespace lib
             Controls.Add(allAisList);
             Controls.Add(selectedAisListLabel);
             Controls.Add(selectedAisList);
+            Controls.Add(enableFutures);
         }
 
         public List<IAi> SelectedAis { get; } = new List<IAi>();
         public NamedMap SelectedMap { get; private set; }
 
+        public Settings Settings { get; private set; } = new Settings(true);
+
         public event Action<NamedMap> MapChanged;
         public event Action<AiFactory> AiSelected;
         public event Action<int> AiAtIndexRemoved;
+        public event Action<bool> EnableFuturesChanged;
 
         public void SetMaps(NamedMap[] maps)
         {
