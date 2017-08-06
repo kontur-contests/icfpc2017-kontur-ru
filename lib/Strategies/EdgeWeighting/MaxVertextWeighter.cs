@@ -15,7 +15,10 @@ namespace lib.Strategies.EdgeWeighting
             Graph = services.Get<Graph>();
             SpGraphService = services.Get<ShortestPathGraphService>();
             MineMultiplier = mineMultiplier;
+            State = state;
         }
+
+        private State State;
 
         private double MineMultiplier { get; }
         private Graph Graph { get; }
@@ -79,6 +82,11 @@ namespace lib.Strategies.EdgeWeighting
         private int CalcProperVertexScore(int vertexId, ICollection<int> claimedMineIds)
         {
             return claimedMineIds.Select(mineId => MineDistCalculator.GetDist(mineId, vertexId)).Sum(x => x * x);
+        }
+
+        private int GetScore(int length, int vertexId)
+        {
+            return 0;//State.settings.futures && State.
         }
 
         private long CalcMutualComponentWeight(ConnectedComponent x, ConnectedComponent y)
