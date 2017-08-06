@@ -50,7 +50,7 @@ namespace lib.viz
                 string player = playerNames[index];
                 var label = new Label
                 {
-                    Text = FormatScore(player, 0),
+                    Text = FormatScore(player, 0, 0),
                     AutoSize = true,
                     Font = new Font(new FontFamily("Arial"), 12),
                     ForeColor = Color.White,
@@ -68,13 +68,13 @@ namespace lib.viz
             Resized();
         }
 
-        public void SetScores(long[] scores)
+        public void SetScores(long[] scores, long[] splurgePoints)
         {
             var bestScoreIndex = 0;
             for (var index = 0; index < scores.Length; index++)
             {
                 var result = scores[index];
-                labels[index].Text = FormatScore((string)labels[index].Tag, result);
+                labels[index].Text = FormatScore((string)labels[index].Tag, result, splurgePoints[index]);
                 if (result > scores[bestScoreIndex])
                     bestScoreIndex = index;
             }
@@ -85,9 +85,9 @@ namespace lib.viz
             PerformLayout();
         }
 
-        private static string FormatScore(string name, long score)
+        private static string FormatScore(string name, long score, long splurgePoints)
         {
-            return name.ToShortUpperLetters() + ": " + score;
+            return $"{name.ToShortUpperLetters()}: {score}|{splurgePoints}";
         }
     }
 }

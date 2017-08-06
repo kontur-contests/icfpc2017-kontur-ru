@@ -48,9 +48,10 @@ namespace lib
                 var current = this;
                 foreach (var step in move.splurger.route.Skip(1))
                 {
-                    current.ApplyClaim(move.splurger.punter, old, step);
+                    current = current.ApplyClaim(move.splurger.punter, old, step);
                     old = step;
                 }
+                return current;
             }
             return this;
         }
