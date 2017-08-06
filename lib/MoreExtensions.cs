@@ -9,6 +9,11 @@ namespace lib
 {
     public static class MoreExtensions
     {
+
+        public static string ToShortUpperLetters(this string s)
+        {
+            return string.Join("", s.Where(char.IsUpper).ToArray());
+        }
         public static IEnumerable<T> Shuffle<T>(this IEnumerable<T> items, Random random)
         {
             var copy = items.ToList();
