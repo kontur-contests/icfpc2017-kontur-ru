@@ -18,12 +18,12 @@ namespace lib.Strategies
         private FutureIsNowSetupStrategy futureIsNowSetupStrategy;
 
         public FutureConnectivityDependentSetupStrategy(
-            double pathMultiplier, State state, Graph graph, MineDistCalculator mineDistCalculator)
+            double pathMultiplier, State state, IServices services)
         {
-            futureIsNowSetupStrategy = new FutureIsNowSetupStrategy(pathMultiplier, state, graph, mineDistCalculator);
+            futureIsNowSetupStrategy = new FutureIsNowSetupStrategy(state, services, pathMultiplier);
             this.state = state;
-            this.graph = graph;
-            this.mineDistCalculator = mineDistCalculator;
+            graph = services.Get<Graph>();
+            mineDistCalculator = services.Get<MineDistCalculator>();
         }
 
         public AiSetupDecision Setup()
