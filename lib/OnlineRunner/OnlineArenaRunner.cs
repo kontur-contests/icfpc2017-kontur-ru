@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Linq;
 using System.Net.Sockets;
+using System.Threading;
 using lib.Ai;
 using lib.Arena;
 using lib.Interaction;
@@ -30,7 +31,7 @@ namespace lib.OnlineRunner
             return $"{ourBotNamePrefix}_{string.Join("", botTypeName.Where(char.IsUpper).ToArray())}";
         }
         
-        public static bool IsSuitableForReplayCollection(this ArenaMatch match)
+        public static bool IsSuitableForOnlineGame(this ArenaMatch match)
         {
                    // Arena is "Waiting for punters."
             return match.Status == ArenaMatch.MatchStatus.Waiting
@@ -47,7 +48,7 @@ namespace lib.OnlineRunner
             var matches = new ArenaApi().GetArenaMatchesAsync()
                 .ConfigureAwait(false).GetAwaiter()
                 .GetResult()
-                .Where(x => x.IsSuitableForReplayCollection())
+                .Where(x => x.IsSuitableForOnlineGame())
                 .ToArray();
 
             return matches
@@ -72,8 +73,14 @@ namespace lib.OnlineRunner
                     do
                     {
                         match = GetNextMatch();
+                        
                         if (match == null)
+                        {
+                            Thread.Sleep(5000);
+                            log.Warn($"Collector {collectorId}: No matches found, sleeping 5 seconds...");
                             continue;
+                        }
+                        
                         isPortOpen = portLocker.TryAcquire(match.Port);
                         if (!isPortOpen)
                             log.Warn($"Collector {collectorId}: {match.Port} taken");
