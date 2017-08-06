@@ -58,7 +58,7 @@ class Fluent:
             place = np.random.randint(0,len(battle))
             for i in range(len(battle)):
                 if i!=place:
-                    battle[i]=dummies[np.random.randint(0,len(dummies))]
+                    battle[i] = np.random.choice(dummies)
 
 
             bs.append((battle,map))
@@ -113,16 +113,12 @@ class Fluent:
                 results = json.loads(file.read())
                 for r in results:
                     self.results.append(r)
-        self.param_names = []
-        for result in self.results:
-            for player in result['Task']['Players']:
-                for key in player['Params']:
-                    if key not in self.param_names:
-                        self.param_names.append(key)
+        self.param_names = list(self.results[0]['Task']['Players'][0]['Params'])
         return self
 
     def store_pointwise(self, filename, mode='w', header=True):
         keys = self.param_names
+        print(keys)
         with open(filename, mode) as file:
             if header:
                 file.write(','.join([
@@ -157,8 +153,6 @@ class Fluent:
                         player['Name']
                     ]]))
                     file.write(',')
-                    file.write(','.join([
-                        str(player['Params'][key]) if key in player['Params'] else 'NA' for key in keys
-                    ]))
+                    file.write(','.join([str(player['Params'][key]) for key in keys]))
                     file.write('\n')
         return self

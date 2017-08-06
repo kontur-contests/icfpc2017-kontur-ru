@@ -11,18 +11,17 @@ namespace lib.Strategies.EdgeWeighting
     {
         public MaxVertextWeighter(double mineMultiplier, State state, IServices services)
         {
-            MineDistCalculator = services.Get<MineDistCalculator>(state);
-            GraphService = services.Get<GraphService>(state);
-            SpGraphService = services.Get<ShortestPathGraphService>(state);
+            MineDistCalculator = services.Get<MineDistCalculator>();
+            Graph = services.Get<Graph>();
+            SpGraphService = services.Get<ShortestPathGraphService>();
             MineMultiplier = mineMultiplier;
         }
 
         private double MineMultiplier { get; }
-        private GraphService GraphService { get; }
+        private Graph Graph { get; }
         private ShortestPathGraphService SpGraphService { get; }
         private MineDistCalculator MineDistCalculator { get; }
         
-        private Graph Graph => GraphService.Graph;
         private ShortestPathGraph SpGraph { get; set; }
         private Dictionary<int, double> SubGraphWeight { get; set; }
         private ICollection<int> ClaimedMineIds { get; set; }
@@ -39,7 +38,10 @@ namespace lib.Strategies.EdgeWeighting
                 .ToDictionary(x => x.vertex, x => x.component);
             MutualComponentWeights = new Dictionary<Tuple<int, int>, long>();
 
-            SpGraph = SpGraphService.For(CurrentComponent.OwnerPunterId, CurrentComponent.Id);
+            SpGraph = currentComponent.Id == -1
+                ? SpGraphService.ForVertex(currentComponent.Vertices.Single())
+                : SpGraphService.ForComponent(CurrentComponent.OwnerPunterId, CurrentComponent.Id);
+
             ClaimedMineIds = CurrentComponent.Mines;
             foreach (var vertex in CurrentComponent.Vertices)
                 SubGraphWeight[vertex] = CalcSubGraphWeight(vertex);

@@ -13,7 +13,6 @@ namespace punter
     class Program
     {
         private static IAi ai;
-        private static IServices services;
         private static TextReader inputReader;
 
         private const string TeamName = "kontur.ru";
@@ -25,8 +24,7 @@ namespace punter
             else
                 inputReader = new StreamReader(args[0]);
             ai = new ConnectClosestMinesAi();
-            services = new Services();
-
+        
             Write(new HandshakeOut {me = TeamName});
             var handshakeIn = Read<HandshakeIn>();
             if (handshakeIn.you != TeamName)
@@ -53,7 +51,7 @@ namespace punter
                 punters = punters,
                 settings = settings
             };
-            var setupDecision = ai.Setup(state, services);
+            var setupDecision = ai.Setup(state, new Services(state));
             if (settings?.futures != true && setupDecision.futures?.Any() == true)
             {
                 Console.Error.WriteLine($"BUG in Ai {ai.Name} - futures are not supported");
@@ -85,7 +83,7 @@ namespace punter
             });
             try
             {
-                var moveDecision = ai.GetNextMove(state, services);
+                var moveDecision = ai.GetNextMove(state, new Services(state));
                 moveDecision = ValidateMove(state.map, moveDecision);
                 state.lastAiMoveDecision = new AiInfoMoveDecision
                 {

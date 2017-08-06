@@ -11,7 +11,7 @@ namespace lib.Structures
         {
         }
 
-        public Settings(bool futures, bool splurges = false)
+        public Settings(bool futures, bool splurges)
         {
             this.futures = futures;
             this.splurges = splurges;
@@ -19,7 +19,7 @@ namespace lib.Structures
 
         public override string ToString()
         {
-            return $"{nameof(futures)}: {futures}";
+            return $"{nameof(futures)}: {futures}, {nameof(splurges)}: {splurges}";
         }
     }
 }

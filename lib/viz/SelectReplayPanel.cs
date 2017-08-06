@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
@@ -7,10 +8,46 @@ using MoreLinq;
 
 namespace lib.viz
 {
+    internal class FilterReplayPanel : TableLayoutPanel
+    {
+        public FilterReplayPanel()
+        {
+            aiFilter = new ComboBox
+            {
+                Dock = DockStyle.Top,
+                DropDownStyle = ComboBoxStyle.DropDownList
+            };
+            aiFilter.SelectedIndexChanged += (_, __) => ApplyFilters();
+            
+            Controls.Add(aiFilter);
+        }
+
+        public void UpdateInfo(ReplayMeta[] metas)
+        {
+            this.metas = metas;
+            aiFilter.Items.Clear();
+            aiFilter.Items.AddRange(metas.Select(m => $"{m.AiName}:{m.AiVersion}").Distinct().OrderBy(s => s).Cast<object>().ToArray());
+
+            ApplyFilters();
+        }
+
+        public event Action<ReplayMeta[]> FiltersUpdated;
+
+        private void ApplyFilters()
+        {
+            FiltersUpdated?.Invoke(metas);
+        }
+
+        private readonly ComboBox aiFilter;
+        private ReplayMeta[] metas;
+    }
+
     internal class SelectReplayPanel : Panel
     {
         public SelectReplayPanel()
         {
+            filter = new FilterReplayPanel();
+            filter.FiltersUpdated += UpdateVisualization;
             var buttonsPanel = new FlowLayoutPanel
             {
                 AutoSize = true,
@@ -22,6 +59,7 @@ namespace lib.viz
                 AutoSize = true
             };
             refreshButton.Click += (sender, args) => RefreshMetasList();
+            buttonsPanel.Controls.Add(filter);
             buttonsPanel.Controls.Add(refreshButton);
             debugTextArea = new TextBox()
             {
@@ -70,6 +108,7 @@ namespace lib.viz
         private ReplayRepo repo;
         private ListView listView;
         private TextBox debugTextArea;
+        private FilterReplayPanel filter;
 
         public ReplayRepo Repo
         {
@@ -88,6 +127,11 @@ namespace lib.viz
         }
 
         private void UpdateList(ReplayMeta[] metas)
+        {
+            filter.UpdateInfo(metas);
+        }
+
+        private void UpdateVisualization(ReplayMeta[] metas)
         {
             listView.BeginUpdate();
             listView.Items.Clear();

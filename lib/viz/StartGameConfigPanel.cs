@@ -73,7 +73,7 @@ namespace lib
             };
             EnableFuturesChanged += enable =>
             {
-                Settings = new Settings(enable);
+                Settings.futures = enable;
             };
             AiSelected += factory =>
             {
@@ -99,7 +99,7 @@ namespace lib
         public List<IAi> SelectedAis { get; } = new List<IAi>();
         public NamedMap SelectedMap { get; private set; }
 
-        public Settings Settings { get; private set; } = new Settings(true);
+        public Settings Settings { get; private set; } = new Settings(true, false);
 
         public event Action<NamedMap> MapChanged;
         public event Action<AiFactory> AiSelected;

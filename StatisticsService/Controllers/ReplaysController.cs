@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Cors;
+﻿using System;
+using System.Data;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using StatisticsService.Models;
 
@@ -15,12 +17,24 @@ namespace StatisticsService.Controllers
             replaysStatisticsProvider = new ReplaysStatisticsProvider();
         }
 
+        private readonly object locker = new object();
+        private ReplaysStatistics data;
+        private DateTime lastUpdateTime = DateTime.UtcNow;
+
         [HttpGet]
         public object Get()
         {
-            //return new ReplayStatisticsRepo().GetMapSizes();
+            if (data != null && DateTime.UtcNow - lastUpdateTime <= TimeSpan.FromMinutes(4))
+            {
+                return data;
+            }
 
-            return replaysStatisticsProvider.Get();
+            lock (locker)
+            {
+                lastUpdateTime = DateTime.UtcNow;
+                data = replaysStatisticsProvider.Get();
+                return data;
+            }
         }
     }
 

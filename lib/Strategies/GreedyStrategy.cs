@@ -12,22 +12,20 @@ namespace lib.Strategies
         {
             AggregateEdgeScores = aggregateEdgeScores;
             PunterId = state.punter;
-            MineDistCalulator = services.Get<MineDistCalculator>(state);
-            GraphService = services.Get<GraphService>(state);
+            MineDistCalulator = services.Get<MineDistCalculator>();
+            Graph = services.Get<Graph>();
         }
 
         private Func<long, long, long> AggregateEdgeScores { get; }
         private MineDistCalculator MineDistCalulator { get; }
         private int PunterId { get; }
-        private GraphService GraphService { get; }
+        private Graph Graph { get; }
 
         public List<TurnResult> NextTurns()
         {
-            var graph = GraphService.Graph;
-
-            var calculator = new ConnectedCalculator(graph, PunterId);
+            var calculator = new ConnectedCalculator(Graph, PunterId);
             var result = new List<TurnResult>();
-            foreach (var vertex in graph.Vertexes.Values)
+            foreach (var vertex in Graph.Vertexes.Values)
             foreach (var edge in vertex.Edges.Where(x => x.Owner == -1))
             {
                 var fromMines = calculator.GetConnectedMines(edge.From);

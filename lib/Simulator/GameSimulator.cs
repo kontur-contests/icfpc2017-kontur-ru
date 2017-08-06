@@ -53,7 +53,7 @@ namespace lib
             {
                 var ai = punters[i].Item1;
                 var state = punters[i].Item2;
-                var services = new Services();
+                var services = new Services(state);
                 var setupDecision = ai.Setup(state, services);
                 Futures.Add(ValidateFutures(setupDecision.futures));
                 state.aiSetupDecision = new AiInfoSetupDecision
@@ -77,7 +77,7 @@ namespace lib
             var state = punters[currentPunter].Item2;
             state.map = map;
             state.turns.Add(new TurnState{moves = turnMoves.ToArray(), aiMoveDecision = state.lastAiMoveDecision});
-            var services = new Services();
+            var services = new Services(state);
             var moveDecision = GetNextMove(ai, state, services, eatExceptions, lastException);
             state.lastAiMoveDecision = new AiInfoMoveDecision
             {
