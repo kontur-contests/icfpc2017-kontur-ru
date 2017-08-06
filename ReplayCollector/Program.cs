@@ -10,7 +10,7 @@ namespace ReplayCollector
 
         public static void Main(string[] args)
         {
-            threadCount = 32;
+            threadCount = 1;
             for (var i = 0; i < threadCount; i++)
             {
                 var index = i;
