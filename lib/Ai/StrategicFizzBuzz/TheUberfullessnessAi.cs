@@ -8,8 +8,8 @@ namespace lib.Ai.StrategicFizzBuzz
     {
         public TheUberfullessnessAi()
             : base(
-                StrategyName.ForSetup<FutureIsNowSetupStrategy>(),
-                StrategyName.For<FutureIsNowStrategy>(),
+                StrategyName.ForSetup<NopSetupStrategy>(),
+                StrategyName.For<LochDinicKillerStrategy>(),
                 StrategyName.ForEWStrategy<AllComponentsEWStrategy, MineGuardianEdgeWeighter>(),
                 StrategyName.ForEWStrategy<AllComponentsEWStrategy, MaxVertextWeighter>())
         {

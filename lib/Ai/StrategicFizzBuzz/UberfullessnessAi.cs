@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using lib.StateImpl;
+using lib.Strategies;
 using lib.Strategies.EdgeWeighting;
 using lib.Strategies.StrategiesCatalog;
 using lib.viz;
@@ -12,13 +13,27 @@ namespace lib.Ai.StrategicFizzBuzz
     {
         public UberfullessnessAi(string setup, string debut, string helper, string mittelspiel)
         {
-            Name = $"{setup}{debut}{helper}{mittelspiel}UberfullessnessAi";
+            Name = BuildName(setup, debut, helper, mittelspiel);
             Ai = new CompositeStrategicAi(
                 Setups[setup].SetupStrategyProvider,
                 Debuts[debut].StrategyProvider,
                 Helpers[helper].StrategyProvider,
                 Mittelspiels[mittelspiel].StrategyProvider,
                 MetaStrategyHelpers.BiggestComponentEWStrategy((s, ss) => new RandomEdgeWeighter())); // Fall back to random in the end.
+        }
+
+        private static string BuildName(string setup, string debut, string helper, string mittelspiel)
+        {
+            var name = "";
+            if (setup != StrategyName.ForSetup<NopSetupStrategy>())
+                name += setup;
+            if (debut != StrategyName.For<NopStrategy>())
+                name += debut;
+            if (helper != StrategyName.For<NopStrategy>())
+                name += helper;
+            if (mittelspiel != StrategyName.For<NopStrategy>())
+                name += mittelspiel;
+            return name + "UberAi";
         }
 
         public static Dictionary<string, SetupStrategyFactory> Setups => SetupStrategies.Factories;
@@ -51,6 +66,6 @@ namespace lib.Ai.StrategicFizzBuzz
             return Ai.GetNextMove(state, services);
         }
 
-        public string Version => "1";
+        public virtual string Version => "1";
     }
 }
