@@ -21,14 +21,14 @@ namespace lib.Strategies.StrategiesCatalog
         public static StrategyFactory Create<TStrategy>(Func<State, IServices, TStrategy> strategyProvider, string namePrefix = null)
             where TStrategy : IStrategy
         {
-            return new StrategyFactory(namePrefix + typeof(TStrategy).GetType().Name, (s, ss) => strategyProvider(s, ss));
+            return new StrategyFactory(StrategyName.For<TStrategy>(namePrefix), (s, ss) => strategyProvider(s, ss));
         }
 
         public static StrategyFactory ForBiggestComponentEW<TEdgeWeighter>(Func<State, IServices, TEdgeWeighter> edgeWeighterProvider)
             where TEdgeWeighter : IEdgeWeighter
         {
             return new StrategyFactory(
-                $"{nameof(BiggestComponentEWStrategy)}_{typeof(TEdgeWeighter).GetType().Name}",
+                StrategyName.ForEWStrategy<BiggestComponentEWStrategy, TEdgeWeighter>(),
                 BiggestComponentEWStrategy((s, ss) => edgeWeighterProvider(s, ss)));
         }
 
@@ -36,7 +36,7 @@ namespace lib.Strategies.StrategiesCatalog
             where TEdgeWeighter : IEdgeWeighter
         {
             return new StrategyFactory(
-                $"{nameof(AllComponentsEWStrategy)}_{typeof(TEdgeWeighter).GetType().Name}",
+                StrategyName.ForEWStrategy<AllComponentsEWStrategy, TEdgeWeighter>(),
                 BiggestComponentEWStrategy((s, ss) => edgeWeighterProvider(s, ss)));
         }
     }

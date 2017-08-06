@@ -7,7 +7,7 @@ using MoreLinq;
 
 namespace lib.Strategies.EdgeWeighting
 {
-    public class BiggestComponentEWStrategy : IStrategy
+    public class BiggestComponentEWStrategy : IStrategy, IMetaStrategy
     {
         public BiggestComponentEWStrategy(IEdgeWeighter edgeWeighter, State state, IServices services)
         {

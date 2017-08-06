@@ -6,7 +6,7 @@ using lib.StateImpl;
 
 namespace lib.Strategies.EdgeWeighting
 {
-    public class AllComponentsEWStrategy : IStrategy
+    public class AllComponentsEWStrategy : IStrategy, IMetaStrategy
     {
         public AllComponentsEWStrategy(IEdgeWeighter edgeWeighter, State state, IServices services)
         {

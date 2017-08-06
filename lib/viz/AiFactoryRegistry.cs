@@ -43,6 +43,7 @@ namespace lib.viz
         }
     }
 
+    [AttributeUsage(AttributeTargets.Class, Inherited = false)]
     public class ShouldNotRunOnlineAttribute : Attribute
     {
         public bool DisableCompletely { get; set; }

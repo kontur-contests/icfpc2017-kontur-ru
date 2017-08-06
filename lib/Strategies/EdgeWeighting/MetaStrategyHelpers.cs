@@ -3,6 +3,10 @@ using lib.StateImpl;
 
 namespace lib.Strategies.EdgeWeighting
 {
+    public interface IMetaStrategy
+    {
+    }
+
     public static class MetaStrategyHelpers
     {
         public static Func<State, IServices, IStrategy> BiggestComponentEWStrategy(Func<State, IServices, IEdgeWeighter> edgeWeighterProvider)

@@ -2,18 +2,20 @@ using System;
 using System.Linq;
 using lib.StateImpl;
 using lib.Strategies;
+using lib.viz;
 using MoreLinq;
 
 namespace lib.Ai.StrategicFizzBuzz
 {
-    public abstract class CompositeStrategicAi : IAi
+    [ShouldNotRunOnline(DisableCompletely = true)]
+    public class CompositeStrategicAi : IAi
     {
-        protected CompositeStrategicAi(params Func<State, IServices, IStrategy>[] strategyProviders)
+        public CompositeStrategicAi(params Func<State, IServices, IStrategy>[] strategyProviders)
         {
             StrategyProviders = strategyProviders;
         }
 
-        protected CompositeStrategicAi(Func<State, IServices, ISetupStrategy> setupStrategyProvider, params Func<State, IServices, IStrategy>[] strategyProviders)
+        public CompositeStrategicAi(Func<State, IServices, ISetupStrategy> setupStrategyProvider, params Func<State, IServices, IStrategy>[] strategyProviders)
         {
             SetupStrategyProvider = setupStrategyProvider;
             StrategyProviders = strategyProviders;
@@ -23,7 +25,7 @@ namespace lib.Ai.StrategicFizzBuzz
         private Func<State, IServices, IStrategy>[] StrategyProviders { get; }
 
         public string Name => GetType().Name;
-        public abstract string Version { get; }
+        public virtual string Version => "1.0";
 
         public AiSetupDecision Setup(State state, IServices services)
         {
