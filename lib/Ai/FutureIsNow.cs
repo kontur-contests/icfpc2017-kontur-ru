@@ -79,7 +79,7 @@ namespace lib.Ai
                 {
                     int neighbourToGo = candidateSites[0].Key;
                     var weakComponentSiteIds = weakComponent.c;
-                    return graph.Vertexes[neighbourToGo].Edges.First(e => weakComponentSiteIds.Contains(e.To));
+                    return graph.Vertexes[neighbourToGo].Edges.First(e => weakComponentSiteIds.Contains(e.To) && e.Owner == -1);
                 }
             }
 
