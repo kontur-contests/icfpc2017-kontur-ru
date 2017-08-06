@@ -51,8 +51,8 @@ def assemble(fname,*args):
 #assemble('future.csv',45820,41308,35379,31603,48105,16426)
 #test_parameter_future()
 
-test_historical();
-#assemble('hist',46229)
+#test_historical();
+assemble('hist',46229,86839,85957)
 #assemble('future',14139,58033,61678,93832);test_parameter_future()
 
 #assemble('historical_4')
