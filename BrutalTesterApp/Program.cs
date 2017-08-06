@@ -19,7 +19,7 @@ namespace BrutalTesterApp
 
         static void Main(string[] args)
         {
-            int minMapPlayersCount = 1;
+            int minMapPlayersCount = 8;
             int maxMapPlayersCount = 8;
             int roundsCount = 100;
             bool failOnExceptions = false;

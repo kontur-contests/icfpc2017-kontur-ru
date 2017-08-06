@@ -15,7 +15,7 @@ namespace lib.Ai
         public string Version => "0";
 
         public FutureIsNow()
-            :this(1)
+            :this(0.2)
         {
         }
         public FutureIsNow(double pathMultiplier)

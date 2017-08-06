@@ -39,7 +39,7 @@ namespace lib.Ai
             else
             {
                 var minesPaths = map.Mines.Select(GreedyGrowPath).ToList();
-                var bestMinesPath = minesPaths.MaxBy(EstimatePath);
+                var bestMinesPath = minesPaths.MaxBy(EstimatePathByDinic);
                 var fullPath = bestMinesPath
                     .Pairwise((a, b) => minDists.GetReversedPath(a, b).Reverse().Skip(1)).SelectMany(z => z)
                     .Take(length)
@@ -54,7 +54,12 @@ namespace lib.Ai
             int firstLastDist = minDists.GetDist(minesPath.First(), minesPath.Last());
             return minesPath.Count + firstLastDist / length + minesPath.Min(m => graph.Vertexes[m].Edges.Count) / 100;
         }
-
+        
+        private double EstimatePathByDinic(List<int> minesPath)
+        {
+            return new Dinic(graph, 0, minesPath.First(), minesPath.Last(), out int flow).GetMinCut().Count * 100000 + EstimatePath(minesPath);
+        }
+        
         private List<int> GreedyGrowPath(int startMine)
         {
             List<int> path = new List<int>(){startMine};
