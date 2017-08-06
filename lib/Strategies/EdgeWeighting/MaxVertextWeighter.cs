@@ -21,9 +21,7 @@ namespace lib.Strategies.EdgeWeighting
         private Dictionary<int, double> SubGraphWeight { get; set; }
         private int[] ClaimedMineIds { get; set; }
 
-        public ConnectedComponent CurrentComponent => null;
-
-        public void Init(Graph graph, List<ConnectedComponent> connectedComponents)
+        public void Init(Graph graph, List<ConnectedComponent> connectedComponents, ConnectedComponent currentComponent)
         {
             var claimedVertexIds = connectedComponents.SelectMany(comp => comp.Vertices).ToArray();
             Graph = graph;
@@ -45,7 +43,7 @@ namespace lib.Strategies.EdgeWeighting
             if (SubGraphWeight.TryGetValue(vertexId, out var weight))
                 return weight;
             weight = CalcVertexScore(vertexId);
-            foreach (var edge in SpGraph.Vertexes[vertexId].Edges)
+            foreach (var edge in SpGraph[vertexId].Edges)
                 weight = Math.Max(weight, CalcSubGraphWeight(edge.To));
             SubGraphWeight[vertexId] = weight;
             return weight;

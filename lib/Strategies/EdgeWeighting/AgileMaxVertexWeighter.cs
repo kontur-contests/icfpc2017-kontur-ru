@@ -7,6 +7,8 @@ using MoreLinq;
 
 namespace lib.Strategies.EdgeWeighting
 {
+    [Obsolete("msamoylenko : Не получилось его вписать в новую концепцию EdgeWeighter-ов. " +
+              "Насколько я понял, он эквивалентен MaxVertextWeighterWithConnectedComponents со стратегией AllComponentsEWStrategy")]
     public class AgileMaxVertexWeighter : IEdgeWeighter
     {
         public AgileMaxVertexWeighter(double mineMultiplier, MineDistCalculator mineDistCalculator)
@@ -25,7 +27,7 @@ namespace lib.Strategies.EdgeWeighting
         public ConnectedComponent CurrentComponent { get; private set; }
         private Dictionary<Tuple<int, int>, long> MutualComponentWeights { get; set; }
 
-        public void Init(Graph graph, List<ConnectedComponent> connectedComponents)
+        public void Init(Graph graph, List<ConnectedComponent> connectedComponents, ConnectedComponent currentComponent)
         {
             Graph = graph;
             SubGraphWeight = new Dictionary<int, double>();
@@ -75,7 +77,7 @@ namespace lib.Strategies.EdgeWeighting
             if (SubGraphWeight.TryGetValue(vertexId, out var weight))
                 return weight;
             weight = CalcVertexScore(vertexId);
-            foreach (var edge in SpGraph.Vertexes[vertexId].Edges)
+            foreach (var edge in SpGraph[vertexId].Edges)
                 //                weight = weight + CalcSubGraphWeight(edge.To);
                 weight = Math.Max(weight, CalcSubGraphWeight(edge.To));
             SubGraphWeight[vertexId] = weight;

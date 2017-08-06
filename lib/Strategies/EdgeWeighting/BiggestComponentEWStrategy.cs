@@ -5,9 +5,9 @@ using MoreLinq;
 
 namespace lib.Strategies.EdgeWeighting
 {
-    public class EdgeWeightingStrategy : IStrategy
+    public class BiggestComponentEWStrategy : IStrategy
     {
-        public EdgeWeightingStrategy(int punterId, IEdgeWeighter edgeWeighter, MineDistCalculator mineDistCalculator)
+        public BiggestComponentEWStrategy(int punterId, IEdgeWeighter edgeWeighter, MineDistCalculator mineDistCalculator)
         {
             PunterId = punterId;
             EdgeWeighter = edgeWeighter;
@@ -41,8 +41,8 @@ namespace lib.Strategies.EdgeWeighting
                     .ToList();
 
             var connectedComponents = ConnectedComponent.GetComponents(graph, PunterId);
-            EdgeWeighter.Init(graph, connectedComponents);
-            var maxComponent = EdgeWeighter.CurrentComponent ?? connectedComponents.MaxBy(comp => comp.Vertices.Count);
+            var maxComponent = connectedComponents.MaxBy(comp => comp.Vertices.Count);
+            EdgeWeighter.Init(graph, connectedComponents, maxComponent);
             return maxComponent.Vertices
                 .SelectMany(v => graph.Vertexes[v].Edges)
                 .Where(e => e.Owner == -1)

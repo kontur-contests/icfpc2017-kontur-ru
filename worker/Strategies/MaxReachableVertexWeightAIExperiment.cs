@@ -18,6 +18,6 @@ namespace worker
         {
             return ExperimentCommon.Run(task,
                 player => new MaxReachableVertexWeightAi(player.Params["MineWeight"]));
-        }
+        }    
     }
 }

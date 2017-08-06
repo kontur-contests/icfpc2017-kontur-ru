@@ -1,6 +1,7 @@
 import numpy as np
 import json
 from magic.foreman import *
+import os
 
 class Param:
     def __init__(self, _min=0, _max=1, _count=5):
@@ -37,6 +38,10 @@ class Fluent:
         self.param_names = ['Age']
         return self;
 
+    def create_nigga_players(self, mine_weight, others_mine_weight=100):
+        self.players = [{ 'Name' : 'xxx', 'Params': {'MineWeight': others_mine_weight}}]
+        self.players[-1]['Params']['MineWeight'] = mine_weight
+        return self
 
     def battling_in_pairs(self):
         self.battles = [[self.players[first], self.players[second]]
@@ -85,7 +90,8 @@ class Fluent:
         return self
 
     def dump(self,dump_file = None):
-        self.result_dump_file = dump_file or ('dumps\\result_dump_'+str(self.token)+'.json')
+        self.result_dump_file = dump_file or os.path.join('dumps',
+                                                     'result_dump_' + str(self.token) + '.json')
         with open(self.result_dump_file,'w') as file:
             file.write(json.dumps(self.results,indent=2))
         return self
@@ -96,10 +102,10 @@ class Fluent:
         self.param_names = list(self.results[0]['Task']['Players'][0]['Params'])
         return self
 
-    def store_pointwise(self, filename):
+    def store_pointwise(self, filename, mode='w'):
         keys = self.param_names
-        with open(filename,'w') as file:
-            file.write('game_number,server_name,scores,ranking,tournament_scores,num_players,map,map_rivers_count,map_sites_count,name,')
+        with open(filename, mode) as file:
+            file.write('game_number,server_name,scores,ranking,tournament_scores,num_players,map,map_rivers_count,map_sites_count,map_mines_count,name,')
             file.write(",".join(keys))
             file.write('\n')
             for game_number, game in enumerate(self.results):
@@ -116,6 +122,7 @@ class Fluent:
                         game['Task']['Map'],
                         game['RiversCount'],
                         game['SitesCount'],
+                        game['MinesCount'],
                         player['Name']
                     ]]))
                     file.write(',')
