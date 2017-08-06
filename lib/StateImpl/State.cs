@@ -17,7 +17,6 @@ namespace lib.StateImpl
         public AiInfoMoveDecision lastAiMoveDecision;
         public List<TurnState> turns = new List<TurnState>();
 
-        public ConnectClosestMinesAi.AiState ccm;
         public MineDistCalculator.ServiceState mdc;
     }
 }

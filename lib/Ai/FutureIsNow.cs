@@ -3,7 +3,6 @@ using System.Linq;
 using lib.GraphImpl;
 using lib.StateImpl;
 using lib.Structures;
-using lib.viz;
 using MoreLinq;
 
 namespace lib.Ai
@@ -36,20 +35,9 @@ namespace lib.Ai
             var edge = new MovesSelector(state.map, graph, sitesToDefend, state.punter).GetNeighbourToGo();
             if (edge == null)
             {
-                state.ccm = state.ccm ?? FillCcmState(state, graph);
                 return new ConnectClosestMinesAi().GetNextMove(state, services);
             }
-            return AiMoveDecision.Claim(state.punter, edge.From, edge.To);
-        }
-
-        private static ConnectClosestMinesAi.AiState FillCcmState(State state, Graph graph)
-        {
-            var myMines = graph.Mines
-                .Where(e => e.Value.Edges.Any(g => g.Owner == state.punter))
-                .Select(e => e.Key)
-                .ToHashSet();
-
-            return new ConnectClosestMinesAi.AiState {stage = 0, myMines = myMines};
+            return AiMoveDecision.Claim(state.punter, edge.From, edge.To, "futures cant wait!!1");
         }
     }
 
@@ -91,7 +79,7 @@ namespace lib.Ai
                 {
                     int neighbourToGo = candidateSites[0].Key;
                     var weakComponentSiteIds = weakComponent.c;
-                    return graph.Vertexes[neighbourToGo].Edges.First(e => weakComponentSiteIds.Contains(e.To));
+                    return graph.Vertexes[neighbourToGo].Edges.First(e => weakComponentSiteIds.Contains(e.To) && e.Owner == -1);
                 }
             }
 

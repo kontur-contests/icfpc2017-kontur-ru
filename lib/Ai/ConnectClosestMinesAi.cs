@@ -8,28 +8,16 @@ using lib.StateImpl;
 using lib.Structures;
 using lib.viz;
 using NUnit.Framework;
-using Shouldly;
 
 namespace lib.Ai
 {
     public class ConnectClosestMinesAi : IAi
     {
-        public class AiState
-        {
-            public int stage = FindNewComponent;
-            public HashSet<int> myMines = new HashSet<int>();
-        }
-
-        private const int FindNewComponent = 0;
-        private const int ExtendComponent = 1;
-        private const int ExtendAnything = 2;
-        
         public string Name => nameof(ConnectClosestMinesAi);
         public string Version => "0.1";
 
         public AiSetupDecision Setup(State state, IServices services)
         {
-            state.ccm = state.ccm ?? new AiState();
             services.Setup<GraphService>(state);
             services.Setup<MineDistCalculator>(state);
             return AiSetupDecision.Empty();
@@ -38,23 +26,12 @@ namespace lib.Ai
         public AiMoveDecision GetNextMove(State state, IServices services)
         {
             AiMoveDecision move;
-            if (state.ccm.stage == ExtendComponent)
-            {
-                if (TryExtendComponent(state, services, out move))
-                    return move;
-                state.ccm.stage = FindNewComponent;
-            }
-
-            if (state.ccm.stage == FindNewComponent && TryBuildNewComponent(state, services, out move))
-            {
-                state.ccm.stage = ExtendComponent;
+            if (TryExtendComponent(state, services, out move))
                 return move;
-            }
-
-            state.ccm.stage = ExtendAnything;
+            if (TryBuildNewComponent(state, services, out move))
+                return move;
             if (TryExtendAnything(state, services, out move))
                 return move;
-
             return AiMoveDecision.Pass(state.punter);
         }
 
@@ -103,20 +80,20 @@ namespace lib.Ai
 
         private bool TryExtendComponent(State state, IServices services, out AiMoveDecision move)
         {
+            //TODO Сейчас увеличивает первую попавшуюся компоненту. А может быть нужно расширять самую большую компоненту.
             var graph = services.Get<GraphService>(state).Graph;
             var queue = new Queue<ExtendQueueItem>();
             var used = new HashSet<int>();
-            foreach (var mineId in graph.Mines.Keys.Where(id => !state.ccm.myMines.Contains(id)))
+            foreach (var mineV in GetNotMyMines(state, graph))
             {
                 var queueItem = new ExtendQueueItem
                 {
-                    CurrentVertex = graph.Vertexes[mineId],
+                    CurrentVertex = mineV,
                     Edge = null
                 };
                 queue.Enqueue(queueItem);
-                used.Add(mineId);
+                used.Add(mineV.Id);
             }
-
             while (queue.Count > 0)
             {
                 var current = queue.Dequeue();
@@ -124,7 +101,6 @@ namespace lib.Ai
                 {
                     if (current.Edge == null)
                         throw new InvalidOperationException("Mine is already part of component! WTF?");
-                    TryAddMine(state, graph, current.Edge);
                     move = AiMoveDecision.Claim(state.punter, current.Edge.From, current.Edge.To);
                     return true;
                 }
@@ -147,21 +123,26 @@ namespace lib.Ai
             return false;
         }
 
+        private static IEnumerable<Vertex> GetNotMyMines(State state, Graph graph)
+        {
+            return graph.Mines.Values.Where(v => v.Edges.All(e => e.Owner != state.punter));
+        }
+
         private bool TryBuildNewComponent(State state, IServices services, out AiMoveDecision move)
         {
             var graph = services.Get<GraphService>(state).Graph;
             var queue = new Queue<BuildQueueItem>();
             var used = new Dictionary<int, BuildQueueItem>();
-            foreach (var mineId in graph.Mines.Keys.Where(id => !state.ccm.myMines.Contains(id)))
+            foreach (var mineV in GetNotMyMines(state, graph))
             {
                 var queueItem = new BuildQueueItem
                 {
-                    CurrentVertex = graph.Vertexes[mineId],
-                    SourceMine = graph.Vertexes[mineId],
+                    CurrentVertex = mineV,
+                    SourceMine = mineV,
                     FirstEdge = null
                 };
                 queue.Enqueue(queueItem);
-                used.Add(mineId, queueItem);
+                used.Add(mineV.Id, queueItem);
             }
 
             while (queue.Count > 0)
@@ -178,14 +159,12 @@ namespace lib.Ai
                             var bestMine = SelectBestMine(prev.SourceMine, current.SourceMine);
                             if (bestMine == prev.SourceMine)
                             {
-                                TryAddMine(state, graph, prev.FirstEdge ?? edge);
                                 Edge edge1 = prev.FirstEdge ?? edge;
                                 move = AiMoveDecision.Claim(state.punter, edge1.From, edge1.To);
                                 return true;
                             }
                             if (bestMine == current.SourceMine)
                             {
-                                TryAddMine(state, graph, current.FirstEdge ?? edge);
                                 Edge edge1 = current.FirstEdge ?? edge;
                                 move = AiMoveDecision.Claim(state.punter, edge1.From, edge1.To);
                                 return true;
@@ -207,14 +186,6 @@ namespace lib.Ai
             }
             move = null;
             return false;
-        }
-
-        private void TryAddMine(State state, Graph graph, Edge edge)
-        {
-            if (graph.Mines.ContainsKey(edge.From))
-                state.ccm.myMines.Add(edge.From);
-            if (graph.Mines.ContainsKey(edge.To))
-                state.ccm.myMines.Add(edge.To);
         }
 
         private long Calc(MineDistCalculator mineDistCalculator, HashSet<int> mineIds, int vertexId)
