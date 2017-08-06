@@ -6,6 +6,7 @@ using Firebase.Auth;
 using Firebase.Database;
 using Firebase.Database.Query;
 using Newtonsoft.Json;
+using NLog;
 
 namespace lib.Replays
 {
@@ -27,6 +28,7 @@ namespace lib.Replays
         private ChildQuery datas;
         private ChildQuery maps;
         private ChildQuery rootQuery;
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
         public ReplayRepo(bool test = false)
         {
@@ -51,6 +53,7 @@ namespace lib.Replays
 
         public void SaveReplay(ReplayMeta meta, ReplayData data)
         {
+            logger.Info($"Checking for saved maps");
             string encodedMap = Encode(data.Map);
             string mapHash = encodedMap.CalculateMd5();
             if (maps.Child("keys").Child(mapHash).OnceSingleAsync<EncodedData>().ConfigureAwait(false).GetAwaiter().GetResult()?.D != "1")
@@ -59,17 +62,21 @@ namespace lib.Replays
                 maps.Child("keys").Child(mapHash).PutAsync(new EncodedData("1")).ConfigureAwait(false).GetAwaiter().GetResult();
             }
 
-            var result = datas
+            logger.Info($"Saving data for AI {meta.AiName} to Firebase");
+            var resultData = datas
                 .PostAsync(new EncodedData(data.Encode()))
                 .ConfigureAwait(false).GetAwaiter()
                 .GetResult();
+            logger.Info($"Data for AI {meta.AiName} saved, result is {resultData.Key}");
 
-            meta.DataId = result.Key;
+            meta.DataId = resultData.Key;
             meta.MapHash = mapHash;
 
-            metas.PostAsync(meta)
+            logger.Info($"Saving meta for AI {meta.AiName} to Firebase");
+            var resultMeta = metas.PostAsync(meta)
                 .ConfigureAwait(false).GetAwaiter()
                 .GetResult();
+            logger.Info($"Meta for AI {meta.AiName} saved, result is {resultMeta.Key}");
         }
 
         private static string Encode<T>(T data)
