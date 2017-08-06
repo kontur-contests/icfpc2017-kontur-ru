@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using lib.GraphImpl;
+using lib.StateImpl;
 using lib.Strategies;
 using MoreLinq;
 
@@ -8,32 +9,32 @@ namespace lib.Ai.StrategicFizzBuzz
 {
     public abstract class StrategicAi : IAi
     {
-        private int PunterId { get; set; }
-        protected abstract IStrategy Strategy { get; }
-        public abstract string Name { get; }
-
-        public virtual Future[] StartRound(int punterId, int puntersCount, Map map, Settings settings)
+        protected StrategicAi(Func<State, IServices, IStrategy> strategyProvider)
         {
-            PunterId = punterId;
-            return new Future[0];
+            StrategyProvider = strategyProvider;
         }
 
-        public Move GetNextMove(Move[] prevMoves, Map map)
+        public string Name => GetType().Name;
+        public abstract string Version { get; }
+
+        private Func<State, IServices, IStrategy> StrategyProvider { get; }
+
+        public AiSetupDecision Setup(State state, IServices services)
         {
-            var turns = Strategy.Turn(new Graph(map));
+            services.Setup<GraphService>(state);
+            StrategyProvider(state, services);
+            return AiSetupDecision.Empty();
+        }
+
+        public AiMoveDecision GetNextMove(State state, IServices services)
+        {
+            var strategy = StrategyProvider(state, services);
+            var graph = services.Get<GraphService>(state).Graph;
+            var turns = strategy.Turn(graph);
             if (!turns.Any())
-                return new PassMove(PunterId);
+                return AiMoveDecision.Pass(state.punter);
             var bestTurn = turns.MaxBy(x => x.Estimation);
-            return new ClaimMove(PunterId, bestTurn.River.Source, bestTurn.River.Target);
-        }
-
-        public string SerializeGameState()
-        {
-            return "";
-        }
-
-        public void DeserializeGameState(string gameState)
-        {
+            return AiMoveDecision.Claim(state.punter, bestTurn.River.Source, bestTurn.River.Target);
         }
     }
 }

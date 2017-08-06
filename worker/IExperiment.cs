@@ -8,6 +8,6 @@ namespace worker
 {
     public interface IExperiment
     {
-        List<PlayerResult> Play(Task task);
+        Result Play(Task task);
     }
 }

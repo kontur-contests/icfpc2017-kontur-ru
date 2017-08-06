@@ -4,6 +4,9 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using lib.Ai;
+using lib.StateImpl;
+using lib.Structures;
+using lib.viz;
 using NUnit.Framework;
 
 namespace lib
@@ -120,28 +123,20 @@ namespace lib
             form.ShowDialog();
         }
 
+        [ShoulNotRunOnline]
         private class JunkAi : IAi
         {
             public string Name => "Junk";
+            public string Version { get; }
 
-            public Future[] StartRound(int punterId, int puntersCount, Map map, Settings settings)
+            public AiSetupDecision Setup(State state, IServices services)
             {
-                throw new NotImplementedException();
+                throw new NotSupportedException();
             }
 
-            public Move GetNextMove(Move[] prevMoves, Map map)
+            public AiMoveDecision GetNextMove(State state, IServices services)
             {
-                throw new NotImplementedException();
-            }
-
-            public string SerializeGameState()
-            {
-                throw new NotImplementedException();
-            }
-
-            public void DeserializeGameState(string gameState)
-            {
-                throw new NotImplementedException();
+                throw new NotSupportedException();
             }
 
             public override string ToString()

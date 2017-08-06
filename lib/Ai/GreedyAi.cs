@@ -5,6 +5,8 @@ using System.Linq;
 using System.Windows.Forms;
 using lib.GraphImpl;
 using lib.Scores.Simple;
+using lib.StateImpl;
+using lib.Structures;
 using lib.viz;
 using NUnit.Framework;
 
@@ -12,37 +14,23 @@ namespace lib.Ai
 {
     public class GreedyAi : IAi
     {
-        public string Name { get; set; } = nameof(GreedyAi);
-        public int punterId { get; private set; }
-        private GreedyAiHelper GreedyAiHelper;
-
-        private MineDistCalculator mineDistCalulator;
-
-        // ReSharper disable once ParameterHidesMember
-        public Future[] StartRound(int punterId, int puntersCount, Map map, Settings settings)
+        public string Name => nameof(GreedyAi);
+        public string Version => "0.1";
+        
+        public AiSetupDecision Setup(State state, IServices services)
         {
-            this.punterId = punterId;
-            this.mineDistCalulator = new MineDistCalculator(new Graph(map));
-            GreedyAiHelper = new GreedyAiHelper(punterId, mineDistCalulator);
-            return new Future[0];
+            services.Setup<GraphService>(state);
+            services.Setup<MineDistCalculator>(state);
+            return AiSetupDecision.Empty();
         }
 
-        public Move GetNextMove(Move[] prevMoves, Map map)
+        public AiMoveDecision GetNextMove(State state, IServices services)
         {
-            var graph = new Graph(map);
-
-            GreedyAiHelper.TryExtendAnything(graph, out Move nextMove);
-            return nextMove;
-        }
-
-        public string SerializeGameState()
-        {
-            return "";
-        }
-
-        public void DeserializeGameState(string gameState)
-        {
-            
+            var graph = services.Get<GraphService>(state).Graph;
+            var mineDistCalculator = services.Get<MineDistCalculator>(state);
+            var connectedCalculator = new ConnectedCalculator(graph, state.punter);
+            GreedyAiHelper.TryExtendAnything(state.punter, graph, connectedCalculator, mineDistCalculator, out Move nextMove);
+            return AiMoveDecision.Move(nextMove);
         }
     }
 
@@ -101,9 +89,9 @@ namespace lib.Ai
 
             foreach (var map in maps)
             {
-                var gamers = new List<IAi> { new GreedyAi(),  };
+                var gamers = new List<IAi> {new GreedyAi(),};
                 var gameSimulator = new GameSimulatorRunner(new SimpleScoreCalculator());
-                
+
 
                 Console.WriteLine($"MAP: {map.Name}");
                 var results = gameSimulator.SimulateGame(

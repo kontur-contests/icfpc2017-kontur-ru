@@ -1,6 +1,7 @@
 ﻿using System;
 using FakeItEasy;
 using lib.Interaction.Internal;
+using lib.Structures;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using Shouldly;
@@ -11,17 +12,15 @@ namespace lib.Interaction
     public class OnlineProtocol_Tests
     {
         [Test]
-        [Explicit]
         public void TestHandShake()
         {
             var transport = A.Fake<ITransport>();
             var gameTransport = new OnlineProtocol(transport);
-            A.CallTo(() => transport.Read(A<int>.Ignored)).Returns("{\"you\":\"player\"}");
+            A.CallTo(() => transport.Read<HandshakeIn>(A<int>.Ignored)).Returns(new HandshakeIn{you = "player"});
 
             gameTransport.HandShake("player");
 
-            var expectedToWrite = "{\"me\":\"player\"}";
-            A.CallTo(() => transport.Write(expectedToWrite)).MustHaveHappened();
+            A.CallTo(() => transport.Write(A<HandshakeOut>.That.Matches(o => o.me == "player"))).MustHaveHappened();
         }
 
         [Test]
@@ -31,29 +30,23 @@ namespace lib.Interaction
             var transport = new TcpTransport(9011);
             var gameTransport = new OnlineProtocol(transport);
 
-            gameTransport.HandShake("playёr");
+            gameTransport.HandShake("player");
             var setup = gameTransport.ReadSetup();
-            Console.WriteLine(setup.Id);
+            Console.WriteLine(setup.punter);
         }
 
         [Test]
-        [Explicit]
         public void TestReadSetup()
         {
             var transport = A.Fake<ITransport>();
             var gameTransport = new OnlineProtocol(transport);
-            var setup = new Setup
+            var setup = new In
             {
-                Id = 1
+                punter = 1
             };
-            var data = JsonConvert.SerializeObject(setup);
-
-            A.CallTo(() => transport.Read(A<int>.Ignored)).Returns(data);
-
+            A.CallTo(() => transport.Read<In>(A<int?>.Ignored)).Returns(setup);
             gameTransport.ReadSetup();
-
-            var expectedToWrite = "{\"ready\":\"id\"}";
-            A.CallTo(() => transport.Write(expectedToWrite)).MustHaveHappened();
+            A.CallTo(() => transport.Read<In>(A<int?>.Ignored)).MustHaveHappened();
         }
     }
 }

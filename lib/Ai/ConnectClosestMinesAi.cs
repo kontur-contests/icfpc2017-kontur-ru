@@ -4,6 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using lib.GraphImpl;
+using lib.StateImpl;
+using lib.Structures;
 using lib.viz;
 using NUnit.Framework;
 using Shouldly;
@@ -12,60 +14,55 @@ namespace lib.Ai
 {
     public class ConnectClosestMinesAi : IAi
     {
+        public class AiState
+        {
+            public int stage = FindNewComponent;
+            public HashSet<int> myMines = new HashSet<int>();
+        }
+
         private const int FindNewComponent = 0;
         private const int ExtendComponent = 1;
         private const int ExtendAnything = 2;
-
-        private readonly HashSet<int> myMines = new HashSet<int>();
-
-        private int stage = FindNewComponent;
-
-        private int punterId;
-        private MineDistCalculator mineDistCalulator;
-
+        
         public string Name => nameof(ConnectClosestMinesAi);
+        public string Version => "0.1";
 
-        // ReSharper disable once ParameterHidesMember
-        public Future[] StartRound(int punterId, int puntersCount, Map map, Settings settings)
+        public AiSetupDecision Setup(State state, IServices services)
         {
-            this.punterId = punterId;
-            this.mineDistCalulator = new MineDistCalculator(new Graph(map));
-            myMines.Clear();
-
-            return new Future[0];
+            state.ccm = state.ccm ?? new AiState();
+            services.Setup<GraphService>(state);
+            services.Setup<MineDistCalculator>(state);
+            return AiSetupDecision.Empty();
         }
 
-        public Move GetNextMove(Move[] prevMoves, Map map)
+        public AiMoveDecision GetNextMove(State state, IServices services)
         {
-            mineDistCalulator = mineDistCalulator ?? new MineDistCalculator(new Graph(map));
-
-            var graph = new Graph(map);
-
-            Move move;
-
-            if (stage == ExtendComponent)
+            AiMoveDecision move;
+            if (state.ccm.stage == ExtendComponent)
             {
-                if (TryExtendComponent(graph, out move))
+                if (TryExtendComponent(state, services, out move))
                     return move;
-                stage = FindNewComponent;
+                state.ccm.stage = FindNewComponent;
             }
 
-            if (stage == FindNewComponent && TryBuildNewComponent(graph, out move))
+            if (state.ccm.stage == FindNewComponent && TryBuildNewComponent(state, services, out move))
             {
-                stage = ExtendComponent;
+                state.ccm.stage = ExtendComponent;
                 return move;
             }
 
-            stage = ExtendAnything;
-            if (TryExtendAnything(graph, out move))
+            state.ccm.stage = ExtendAnything;
+            if (TryExtendAnything(state, services, out move))
                 return move;
 
-            return new PassMove(punterId);
+            return AiMoveDecision.Pass(state.punter);
         }
 
-        private bool TryExtendAnything(Graph graph, out Move nextMove)
+        private bool TryExtendAnything(State state, IServices services, out AiMoveDecision nextMove)
         {
-            var calculator = new ConnectedCalculator(graph, punterId);
+            var graph = services.Get<GraphService>(state).Graph;
+            var mineDistCalculator = services.Get<MineDistCalculator>(state);
+            var calculator = new ConnectedCalculator(graph, state.punter);
             var maxAddScore = long.MinValue;
             Edge bestEdge = null;
             foreach (var vertex in graph.Vertexes.Values)
@@ -76,7 +73,7 @@ namespace lib.Ai
                     var toMines = calculator.GetConnectedMines(edge.To);
                     long addScore;
                     if (fromMines.Count == 0)
-                        addScore = Calc(toMines, edge.From);
+                        addScore = Calc(mineDistCalculator, toMines, edge.From);
                     else
                     {
                         if (toMines.Count != 0)
@@ -86,7 +83,7 @@ namespace lib.Ai
                             addScore = 0;
                         }
                         else
-                            addScore = Calc(fromMines, edge.To);
+                            addScore = Calc(mineDistCalculator, fromMines, edge.To);
                     }
                     if (addScore > maxAddScore)
                     {
@@ -97,18 +94,19 @@ namespace lib.Ai
             }
             if (bestEdge != null)
             {
-                nextMove = MakeMove(bestEdge);
+                nextMove = AiMoveDecision.Claim(state.punter, bestEdge.From, bestEdge.To);
                 return true;
             }
             nextMove = null;
             return false;
         }
 
-        private bool TryExtendComponent(Graph graph, out Move move)
+        private bool TryExtendComponent(State state, IServices services, out AiMoveDecision move)
         {
+            var graph = services.Get<GraphService>(state).Graph;
             var queue = new Queue<ExtendQueueItem>();
             var used = new HashSet<int>();
-            foreach (var mineId in graph.Mines.Keys.Where(id => !myMines.Contains(id)))
+            foreach (var mineId in graph.Mines.Keys.Where(id => !state.ccm.myMines.Contains(id)))
             {
                 var queueItem = new ExtendQueueItem
                 {
@@ -122,12 +120,12 @@ namespace lib.Ai
             while (queue.Count > 0)
             {
                 var current = queue.Dequeue();
-                if (current.CurrentVertex.Edges.Any(x => x.Owner == punterId))
+                if (current.CurrentVertex.Edges.Any(x => x.Owner == state.punter))
                 {
                     if (current.Edge == null)
                         throw new InvalidOperationException("Mine is already part of component! WTF?");
-                    TryAddMine(graph, current.Edge);
-                    move = MakeMove(current.Edge);
+                    TryAddMine(state, graph, current.Edge);
+                    move = AiMoveDecision.Claim(state.punter, current.Edge.From, current.Edge.To);
                     return true;
                 }
                 foreach (var edge in current.CurrentVertex.Edges.Where(x => x.Owner == -1))
@@ -149,11 +147,12 @@ namespace lib.Ai
             return false;
         }
 
-        private bool TryBuildNewComponent(Graph graph, out Move move)
+        private bool TryBuildNewComponent(State state, IServices services, out AiMoveDecision move)
         {
+            var graph = services.Get<GraphService>(state).Graph;
             var queue = new Queue<BuildQueueItem>();
             var used = new Dictionary<int, BuildQueueItem>();
-            foreach (var mineId in graph.Mines.Keys.Where(id => !myMines.Contains(id)))
+            foreach (var mineId in graph.Mines.Keys.Where(id => !state.ccm.myMines.Contains(id)))
             {
                 var queueItem = new BuildQueueItem
                 {
@@ -179,14 +178,16 @@ namespace lib.Ai
                             var bestMine = SelectBestMine(prev.SourceMine, current.SourceMine);
                             if (bestMine == prev.SourceMine)
                             {
-                                TryAddMine(graph, prev.FirstEdge ?? edge);
-                                move = MakeMove(prev.FirstEdge ?? edge);
+                                TryAddMine(state, graph, prev.FirstEdge ?? edge);
+                                Edge edge1 = prev.FirstEdge ?? edge;
+                                move = AiMoveDecision.Claim(state.punter, edge1.From, edge1.To);
                                 return true;
                             }
                             if (bestMine == current.SourceMine)
                             {
-                                TryAddMine(graph, current.FirstEdge ?? edge);
-                                move = MakeMove(current.FirstEdge ?? edge);
+                                TryAddMine(state, graph, current.FirstEdge ?? edge);
+                                Edge edge1 = current.FirstEdge ?? edge;
+                                move = AiMoveDecision.Claim(state.punter, edge1.From, edge1.To);
                                 return true;
                             }
                         }
@@ -208,20 +209,20 @@ namespace lib.Ai
             return false;
         }
 
-        private void TryAddMine(Graph graph, Edge edge)
+        private void TryAddMine(State state, Graph graph, Edge edge)
         {
             if (graph.Mines.ContainsKey(edge.From))
-                myMines.Add(edge.From);
+                state.ccm.myMines.Add(edge.From);
             if (graph.Mines.ContainsKey(edge.To))
-                myMines.Add(edge.To);
+                state.ccm.myMines.Add(edge.To);
         }
 
-        private long Calc(HashSet<int> mineIds, int vertexId)
+        private long Calc(MineDistCalculator mineDistCalculator, HashSet<int> mineIds, int vertexId)
         {
             return mineIds.Sum(
                 mineId =>
                 {
-                    var dist = mineDistCalulator.GetDist(mineId, vertexId);
+                    var dist = mineDistCalculator.GetDist(mineId, vertexId);
                     return (long) dist * dist;
                 });
         }
@@ -229,25 +230,6 @@ namespace lib.Ai
         private static Vertex SelectBestMine(Vertex a, Vertex b)
         {
             return a.Edges.Count(x => x.Owner == -1) < b.Edges.Count(x => x.Owner == -1) ? a : b;
-        }
-
-        private Move MakeMove(Edge edge)
-        {
-            return new ClaimMove(punterId, edge.From, edge.To);
-        }
-
-        public string SerializeGameState()
-        {
-            return $"{punterId};{stage};{string.Join(";", myMines)}";
-    }
-
-        public void DeserializeGameState(string gameState)
-        {
-            var split = gameState.Split(new[]{';'}, StringSplitOptions.RemoveEmptyEntries);
-            punterId = int.Parse(split[0]);
-            stage = int.Parse(split[1]);
-            myMines.Clear();
-            myMines.UnionWith(split.Skip(2).Select(int.Parse));
         }
 
         private class BuildQueueItem
@@ -270,38 +252,24 @@ namespace lib.Ai
         [Test]
         public void Test1()
         {
-            var map = MapLoader.LoadMap(Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\..\maps\sample.json")).Map;
             var ai = new ConnectClosestMinesAi();
-            ai.StartRound(0, 1, map, new Settings());
-            var move = ai.GetNextMove(null, map);
-            Assert.That(move, Is.EqualTo(new ClaimMove(0, 5, 7)).Or.EqualTo(new ClaimMove(0, 5, 3)));
+            var state = new State{punter = 0, punters = 1, map = MapLoader.LoadMap(Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\..\maps\sample.json")).Map };
+            var services = new Services();
+            ai.Setup(state, services);
+            var moveDecision = ai.GetNextMove(state, services);
+            Assert.That(moveDecision.move, Is.EqualTo(Move.Claim(0, 5, 3)));
+            state.map = state.map.ApplyMove(moveDecision.move);
+            state.turns.Add(new TurnState());
+            services.ApplyNextState(state);
+            moveDecision = ai.GetNextMove(state, services);
+            Assert.That(moveDecision.move, Is.EqualTo(Move.Claim(0, 1, 3)));
+            state.map = state.map.ApplyMove(moveDecision.move);
+            state.turns.Add(new TurnState());
+            services.ApplyNextState(state);
+            moveDecision = ai.GetNextMove(state, services);
+            Assert.That(moveDecision.move, Is.EqualTo(Move.Claim(0, 0, 1)));
         }
-
-        [Test]
-        public void Test2()
-        {
-            var map = MapLoader.LoadMap(Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\..\maps\sample.json")).Map;
-            var ai = new ConnectClosestMinesAi();
-            var simulator = new GameSimulator(map, new Settings());
-            simulator.StartGame(new List<IAi> {ai});
-            var gameState = simulator.NextMove();
-            var move = ai.GetNextMove(null, gameState.CurrentMap);
-            move.ShouldBe(new ClaimMove(0, 1, 3));
-        }
-
-        [Test]
-        public void Test3()
-        {
-            var map = MapLoader.LoadMap(Path.Combine(TestContext.CurrentContext.TestDirectory, @"..\..\..\..\maps\sample.json")).Map;
-            var ai = new ConnectClosestMinesAi();
-            var simulator = new GameSimulator(map, new Settings());
-            simulator.StartGame(new List<IAi> {ai});
-            simulator.NextMove();
-            var gameState = simulator.NextMove();
-            var move = ai.GetNextMove(null, gameState.CurrentMap);
-            move.ShouldBe(new ClaimMove(0, 0, 1));
-        }
-
+        
         [Test]
         [STAThread]
         [Explicit]

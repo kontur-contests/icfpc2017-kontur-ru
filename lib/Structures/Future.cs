@@ -1,14 +1,11 @@
 using System.IO;
-using System.Text;
-using Newtonsoft.Json;
 
-namespace lib
+namespace lib.Structures
 {
     public class Future
     {
-        [JsonProperty("source")] public int Source;
-
-        [JsonProperty("target")] public int Target;
+        public int source;
+        public int target;
 
         public Future()
         {
@@ -16,13 +13,13 @@ namespace lib
 
         public Future(int source, int target)
         {
-            Source = source;
-            Target = target;
+            this.source = source;
+            this.target = target;
         }
 
         public override string ToString()
         {
-            return $"{nameof(Source)}: {Source}, {nameof(Target)}: {Target}";
+            return $"{nameof(source)}: {source}, {nameof(target)}: {target}";
         }
 
         public static Future DecodeFrom(BinaryReader reader)
@@ -37,8 +34,8 @@ namespace lib
         public void EncodeTo(BinaryWriter writer)
         {
             writer.Write((byte)1);//marker
-            writer.Write(Source);
-            writer.Write(Target);
+            writer.Write((int) source);
+            writer.Write((int) target);
         }
     }
 }

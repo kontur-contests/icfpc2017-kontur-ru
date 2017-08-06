@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using FluentAssertions;
 using lib.Ai;
+using lib.StateImpl;
+using lib.Structures;
+using lib.viz;
 using NUnit.Framework;
 
 namespace lib
@@ -45,28 +47,20 @@ namespace lib
             a.ShouldNotThrow();
         }
 
+        [ShoulNotRunOnline]
         private class Ai : IAi
         {
             public string Name { get; }
+            public string Version { get; }
 
-            public Future[] StartRound(int punterId, int puntersCount, Map map, Settings settings)
+            public AiSetupDecision Setup(State state, IServices services)
             {
-                return new Future[0];
+                return AiSetupDecision.Empty();
             }
 
-            public Move GetNextMove(Move[] prevMoves, Map map)
+            public AiMoveDecision GetNextMove(State state, IServices services)
             {
-                return new ClaimMove(0, 0, 1);
-            }
-
-            public string SerializeGameState()
-            {
-                throw new System.NotImplementedException();
-            }
-
-            public void DeserializeGameState(string gameState)
-            {
-                throw new System.NotImplementedException();
+                return AiMoveDecision.Claim(0, 0, 1);
             }
         }
     }

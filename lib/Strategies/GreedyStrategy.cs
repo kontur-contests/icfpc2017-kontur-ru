@@ -6,10 +6,10 @@ namespace lib.Strategies
 {
     public class GreedyStrategy : IStrategy
     {
-        public GreedyStrategy(Map map, int punterId)
+        public GreedyStrategy(int punterId, MineDistCalculator mineDistCalculator)
         {
             PunterId = punterId;
-            MineDistCalulator = new MineDistCalculator(new Graph(map));
+            MineDistCalulator = mineDistCalculator;
         }
 
         private MineDistCalculator MineDistCalulator { get; }

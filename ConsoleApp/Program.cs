@@ -5,6 +5,7 @@ using lib;
 using lib.Ai;
 using lib.Scores.Simple;
 using lib.Strategies;
+using lib.Structures;
 
 namespace ConsoleApp
 {
@@ -18,7 +19,7 @@ namespace ConsoleApp
 
             foreach (var map in maps)
             {
-                var gamers = new List<IAi> { new ConnectClosestMinesAi(), new LochKillerAi() };
+                var gamers = new List<IAi> { new LochMaxVertexWeighterKillerAi(), new ConnectClosestMinesAi() };
                 var gameSimulator = new GameSimulatorRunner(new SimpleScoreCalculator(), true);
 
 

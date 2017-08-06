@@ -1,4 +1,5 @@
 ﻿using lib.GraphImpl;
+using lib.Structures;
 
 namespace lib.Scores.Simple
 {
@@ -7,7 +8,7 @@ namespace lib.Scores.Simple
         public long GetScore(int punter, Map map, Future[] futures)
         {
             var graph = new Graph(map);
-            var distCalc = new MineDistCalculator(graph);
+            var distCalc = new MineDistCalculator.Impl(graph);
             var minesCalc = new ConnectedCalculator(graph, punter);
 
             long res = 0;
@@ -23,13 +24,13 @@ namespace lib.Scores.Simple
 
             foreach (var future in futures)
             {
-                var mines = minesCalc.GetConnectedMines(future.Target);
+                var mines = minesCalc.GetConnectedMines(future.target);
 
-                var dist = distCalc.GetDist(future.Source, future.Target);
+                var dist = distCalc.GetDist(future.source, future.target);
 
                 var futureScoreValue = dist * dist * dist;
 
-                var futureScore = mines.Contains(future.Source)
+                var futureScore = mines.Contains(future.source)
                     ? futureScoreValue
                     : -futureScoreValue;
 

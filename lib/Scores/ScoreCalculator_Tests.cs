@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using lib.Scores.Simple;
+using lib.Structures;
 using NUnit.Framework;
 
 namespace lib.Scores

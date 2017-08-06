@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using lib.GraphImpl;
 
@@ -8,7 +9,7 @@ namespace lib.Strategies.EdgeWeighting
     {
         private static ThreadLocal<Random> Random { get; } = new ThreadLocal<Random>(() => new Random(Guid.NewGuid().GetHashCode()));
 
-        public void Init(Graph graph, int[] claimedVertexIds)
+        public void Init(Graph graph, List<ConnectedComponent> connectedComponents)
         {
         }
 

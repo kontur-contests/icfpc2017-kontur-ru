@@ -1,40 +1,31 @@
-from magic import *
+import magic
 import json
 import numpy as np
 
+def test_historical_2():
+    runner = magic.Fluent()
+    (runner
+    .create_historical_players(5)
+    .battles_on_map('sample.json', 2, 3)
+    .battles_on_map('Sierpinski-triangle.json', 3, 4)
+    .battles_on_map('gothenburg-sparse.json', 8, 6)
+    .experiment('Historical')
+    .preview())
 
-
-
-
-def test_greedy_algorithms():
-    (Fluent()
-    .from_params()
-    .create_random_players(1)
-    .first_against_himself(1,2,4)
-    .on_maps('sample.json')
-    .experiment('Greedy')
-    .preview()
-    .run()
-    .dump('greedy_results')
+def test_parameter():
+    runner = magic.Fluent()
+    (runner
+    .from_params(MineWeight = magic.Param(10,300))
+    .create_random_players(100)
+    .battles_on_map('Sierpinski-triangle.json', 3, 100)
+    .experiment('MRVW')
+    #.preview()
+    .run().dump().store_pointwise('exp.csv')
      )
+    print(runner.token)
 
-def test_historical_algorithms():
-    (Fluent()
-     .create_historical_players(3)
-     .battling_in_pairs()
-     .on_maps('sample.json')
-     .experiment('Historical')
-     .preview())
-
-#test_historical_algorithms()
-
-#Fluent().restore_dump('result_dump_93839.json').store_pointwise('test.csv')
+test_parameter()
 
 
-#test_greedy_algorithms()
+#test_historical_2()
 
-#Fluent().restore_dump('greedy_results').store_pointwise('test.csv')
-
-
-
-empty_queue()

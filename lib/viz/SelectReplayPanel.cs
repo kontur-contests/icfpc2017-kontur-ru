@@ -14,7 +14,7 @@ namespace lib.viz
             var buttonsPanel = new FlowLayoutPanel
             {
                 AutoSize = true,
-                Dock =DockStyle.Top
+                Dock = DockStyle.Top
             };
             var refreshButton = new Button()
             {
@@ -51,8 +51,8 @@ namespace lib.viz
 
 
             listView.ItemSelectionChanged += SelectedReplayChanged;
-            Controls.Add(debugTextArea);
             Controls.Add(listView);
+            Controls.Add(debugTextArea);
             Controls.Add(buttonsPanel);
         }
 
@@ -96,8 +96,8 @@ namespace lib.viz
                 var lvItem = listView.Items.Add(meta.Timestamp.ToString("T"));
                 lvItem.Tag = meta;
                 lvItem.SubItems.Add(meta.AiName);
-                var ourScore = meta.Scores.First(s => s.Punter == meta.OurPunter).Score;
-                var count = meta.Scores.Count(s => s.Score < ourScore) + 1;
+                var ourScore = meta.Scores.First(s => s.punter == meta.OurPunter).score;
+                var count = meta.Scores.Count(s => s.score < ourScore) + 1;
                 lvItem.SubItems.Add(count.ToString());
                 lvItem.SubItems.Add(meta.Scores.Length.ToString());
                 lvItem.BackColor = (count == meta.Scores.Length) ? Color.GreenYellow : Color.White;

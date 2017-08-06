@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using lib.Ai;
 using lib.Interaction.Internal;
 using lib.Replays;
-using lib.viz;
+using lib.StateImpl;
+using lib.Structures;
 using Newtonsoft.Json;
 using NUnit.Framework;
 
@@ -13,104 +15,109 @@ namespace lib.Interaction
 {
     public class OnlineInteraction : IServerInteraction
     {
+        private readonly string botName;
         private readonly OnlineProtocol connection;
-
-        public OnlineInteraction(int port)
+        private string BotName => botName ?? "kontur.ru";
+        public OnlineInteraction(int port, string botName=null)
         {
+            this.botName = botName;
             connection = new OnlineProtocol(new TcpTransport(port));
         }
 
         public bool Start()
         {
-            return connection.HandShake(CreateBotName());
-        }
-
-        public string CreateBotName()
-        {
-            return "kontur.ru"; // Sneaky fucker...
+            return connection.HandShake(BotName);
         }
 
         public Tuple<ReplayMeta, ReplayData> RunGame(IAi ai)
         {
             var setup = connection.ReadSetup();
 
-            Future[] futures;
+            var services = new Services();
+            var state = new State
+            {
+                map = setup.map,
+                punter = setup.punter,
+                punters = setup.punters,
+                settings = setup.settings
+            };
+
+            AiSetupDecision setupDecision;
 
             try
             {
-                futures = ai.StartRound(setup.Id, setup.PunterCount, setup.Map, setup.Settings);
+                setupDecision = ai.Setup(state, services);
             }
             catch
             {
-                var handshake = JsonConvert.SerializeObject(new { you = CreateBotName() });
-                var input = JsonConvert.SerializeObject(new
-                {
-                    punter = setup.Id,
-                    punters = setup.PunterCount,
-                    map = setup.Map,
-                    settings = setup.Settings
-                });
+                var handshake = JsonConvert.SerializeObject(new HandshakeIn { you = botName });
+                var input = JsonConvert.SerializeObject(setup, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
                 File.WriteAllText($@"error-setup-{DateTime.UtcNow.ToString("O").Replace(":", "_")}.json", $@"{handshake.Length}:{handshake}{input.Length}:{input}");
                 throw;
             }
 
-            connection.WriteSetupReply(new SetupReply(setup.Id, futures));
+            if (setup.settings?.futures != true && setupDecision.futures?.Any() == true)
+                throw new InvalidOperationException($"BUG in Ai {ai.Name} - futures are not supported");
+            state.aiSetupDecision = new AiInfoSetupDecision
+            {
+                name = ai.Name,
+                version = ai.Version,
+                futures = setupDecision.futures,
+                reason = setupDecision.reason
+            };
 
-            var map = setup.Map;
-
-            var serverResponse = connection.ReadGameState();
+            connection.WriteSetupReply(new SetupOut { ready = setup.punter, futures = setupDecision.futures });
 
             var allMoves = new List<Move>();
-            
-            while (!connection.IsGameOver)
+
+            var serverResponse = connection.ReadNextTurn();
+
+            while (!serverResponse.IsScoring())
             {
-                var moves = connection.GetMoves(serverResponse);
-                var gameplay = JsonConvert.SerializeObject(new
-                {
-                    move = new
-                    {
-                        moves = moves.Select(x => new
-                        {
-                            claim = x as ClaimMove,
-                            pass = x as PassMove
-                        }).ToArray()
-                    },
-                    state = new
-                    {
-                        ai = ai.SerializeGameState(),
-                        punter = setup.Id,
-                        punters = setup.PunterCount,
-                        map
-                    }
-                }, new JsonSerializerSettings{NullValueHandling = NullValueHandling.Ignore});
+                var moves = serverResponse.move.moves;
+                var gameplay = JsonConvert.SerializeObject(serverResponse, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore});
 
                 allMoves.AddRange(moves);
                 foreach (var move in moves)
-                    map = move.Execute(map);
+                    state.map = state.map.ApplyMove(move);
 
-                Move nextMove;
+                state.turns.Add(new TurnState
+                {
+                    moves = moves,
+                    aiMoveDecision = state.lastAiMoveDecision
+                });
+
+                services.ApplyNextState(state);
+
+                AiMoveDecision moveDecision;
                 try
                 {
-                    nextMove = ai.GetNextMove(moves, map);
+                    moveDecision = ai.GetNextMove(state, services);
                 }
                 catch
                 {
-                    var handshake = JsonConvert.SerializeObject(new { you = CreateBotName() });
+                    var handshake = JsonConvert.SerializeObject(new { you = "kontur.ru" });
                     File.WriteAllText($@"error-turn-{DateTime.UtcNow.ToString("O").Replace(":", "_")}.json", $@"{handshake.Length}:{handshake}{gameplay.Length}:{gameplay}");
                     throw;
                 }
+                state.lastAiMoveDecision = new AiInfoMoveDecision
+                {
+                    name = ai.Name,
+                    version = ai.Version,
+                    move = moveDecision.move,
+                    reason = moveDecision.reason
+                };
 
-                allMoves.Add(nextMove);
-                connection.WriteMove(nextMove);
-
-                serverResponse = connection.ReadGameState();
+                connection.WriteMove(moveDecision.move);
+                serverResponse = connection.ReadNextTurn();
             }
-            var score = connection.GetScore(serverResponse);
 
-            allMoves.AddRange(score.MoveModels.Select(ProtocolBase.MoveModel.GetMove));
+            var stopIn = serverResponse.stop;
+
+            allMoves.AddRange(stopIn.moves);
             
-            var meta = new ReplayMeta(DateTime.UtcNow, ai.Name, setup.Id, setup.PunterCount, score.Scores);
-            var data = new ReplayData(setup.Map, allMoves, futures);
+            var meta = new ReplayMeta(DateTime.UtcNow, ai.Name, ai.Version, "", setup.punter, setup.punters, stopIn.scores);
+            var data = new ReplayData(setup.map, allMoves, state.aiSetupDecision.futures);
             
             return Tuple.Create(meta, data);
         }

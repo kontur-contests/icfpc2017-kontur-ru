@@ -1,11 +1,12 @@
+using lib.StateImpl;
+
 namespace lib.Ai
 {
     public interface IAi
     {
         string Name { get; }
-        Future[] StartRound(int punterId, int puntersCount, Map map, Settings settings);
-        Move GetNextMove(Move[] prevMoves, Map map);
-        string SerializeGameState();
-        void DeserializeGameState(string gameState);
+        string Version { get; }
+        AiSetupDecision Setup(State state, IServices services);
+        AiMoveDecision GetNextMove(State state, IServices services);
     }
 }

@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using lib;
 using lib.Ai;
+using lib.StateImpl;
+using lib.Structures;
 using Newtonsoft.Json;
 
 namespace punter
@@ -11,6 +13,7 @@ namespace punter
     class Program
     {
         private static IAi ai;
+        private static IServices services;
         private static TextReader inputReader;
 
         private const string TeamName = "kontur.ru";
@@ -21,7 +24,8 @@ namespace punter
                 inputReader = Console.In;
             else
                 inputReader = new StreamReader(args[0]);
-            ai = new LochKillerAi();
+            ai = new ConnectClosestMinesAi();
+            services = new Services();
 
             Write(new HandshakeOut {me = TeamName});
             var handshakeIn = Read<HandshakeIn>();
@@ -30,17 +34,11 @@ namespace punter
 
             var @in = Read<In>();
             if (@in.IsSetup())
-            {
-                Write(DoSetup(@in.punter.Value, @in.punters, @in.map, @in.settings));
-            }
+                Write(DoSetup(@in.punter, @in.punters, @in.map, @in.settings));
             else if (@in.IsGameplay())
-            {
                 Write(DoGameplay(@in.move.moves, @in.state));
-            }
             else if (@in.IsScoring())
-            {
-                DoScoring(@in.stop.moves, @in.stop.scores, @in.state);
-            }
+                DoScoring(@in.stop.moves, @in.stop.scores);
             else
                 throw new InvalidOperationException($"Invalid input: {@in.line}");
         }
@@ -48,90 +46,105 @@ namespace punter
         private static SetupOut DoSetup(int punter, int punters, Map map, Settings settings)
         {
             Console.Error.WriteLine($"punter={punter}/{punters}");
-            var futures = ai.StartRound(punter, punters, map, settings);
+            var state = new State
+            {
+                map = map,
+                punter = punter,
+                punters = punters,
+                settings = settings
+            };
+            var setupDecision = ai.Setup(state, services);
+            if (settings?.futures != true && setupDecision.futures?.Any() == true)
+            {
+                Console.Error.WriteLine($"BUG in Ai {ai.Name} - futures are not supported");
+                setupDecision = AiSetupDecision.Empty("futures are not supported");
+            }
+            state.aiSetupDecision = new AiInfoSetupDecision
+            {
+                name = ai.Name,
+                version = ai.Version,
+                futures = setupDecision.futures,
+                reason = setupDecision.reason
+            };
             return new SetupOut
             {
                 ready = punter,
-                futures = futures,
-                state = new State
-                {
-                    ai = ai.SerializeGameState(),
-                    punter = punter,
-                    punters = punters,
-                    map = map
-                }
+                futures = setupDecision.futures,
+                state = state
             };
         }
 
-        private static GameplayOut DoGameplay(MoveIn[] moves, State state)
+        private static GameplayOut DoGameplay(Move[] moves, State state)
         {
-            var map = state.map;
-            foreach (var moveIn in moves)
-                ApplyMove(map, moveIn);
-            ai.DeserializeGameState(state.ai);
+            foreach (var move in moves)
+                state.map = state.map.ApplyMove(move);
+            state.turns.Add(new TurnState
+            {
+                moves = moves,
+                aiMoveDecision = state.lastAiMoveDecision
+            });
             try
             {
-                var nextMove = ai.GetNextMove(moves.Select(m => (Move) m.claim ?? m.pass).ToArray(), map);
-                return new GameplayOut
+                services.ApplyNextState(state);
+                var moveDecision = ai.GetNextMove(state, services);
+                moveDecision = ValidateMove(state.map, moveDecision);
+                state.lastAiMoveDecision = new AiInfoMoveDecision
                 {
-                    claim = nextMove as ClaimMove,
-                    pass = nextMove as PassMove,
-                    state = new State
-                    {
-                        ai = ai.SerializeGameState(),
-                        punter = state.punter,
-                        punters = state.punters,
-                        map = map
-                    }
+                    name = ai.Name,
+                    version = ai.Version,
+                    move = moveDecision.move,
+                    reason = moveDecision.reason
                 };
+                return new GameplayOut(moveDecision.move, state);
             }
             catch (Exception e)
             {
                 Console.Error.WriteLine(e);
-                return new GameplayOut
+                var moveDecision = AiMoveDecision.Pass(state.punter, "exception");
+                state.lastAiMoveDecision = new AiInfoMoveDecision
                 {
-                    pass = new PassMove(state.punter),
-                    state = new State
-                    {
-                        ai = state.ai,
-                        punter = state.punter,
-                        punters = state.punters,
-                        map = map
-                    }
+                    name = ai.Name,
+                    version = ai.Version,
+                    move = moveDecision.move,
+                    reason = moveDecision.reason
                 };
+                return new GameplayOut(Move.Pass(state.punter), state);
             }
         }
 
-        private static void DoScoring(MoveIn[] moves, ScoreModel[] scores, State state)
+        private static void DoScoring(Move[] moves, Score[] scores)
         {
             foreach (var scoreModel in scores)
-                Console.Error.WriteLine($"{scoreModel.Punter}={scoreModel.Score}");
+                Console.Error.WriteLine($"{scoreModel.punter}={scoreModel.score}");
         }
 
-        private static void ApplyMove(Map map, MoveIn moveIn)
+        private static AiMoveDecision ValidateMove(Map map, AiMoveDecision decision)
         {
-            if (moveIn.claim == null)
-                return;
+            var move = decision.move;
+            if (move.claim == null)
+                return decision;
 
-            var move = moveIn.claim;
             foreach (var river in map.Rivers)
             {
-                if (river.Source == move.Source && river.Target == move.Target || river.Target == move.Source && river.Source == move.Target)
+                if (river.Source == move.claim.source && river.Target == move.claim.target || river.Target == move.claim.source && river.Source == move.claim.target)
                 {
                     if (river.Owner != -1)
-                        throw new InvalidOperationException($"river.Owner != -1 for move: {move}");
-                    river.Owner = move.PunterId;
-                    return;
+                    {
+                        Console.Error.WriteLine($"BUG in Ai {ai.Name} - river.Owner != -1 for move: {move}");
+                        return AiMoveDecision.Pass(move.claim.punter, "invalid move");
+                    }
+                    return decision;
                 }
             }
 
-            throw new InvalidOperationException($"Couldn't find river for move: {move}");
+            Console.Error.WriteLine($"BUG in Ai {ai.Name} - Couldn't find river for move: {move}");
+            return AiMoveDecision.Pass(move.claim.punter, "invalid move");
         }
 
         private static void Write<T>(T obj)
         {
             Console.Error.WriteLine($"Writing {typeof(T)}");
-            var line = JsonConvert.SerializeObject(obj);
+            var line = JsonConvert.SerializeObject(obj, new JsonSerializerSettings{NullValueHandling = NullValueHandling.Ignore});
             Console.Error.WriteLine($"Writing {typeof(T)} line: {line}");
             Console.Out.Write($"{line.Length}:{line}");
         }
@@ -164,76 +177,5 @@ namespace punter
             result.line = line;
             return result;
         }
-    }
-
-    public class State
-    {
-        public string ai;
-        public int punter;
-        public int punters;
-        public Map map;
-    }
-
-    public abstract class InBase
-    {
-        [JsonIgnore] public string line;
-    }
-
-    public class HandshakeIn : InBase
-    {
-        public string you;
-    }
-
-    public class In : InBase
-    {
-        public bool IsSetup() => punter.HasValue;
-        public int? punter;
-        public int punters;
-        public Map map;
-        public Settings settings;
-
-        public bool IsGameplay() => move != null;
-        public MovesIn move;
-
-        public bool IsScoring() => stop != null;
-        public StopIn stop;
-
-        public State state;
-    }
-
-    public class StopIn
-    {
-        public MoveIn[] moves;
-        public ScoreModel[] scores;
-    }
-
-    public class MovesIn
-    {
-        public MoveIn[] moves;
-    }
-
-    public class MoveIn
-    {
-        public ClaimMove claim;
-        public PassMove pass;
-    }
-
-    public class HandshakeOut
-    {
-        public string me;
-    }
-
-    public class SetupOut
-    {
-        public int ready;
-        public Future[] futures;
-        public State state;
-    }
-
-    public class GameplayOut
-    {
-        public ClaimMove claim;
-        public PassMove pass;
-        public State state;
     }
 }
