@@ -3,43 +3,37 @@ import json
 from magic.foreman import *
 import os
 
-class Param:
-    def __init__(self, _min=0, _max=1, _count=5):
-        self.min=_min
-        self.max=_max
-        self.count = _count
 
 class Fluent:
 
     def __init__(self):
-        self.params = dict()
         self.param_names = list()
         self.battles_on_maps = []
+        self.players = []
 
-    def from_params(self, **kwargs):
-        self.params = kwargs
-        self.param_names = list(self.params)
-        return self
-
-    def create_random_players(self, count):
-        players = []
+    def create_random_players(self, class_name, count, *limits):
         for i in range(count):
             player = dict()
-            for key in self.params:
+            for number,limit in enumerate(limits):
+                key = 'param'+str(number+1)
+                if key not in self.param_names:
+                    self.param_names.append(key)
                 value = np.random.random_sample(1)[0]
-                value = value * (self.params[key].max-self.params[key].min)+self.params[key].min
-                player[key]=value
-            players.append({'Name' : str(i), 'Params' : player})
-        self.players = players
+                value = value * (limit[1] - limit[0]) + limit[0]
+                player[key] = value
+            self.players.append({'Name': str(i), 'Params': player, 'ClassName' : class_name})
         return self
+
 
     def create_historical_players(self, history_length):
         self.players = [ { 'Name' : 'Age'+str(i), 'Params' : {'Age' : i}} for i in range(history_length)]
         self.param_names = ['Age']
         return self;
 
-    def create_nigga_players(self, mine_weight, others_mine_weight=100):
-        self.players = [{ 'Name' : 'xxx', 'Params': {'MineWeight': others_mine_weight}}]
+    def create_nigga_players(self, mine_weight, players_number, default_mine_weight=100):
+        self.players = [{ 'Name' : player_index, 'Params': {'MineWeight': default_mine_weight}}
+                        for player_index
+                        in range(players_number)]
         self.players[-1]['Params']['MineWeight'] = mine_weight
         return self
 
@@ -65,7 +59,7 @@ class Fluent:
 
     def battles_on_map(self, map, player_count, battles_count):
         for _ in range(battles_count):
-            players = [ self.players[np.random.randint(0,len(self.players))] for __ in range(player_count)]
+            players = [np.random.choice(self.players) for _ in range(player_count)]
             self.battles_on_maps.append((players,map))
         return self
 

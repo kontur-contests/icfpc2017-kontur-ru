@@ -2,30 +2,36 @@ import magic
 import json
 import numpy as np
 
+maps = {
+    'sample.json': 2,
+    'Sierpinski-triangle.json': 3,
+    'randomSparse.json': 4,
+    'lambda.json': 4,
+    'circle.json': 4,
+    'randomMedium.json': 4,
+    'boston-sparse.json': 8,
+    'tube.json': 8,
+    'edinburgh-sparse.json': 16,
+    'oxford-sparse.json': 16,
+    'gothenburg-sparse.json': 16,
+}
+
 def test_historical_2():
-    runner = magic.Fluent()
-    (runner
-    .create_historical_players(5)
-    .battles_on_map('sample.json', 2, 3)
-    .battles_on_map('Sierpinski-triangle.json', 3, 4)
-    .battles_on_map('gothenburg-sparse.json', 8, 6)
-    .experiment('Historical')
-    .preview())
+
+    (magic.Fluent()
+         .create_historical_players(6)
+         .battles_on_map_set(maps,1)
+         .experiment('Historical')
+         .run().dump().store_pointwise('historical_4')
+    )
+
 
 def test_parameter():
-    runner = magic.Fluent()
-    (runner
-    .from_params(MineWeight = magic.Param(10,300))
-    .create_random_players(100)
-    .battles_on_map('Sierpinski-triangle.json', 3, 100)
-    .experiment('MRVW')
-    #.preview()
-    .run().dump().store_pointwise('exp.csv')
-     )
-    print(runner.token)
+    (magic.Fluent()
+     .create_random_players('Podnaserator2000Ai', 1, (0, 1), (0, 1), (0, 1))
+     .create_random_players('MaxReachableVertexWeightAi', 1, (0, 1))
+     .battles_on_map('sample.json',2,5)
+     .experiment('Uber')
+     .run().dump())
 
 test_parameter()
-
-
-#test_historical_2()
-

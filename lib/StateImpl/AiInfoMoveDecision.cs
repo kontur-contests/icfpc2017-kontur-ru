@@ -8,5 +8,10 @@ namespace lib.StateImpl
         public string version;
         public Move move;
         public string reason;
+
+        public override string ToString()
+        {
+            return $"{name} {version}: {move} ({reason})";
+        }
     }
 }
