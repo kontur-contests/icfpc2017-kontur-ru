@@ -13,6 +13,10 @@ namespace lib
             Map = map;
         }
 
+        public bool IsOnline { get; set; }
+
+        public int PlayersCount { get; set; }
+
         [NotNull]
         public string Name { get; }
 

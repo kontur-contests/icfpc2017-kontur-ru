@@ -1,0 +1,14 @@
+{
+  "sample.json": 2,
+  "Sierpinski-triangle.json": 3,
+  "circle.json": 4,
+  "lambda.json": 4,
+  "randomMedium.json": 4,
+  "randomSparse.json": 4,
+  "boston-sparse.json": 8,
+  "tube.json": 8,
+  "edinburgh-sparse.json": 16,
+  "gothenburg-sparse.json": 16,
+  "nara-sparse.json": 16,
+  "oxford-sparse.json": 16
+}
