@@ -11,33 +11,34 @@ namespace lib.Strategies.EdgeWeighting
         {
             PunterId = state.punter;
             EdgeWeighter = edgeWeighter;
-            Graph = services.Get<Graph>();
-            MineDistCalulator = services.Get<MineDistCalculator>();
-            ConnectedComponentsService = services.Get<ConnectedComponentsService>();
+            GraphService = services.Get<GraphService>(state);
+            MineDistCalulator = services.Get<MineDistCalculator>(state);
+            ConnectedComponentsService = services.Get<ConnectedComponentsService>(state);
         }
 
         private MineDistCalculator MineDistCalulator { get; }
         private IEdgeWeighter EdgeWeighter { get; }
         private int PunterId { get; }
         private ConnectedComponentsService ConnectedComponentsService { get; }
-        private Graph Graph { get; }
+        private GraphService GraphService { get; }
 
 
         public List<TurnResult> NextTurns()
         {
-            var allComponents = GetAllComponents(Graph).ToArray();
-            return allComponents.SelectMany(x => GetTurnsForComponents(Graph, allComponents, x)).ToList();
+            var graph = GraphService.Graph;
+            var connectedComponents = ConnectedComponentsService.For(PunterId);
+            var allComponents = GetAllComponents(graph, connectedComponents).ToArray();
+            return allComponents.SelectMany(x => GetTurnsForComponents(graph, connectedComponents, x)).ToList();
         }
 
-        private IEnumerable<ConnectedComponent> GetAllComponents(Graph graph)
+        private IEnumerable<ConnectedComponent> GetAllComponents(Graph graph, ConnectedComponent[] connectedComponents)
         {
-            var connectedComponents = ConnectedComponentsService.For(PunterId);
             foreach (var connectedComponent in connectedComponents)
                 yield return connectedComponent;
             var notConnectedMines = graph.Mines.Keys.Except(connectedComponents.SelectMany(x => x.Mines));
             foreach (var mine in notConnectedMines)
             {
-                var connectedComponent = new ConnectedComponent(connectedComponents.Length, PunterId);
+                var connectedComponent = new ConnectedComponent(-1, PunterId);
                 connectedComponent.Mines.Add(mine);
                 connectedComponent.Vertices.Add(mine);
                 yield return connectedComponent;

@@ -8,9 +8,10 @@ namespace lib.Strategies.EdgeWeighting
 {
     public class ShortestPathGraphService : IService
     {
-        private readonly Graph graph;
-        private readonly ConnectedComponentsService connectedComponentsService;
-        private readonly IDictionary<Tuple<int, int>, ShortestPathGraph> cache = new Dictionary<Tuple<int, int>, ShortestPathGraph>();
+        private Graph Graph { get; set; }
+        private ConnectedComponentsService ConnectedComponentsService { get; set; }
+        private IDictionary<Tuple<int, int>, ShortestPathGraph> ComponentsCache { get; } = new Dictionary<Tuple<int, int>, ShortestPathGraph>();
+        private IDictionary<int, ShortestPathGraph> VertexesCache { get; } = new Dictionary<int, ShortestPathGraph>();
 
         public ShortestPathGraphService(Graph graph, ConnectedComponentsService connectedComponentsService)
         {
@@ -18,14 +19,19 @@ namespace lib.Strategies.EdgeWeighting
             this.connectedComponentsService = connectedComponentsService;
         }
 
-        public ShortestPathGraph For(int punterId, int componentId)
+        public ShortestPathGraph ForComponent(int punterId, int componentId)
         {
-            return cache.GetOrCreate(
+            return ComponentsCache.GetOrCreate(
                 Tuple.Create(punterId, componentId), key =>
                 {
                     var components = connectedComponentsService.For(punterId);
                     return ShortestPathGraph.Build(graph, components[componentId].Vertices);
                 });
         }
+
+        public ShortestPathGraph ForVertex(int vertexId)
+        {
+            return VertexesCache.GetOrCreate(vertexId, key => ShortestPathGraph.Build(Graph, vertexId));
+    }
     }
 }
