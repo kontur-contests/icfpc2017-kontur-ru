@@ -19,7 +19,7 @@ namespace lib.OnlineRunner
         private static readonly ILogger log = LogManager.GetCurrentClassLogger();
         private static readonly ReplayRepo Repo = new ReplayRepo();
 
-        private const string ourBotNamePrefix = "kontur.ru";
+        public const string ourBotNamePrefix = "kontur.ru";
 
         private static readonly string[] orgBoxNames =
         {
@@ -30,6 +30,11 @@ namespace lib.OnlineRunner
         {
             return $"{ourBotNamePrefix}_{string.Join("", botTypeName.Where(char.IsUpper).ToArray())}";
         }
+
+        public static bool IsOurBot(this string botName)
+        {
+            return botName.StartsWith(ourBotNamePrefix);
+        }
         
         public static bool IsSuitableForOnlineGame(this ArenaMatch match)
         {
@@ -37,7 +42,7 @@ namespace lib.OnlineRunner
             return match.Status == ArenaMatch.MatchStatus.Waiting
                    
                    // ...and there're no "kontur.ru_*" bots already connected to arena
-                && match.Players.All(x => !x.StartsWith(ourBotNamePrefix))
+                && match.Players.All(x => !x.IsOurBot())
                    
                    // ...and it's not a map fully populated with organizers' bots
                 && !(match.TakenSeats + 1 == match.TotalSeats && match.Players.All(x => orgBoxNames.Contains(x)));

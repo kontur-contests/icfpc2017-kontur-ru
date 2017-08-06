@@ -3,34 +3,43 @@ using System.Collections.Generic;
 using System.Linq;
 using lib.GraphImpl;
 using lib.GraphImpl.ShortestPath;
+using MoreLinq;
 
 namespace lib.Strategies.EdgeWeighting
 {
     public class MaxVertextWeighter : IEdgeWeighter
     {
-        public MaxVertextWeighter(MineDistCalculator mineDistCalculator, double mineWeight)
+        public MaxVertextWeighter(double mineMultiplier, MineDistCalculator mineDistCalculator)
         {
-            MineWeight = mineWeight;
             MineDistCalculator = mineDistCalculator;
+            MineMultiplier = mineMultiplier;
         }
 
-        private double MineWeight { get; }
+        private double MineMultiplier { get; }
         private Graph Graph { get; set; }
         private MineDistCalculator MineDistCalculator { get; }
         private ShortestPathGraph SpGraph { get; set; }
         private Dictionary<int, double> SubGraphWeight { get; set; }
-        private int[] ClaimedMineIds { get; set; }
+        private ICollection<int> ClaimedMineIds { get; set; }
+        private Dictionary<int, ConnectedComponent> VertexComponent { get; set; }
+        private ConnectedComponent CurrentComponent { get; set; }
+        private Dictionary<Tuple<int, int>, long> MutualComponentWeights { get; set; }
 
         public void Init(Graph graph, List<ConnectedComponent> connectedComponents, ConnectedComponent currentComponent)
         {
-            var claimedVertexIds = connectedComponents.SelectMany(comp => comp.Vertices).ToArray();
             Graph = graph;
-            SpGraph = ShortestPathGraph.Build(graph, claimedVertexIds);
-            ClaimedMineIds = claimedVertexIds.Where(v => graph.Mines.ContainsKey(v)).ToArray();
             SubGraphWeight = new Dictionary<int, double>();
+            CurrentComponent = currentComponent;
+            VertexComponent = connectedComponents
+                .SelectMany(x => x.Vertices, (component, vertex) => new {component, vertex})
+                .ToDictionary(x => x.vertex, x => x.component);
+            MutualComponentWeights = new Dictionary<Tuple<int, int>, long>();
+            
+            SpGraph = ShortestPathGraph.Build(Graph, CurrentComponent.Vertices);
+            ClaimedMineIds = CurrentComponent.Mines;
+            foreach (var vertex in CurrentComponent.Vertices)
+                SubGraphWeight[vertex] = CalcSubGraphWeight(vertex);
 
-            foreach (var claimedVertexId in claimedVertexIds)
-                SubGraphWeight[claimedVertexId] = CalcSubGraphWeight(claimedVertexId);
         }
 
         public double EstimateWeight(Edge edge)
@@ -44,16 +53,41 @@ namespace lib.Strategies.EdgeWeighting
                 return weight;
             weight = CalcVertexScore(vertexId);
             foreach (var edge in SpGraph[vertexId].Edges)
+//                weight = weight + CalcSubGraphWeight(edge.To);
                 weight = Math.Max(weight, CalcSubGraphWeight(edge.To));
             SubGraphWeight[vertexId] = weight;
             return weight;
         }
 
-        private double CalcVertexScore(int vertexId)
+        private long CalcVertexScore(int vertexId)
         {
-            return (Graph.Mines.ContainsKey(vertexId) ? MineWeight : 1) *
-                   ClaimedMineIds.Select(mineId => MineDistCalculator.GetDist(mineId, vertexId))
-                       .Sum(x => x * x);
+            if (VertexComponent.TryGetValue(vertexId, out var component))
+            {
+                if (component.Id == CurrentComponent.Id)
+                    return 0;
+                if (!MutualComponentWeights.TryGetValue(Tuple.Create<int, int>(component.Id, CurrentComponent.Id), out var weight))
+                    weight = CalcMutualComponentWeight(component, CurrentComponent);
+                return weight;
+            }
+            var vertexWeight = CalcProperVertexScore(vertexId, ClaimedMineIds);
+            if (Graph.Mines.ContainsKey(vertexId))
+                return (long)(MineMultiplier*vertexWeight) + CurrentComponent.Vertices.Sum(v => CalcProperVertexScore(v, new [] {vertexId}));
+            return vertexWeight;
+        }
+
+        private int CalcProperVertexScore(int vertexId, ICollection<int> claimedMineIds)
+        {
+            return claimedMineIds.Select(mineId => MineDistCalculator.GetDist(mineId, vertexId)).Sum(x => x * x);
+        }
+
+        private long CalcMutualComponentWeight(ConnectedComponent x, ConnectedComponent y)
+        {
+            var weight = 0;
+            weight += x.Vertices.Sum(v => CalcProperVertexScore(v, y.Mines));
+            weight += y.Vertices.Sum(v => CalcProperVertexScore(v, x.Mines));
+            MutualComponentWeights.Add(Tuple.Create(x.Id, y.Id), weight);
+            MutualComponentWeights.Add(Tuple.Create(y.Id, x.Id), weight);
+            return weight;
         }
     }
 }
