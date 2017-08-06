@@ -12,10 +12,10 @@ namespace lib.Strategies
         private readonly Graph graph;
         private readonly MeetingPointService meetingPointService;
 
-        public MeetInTheMiddleSetupStrategy(Graph graph, MeetingPointService meetingPointService)
+        public MeetInTheMiddleSetupStrategy(State state, IServices services)
         {
-            this.graph = graph;
-            this.meetingPointService = meetingPointService;
+            graph = services.Get<Graph>();
+            meetingPointService = services.Get<MeetingPointService>();
         }
 
         public AiSetupDecision Setup()
@@ -39,11 +39,11 @@ namespace lib.Strategies
         private readonly Graph graph;
         private readonly MeetingPointService meetingPointService;
 
-        public MeetInTheMiddleStrategy(State state, Graph graph, MeetingPointService meetingPointService)
+        public MeetInTheMiddleStrategy(State state, IServices services)
         {
             this.state = state;
-            this.graph = graph;
-            this.meetingPointService = meetingPointService;
+            graph = services.Get<Graph>();
+            meetingPointService = services.Get<MeetingPointService>();
         }
 
         public List<TurnResult> NextTurns()

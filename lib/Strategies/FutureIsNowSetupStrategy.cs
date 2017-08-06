@@ -12,12 +12,12 @@ namespace lib.Strategies
         private readonly Graph graph;
         private readonly MineDistCalculator mineDistCalculator;
 
-        public FutureIsNowSetupStrategy(double pathMultiplier, State state, Graph graph, MineDistCalculator mineDistCalculator)
+        public FutureIsNowSetupStrategy(double pathMultiplier, State state, IServices services)
         {
             this.pathMultiplier = pathMultiplier;
             this.state = state;
-            this.graph = graph;
-            this.mineDistCalculator = mineDistCalculator;
+            graph = services.Get<Graph>();
+            mineDistCalculator = services.Get<MineDistCalculator>();
         }
 
         public AiSetupDecision Setup()

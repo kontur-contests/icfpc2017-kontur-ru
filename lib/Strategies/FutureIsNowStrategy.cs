@@ -12,10 +12,10 @@ namespace lib.Strategies
         private readonly State state;
         private readonly Graph graph;
         
-        public FutureIsNowStrategy(State state, Graph graph)
+        public FutureIsNowStrategy(State state, IServices services)
         {
             this.state = state;
-            this.graph = graph;
+            graph = services.Get<Graph>();
         }
 
         public List<TurnResult> NextTurns()

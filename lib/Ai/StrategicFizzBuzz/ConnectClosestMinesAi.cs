@@ -15,8 +15,8 @@ namespace lib.Ai.StrategicFizzBuzz
     {
         public ConnectClosestMinesAi()
             : base(
-                (state, services) => new ExtendComponentStrategy(state, services.Get<Graph>()),
-                (state, services) => new BuildNewComponentStrategy(state, services.Get<Graph>()),
+                (state, services) => new ExtendComponentStrategy(state, services),
+                (state, services) => new BuildNewComponentStrategy(state, services),
                 (state, services) => new GreedyStrategy(state, services, Math.Max))
         {
         }

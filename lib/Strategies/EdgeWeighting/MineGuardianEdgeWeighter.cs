@@ -7,7 +7,7 @@ namespace lib.Strategies.EdgeWeighting
 {
     public class MineGuardianEdgeWeighter : IEdgeWeighter
     {
-        public MineGuardianEdgeWeighter(State state, IServices services, int outEdgesWarningLevel, int guardedComponentSizeThreshold)
+        public MineGuardianEdgeWeighter(State state, IServices services, int outEdgesWarningLevel = 3, int guardedComponentSizeThreshold = 10)
         {
             Graph = services.Get<Graph>();
             OutEdgesWarningLevel = outEdgesWarningLevel;
