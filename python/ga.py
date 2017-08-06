@@ -35,5 +35,4 @@ def evaluate(pool):
 
 
 
-
 pool = init_genes(10);pool = pool + pool;evaluate(pool)
