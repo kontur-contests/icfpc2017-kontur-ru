@@ -11,16 +11,18 @@ namespace lib
     {
         private readonly IScoreCalculator scoreCalculator;
         private readonly bool silent;
+        private readonly bool eatExceptions;
 
-        public GameSimulatorRunner(IScoreCalculator scoreCalculator, bool silent = false)
+        public GameSimulatorRunner(IScoreCalculator scoreCalculator, bool silent = false, bool eatExceptions = false)
         {
             this.scoreCalculator = scoreCalculator;
             this.silent = silent;
+            this.eatExceptions = eatExceptions;
         }
 
         public List<GameSimulationResult> SimulateGame(List<IAi> gamers, Map map, Settings settings)
         {
-            var gameSimulator = new GameSimulator(map, settings);
+            var gameSimulator = new GameSimulator(map, settings, eatExceptions);
             gameSimulator.StartGame(gamers);
             var state = gameSimulator.NextMove();
             while (!state.IsGameOver)
@@ -35,20 +37,22 @@ namespace lib
 
             return gamers
                 .Zip(gameSimulator.Futures, (ai, futures) => new {Gamer = ai, Futures = futures})
-                .Select((e, i) => new GameSimulationResult(e.Gamer, scoreCalculator.GetScore(i, state.CurrentMap, e.Futures)))
+                .Select((e, i) => new GameSimulationResult(e.Gamer, scoreCalculator.GetScore(i, state.CurrentMap, e.Futures), gameSimulator.GetLastException(e.Gamer)))
                 .ToList();
         }
     }
 
     public class GameSimulationResult
     {
-        public GameSimulationResult(IAi gamer, long gamerScore)
+        public GameSimulationResult(IAi gamer, long gamerScore, Exception lastException)
         {
             Gamer = gamer;
             Score = gamerScore;
+            LastException = lastException;
         }
 
         public IAi Gamer { get; }
         public long Score { get; }
+        public Exception LastException { get; }
     }
 }

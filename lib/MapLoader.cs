@@ -52,13 +52,31 @@ namespace lib
             var directory = new DirectoryInfo(path);
             if (!directory.Exists)
                 throw new Exception($"Directory {path} not exists");
-            return directory.EnumerateFiles().Select(x => LoadMap(x.FullName));
+            return directory.EnumerateFiles("*.json").Select(x => LoadMap(x.FullName));
         }
 
         [NotNull]
         public static IEnumerable<NamedMap> LoadDefaultMaps()
         {
             return LoadMaps(LocateMapsFolder());
+        }
+        [NotNull]
+        public static IEnumerable<NamedMap> LoadOnlineMaps()
+        {
+            var sizes = LoadOnlineMapSizes();
+            return sizes.Select(s =>
+            {
+                var map = LoadMapByName(s.Key);
+                map.IsOnline = true;
+                map.PlayersCount = s.Value;
+                return map;
+            });
+        }
+        [NotNull]
+        public static Dictionary<string, int> LoadOnlineMapSizes()
+        {
+            string text = File.ReadAllText(Path.Combine(LocateMapsFolder(), ".online-map-sizes"));
+            return JsonConvert.DeserializeObject<Dictionary<string, int>>(text);
         }
     }
 

@@ -18,6 +18,43 @@ namespace lib.OnlineRunner
         private static readonly ILogger log = LogManager.GetCurrentClassLogger();
         private static readonly ReplayRepo Repo = new ReplayRepo();
 
+        private const string ourBotNamePrefix = "kontur.ru";
+
+        private static readonly string[] orgBoxNames =
+        {
+            "eager punter"  
+        };
+        
+        private static string GetBotName(string botTypeName)
+        {
+            return $"{ourBotNamePrefix}_{string.Join("", botTypeName.Where(char.IsUpper).ToArray())}";
+        }
+        
+        public static bool IsSuitableForReplayCollection(this ArenaMatch match)
+        {
+                   // Arena is "Waiting for punters."
+            return match.Status == ArenaMatch.MatchStatus.Waiting
+                   
+                   // ...and there're no "kontur.ru_*" bots already connected to arena
+                && match.Players.All(x => !x.StartsWith(ourBotNamePrefix))
+                   
+                   // ...and it's not a map fully populated with organizers' bots
+                && !(match.TakenSeats + 1 == match.TotalSeats && match.Players.All(x => orgBoxNames.Contains(x)));
+        }
+        
+        private static ArenaMatch GetNextMatch()
+        {
+            var matches = new ArenaApi().GetArenaMatchesAsync()
+                .ConfigureAwait(false).GetAwaiter()
+                .GetResult()
+                .Where(x => x.IsSuitableForReplayCollection())
+                .ToArray();
+
+            return matches
+                .OrderBy(x => Guid.NewGuid())
+                .FirstOrDefault();
+        }
+
         public static bool TryCompeteOnArena(string collectorId, string commitHash = "manualRun")
         {
             var portLocker = new PortLocker();
@@ -34,7 +71,7 @@ namespace lib.OnlineRunner
                     var isPortOpen = false;
                     do
                     {
-                        match = ArenaApi.GetNextMatch();
+                        match = GetNextMatch();
                         if (match == null)
                             continue;
                         isPortOpen = portLocker.TryAcquire(match.Port);
@@ -81,11 +118,6 @@ namespace lib.OnlineRunner
             
             portLocker.Free(match.Port);
             return true;
-        }
-
-        private static string GetBotName(string botTypeName)
-        {
-            return $"kontur.ru_{string.Join("", botTypeName.Where(char.IsUpper).ToArray())}";
         }
     }
 }

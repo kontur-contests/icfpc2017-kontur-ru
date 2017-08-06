@@ -19,11 +19,5 @@
         public string[] Extensions;
         public int Port;
         public string MapName;
-
-        public bool IsSuitableForReplayCollection()
-        {
-            return Status == MatchStatus.Waiting; 
-            //&& TotalSeats - TakenSeats == 1; //&&  MapName.IsOneOf("sample.json", "circle.json", "lambda.json", "Sierpinski-triangle.json");
-        }
     }
 }
