@@ -195,7 +195,7 @@ namespace lib
             form.ShowDialog();
         }
 
-        [ShouldNotRunOnline]
+        [ShouldNotRunOnline(DisableCompletely = true)]
         private class JunkAi : IAi
         {
             public string Name => "Junk";

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Reflection;
 using lib.Ai;
 
 namespace lib.viz
@@ -13,11 +14,13 @@ namespace lib.viz
         {
             var aiTypes = typeof(AiFactoryRegistry).Assembly.GetTypes()
                 .Where(x => typeof(IAi).IsAssignableFrom(x) && x.GetConstructor(Type.EmptyTypes) != null)
+                .Select(type => new {type, attr = type.GetCustomAttribute<ShouldNotRunOnlineAttribute>()})
+                .Where(x => x.attr == null || !x.attr.DisableCompletely)
                 .ToArray();
-            Factories = aiTypes.Select(CreateFactory).ToArray();
+            Factories = aiTypes.Select(x => CreateFactory(x.type)).ToArray();
             ForOnlineRunsFactories = aiTypes
-                .Where(x => Attribute.GetCustomAttribute(x, typeof(ShouldNotRunOnlineAttribute)) == null)
-                .Select(CreateFactory)
+                .Where(x => x.attr == null)
+                .Select(x => CreateFactory(x.type))
                 .ToArray();
         }
 
@@ -42,5 +45,6 @@ namespace lib.viz
 
     public class ShouldNotRunOnlineAttribute : Attribute
     {
+        public bool DisableCompletely { get; set; }
     }
 }
