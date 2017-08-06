@@ -102,7 +102,7 @@ namespace lib.OnlineRunner
                     }
                 }
 
-                log.Info($"Collector {collectorId}: Running game");
+                log.Info($"Collector {collectorId}: Running game on port {match.Port}");
                 var metaAndData = interaction.RunGame(ai);
 
                 metaAndData.Item1.CommitHash = commitHash;
