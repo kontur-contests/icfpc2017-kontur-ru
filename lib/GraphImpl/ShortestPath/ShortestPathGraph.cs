@@ -9,7 +9,10 @@ namespace lib.GraphImpl.ShortestPath
         {
         }
 
-        public Dictionary<int, ShortestPathVertex> Vertexes { get; } = new Dictionary<int, ShortestPathVertex>();
+        private readonly Dictionary<int, ShortestPathVertex> vertexes = new Dictionary<int, ShortestPathVertex>();
+
+        public ShortestPathVertex this[int vertexId] => vertexes.TryGetValue(vertexId, out var vertex) ? vertex : new ShortestPathVertex(vertexId, -1);
+        public ICollection<ShortestPathVertex> Vertexes => vertexes.Values;
 
         public static ShortestPathGraph Build(Graph graph, params int[] sourceVertexes)
         {
@@ -30,9 +33,9 @@ namespace lib.GraphImpl.ShortestPath
                 {
                     if (edge.Owner != -1)
                         continue;
-                    if (spGraph.Vertexes.ContainsKey(edge.To))
+                    if (spGraph.vertexes.ContainsKey(edge.To))
                     {
-                        var to = spGraph.Vertexes[edge.To];
+                        var to = spGraph.vertexes[edge.To];
                         if (to.Distance == from.Distance + 1)
                             spGraph.AddEdge(edge);
                         else if (to.Distance == from.Distance && from.Id < to.Id)
@@ -44,27 +47,23 @@ namespace lib.GraphImpl.ShortestPath
                 }
             }
 
-            foreach (var vertex in graph.Vertexes.Values)
-                if (!spGraph.Vertexes.ContainsKey(vertex.Id))
-                    spGraph.AddVertex(vertex.Id, -1);
-
             return spGraph;
         }
 
         protected ShortestPathVertex AddVertex(int vertexId, int distance)
         {
-            return Vertexes[vertexId] = new ShortestPathVertex(vertexId, distance);
+            return vertexes[vertexId] = new ShortestPathVertex(vertexId, distance);
         }
 
         protected void AddEdge(Edge edge)
         {
-            Vertexes[edge.From].Edges.Add(edge);
+            vertexes[edge.From].Edges.Add(edge);
         }
 
         protected void AddSameLayerEdge(Edge edge)
         {
-            Vertexes[edge.From].SameLayerEdges.Add(edge);
-            Vertexes[edge.To].SameLayerEdges.Add(edge.Reverse());
+            vertexes[edge.From].SameLayerEdges.Add(edge);
+            vertexes[edge.To].SameLayerEdges.Add(edge.Reverse());
         }
     }
 }

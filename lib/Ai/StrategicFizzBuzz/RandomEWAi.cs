@@ -4,9 +4,9 @@ using lib.Strategies.EdgeWeighting;
 namespace lib.Ai.StrategicFizzBuzz
 {
     [UsedImplicitly]
-    public class RandomEdgeWeightingAi : EdgeWeightingStrategicAi
+    public class RandomEWAi : BiggestComponentEWStrategicAi
     {
-        public RandomEdgeWeightingAi()
+        public RandomEWAi()
             : base((state, services) => new RandomEdgeWeighter())
         {
         }

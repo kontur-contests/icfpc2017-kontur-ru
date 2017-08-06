@@ -1,42 +1,39 @@
 import numpy as np
 import json
 from magic.foreman import *
+import os
 
-class Param:
-    def __init__(self, _min=0, _max=1, _count=5):
-        self.min=_min
-        self.max=_max
-        self.count = _count
 
 class Fluent:
 
     def __init__(self):
-        self.params = dict()
         self.param_names = list()
         self.battles_on_maps = []
+        self.players = []
 
-    def from_params(self, **kwargs):
-        self.params = kwargs
-        self.param_names = list(self.params)
-        return self
-
-    def create_random_players(self, count):
-        players = []
+    def create_random_players(self, class_name, count, *limits):
         for i in range(count):
             player = dict()
-            for key in self.params:
+            for number,limit in enumerate(limits):
+                key = 'param'+str(number+1)
+                if key not in self.param_names:
+                    self.param_names.append(key)
                 value = np.random.random_sample(1)[0]
-                value = value * (self.params[key].max-self.params[key].min)+self.params[key].min
-                player[key]=value
-            players.append({'Name' : str(i), 'Params' : player})
-        self.players = players
+                value = value * (limit[1] - limit[0]) + limit[0]
+                player[key] = value
+            self.players.append({'Name': str(i), 'Params': player, 'ClassName' : class_name})
         return self
+
 
     def create_historical_players(self, history_length):
         self.players = [ { 'Name' : 'Age'+str(i), 'Params' : {'Age' : i}} for i in range(history_length)]
         self.param_names = ['Age']
         return self;
 
+    def create_nigga_players(self, mine_weight, others_mine_weight=100):
+        self.players = [{ 'Name' : 'xxx', 'Params': {'MineWeight': others_mine_weight}}]
+        self.players[-1]['Params']['MineWeight'] = mine_weight
+        return self
 
     def battling_in_pairs(self):
         self.battles = [[self.players[first], self.players[second]]
@@ -85,7 +82,8 @@ class Fluent:
         return self
 
     def dump(self,dump_file = None):
-        self.result_dump_file = dump_file or ('dumps\\result_dump_'+str(self.token)+'.json')
+        self.result_dump_file = dump_file or os.path.join('dumps',
+                                                     'result_dump_' + str(self.token) + '.json')
         with open(self.result_dump_file,'w') as file:
             file.write(json.dumps(self.results,indent=2))
         return self
@@ -96,10 +94,10 @@ class Fluent:
         self.param_names = list(self.results[0]['Task']['Players'][0]['Params'])
         return self
 
-    def store_pointwise(self, filename):
+    def store_pointwise(self, filename, mode='w'):
         keys = self.param_names
-        with open(filename,'w') as file:
-            file.write('game_number,server_name,scores,ranking,tournament_scores,num_players,map,map_rivers_count,map_sites_count,name,')
+        with open(filename, mode) as file:
+            file.write('game_number,server_name,scores,ranking,tournament_scores,num_players,map,map_rivers_count,map_sites_count,map_mines_count,name,')
             file.write(",".join(keys))
             file.write('\n')
             for game_number, game in enumerate(self.results):
@@ -116,6 +114,7 @@ class Fluent:
                         game['Task']['Map'],
                         game['RiversCount'],
                         game['SitesCount'],
+                        game['MinesCount'],
                         player['Name']
                     ]]))
                     file.write(',')

@@ -16,7 +16,7 @@ namespace lib.GraphImpl.ShortestPath
                     AddVertex(vertex);
             }
 
-            public IEnumerator<int> GetEnumerator() => Enumerable.Select<Vertex, int>(Vertexes.Values, x => x.Id).GetEnumerator();
+            public IEnumerator<int> GetEnumerator() => Vertexes.Values.Select(x => x.Id).GetEnumerator();
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
             public void Add(int vertexId, int[] neighborIds = null)
@@ -28,7 +28,7 @@ namespace lib.GraphImpl.ShortestPath
 
         private class TestShortestPathGraph : ShortestPathGraph, IEnumerable<int>
         {
-            public IEnumerator<int> GetEnumerator() => Enumerable.Select<ShortestPathVertex, int>(Vertexes.Values, x => x.Id).GetEnumerator();
+            public IEnumerator<int> GetEnumerator() => Vertexes.Select(x => x.Id).GetEnumerator();
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
             public void Add(int vertexId, int distance, int[] neighborIds = null, int[] sameLevelNeighborIds = null)

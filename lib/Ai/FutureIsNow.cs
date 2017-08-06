@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using lib.GraphImpl;
 using lib.StateImpl;
-using lib.viz;
+using lib.Structures;
 using MoreLinq;
 
 namespace lib.Ai
@@ -16,6 +16,12 @@ namespace lib.Ai
         {
             var graph = services.Get<GraphService>(state).Graph;
             var mineDists = services.Get<MineDistCalculator>(state);
+
+            if (state.settings == null || !state.settings.futures)
+            {
+                return AiSetupDecision.Create(new Future[0]);
+            }
+
             var length = 5 * state.punters;
             var path = new PathSelector(state.map, mineDists.impl, length).SelectPath();
             var futures = new FuturesPositioner(state.map, graph, path, mineDists.impl).GetFutures();
@@ -29,20 +35,9 @@ namespace lib.Ai
             var edge = new MovesSelector(state.map, graph, sitesToDefend, state.punter).GetNeighbourToGo();
             if (edge == null)
             {
-                state.ccm = state.ccm ?? FillCcmState(state, graph);
                 return new ConnectClosestMinesAi().GetNextMove(state, services);
             }
-            return AiMoveDecision.Claim(state.punter, edge.From, edge.To);
-        }
-
-        private static ConnectClosestMinesAi.AiState FillCcmState(State state, Graph graph)
-        {
-            var myMines = graph.Mines
-                .Where(e => e.Value.Edges.Any(g => g.Owner == state.punter))
-                .Select(e => e.Key)
-                .ToHashSet();
-
-            return new ConnectClosestMinesAi.AiState {stage = 0, myMines = myMines};
+            return AiMoveDecision.Claim(state.punter, edge.From, edge.To, "futures cant wait!!1");
         }
     }
 
@@ -84,7 +79,7 @@ namespace lib.Ai
                 {
                     int neighbourToGo = candidateSites[0].Key;
                     var weakComponentSiteIds = weakComponent.c;
-                    return graph.Vertexes[neighbourToGo].Edges.First(e => weakComponentSiteIds.Contains(e.To));
+                    return graph.Vertexes[neighbourToGo].Edges.First(e => weakComponentSiteIds.Contains(e.To) && e.Owner == -1);
                 }
             }
 

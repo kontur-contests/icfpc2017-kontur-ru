@@ -5,13 +5,13 @@ using lib.Strategies.EdgeWeighting;
 namespace lib.Ai.StrategicFizzBuzz
 {
     [UsedImplicitly]
-    public class MaxReachableVertexWithConnectedComponentsWeightAi : BiggestComponentEWStrategicAi
+    public class AllComponentsMaxReachableVertexWeightWCCAi : AllComponentsEWStrategicAi
     {
-        public MaxReachableVertexWithConnectedComponentsWeightAi() : this(100)
+        public AllComponentsMaxReachableVertexWeightWCCAi() : this((double) 100)
         {
         }
 
-        public MaxReachableVertexWithConnectedComponentsWeightAi(double mineWeight)
+        public AllComponentsMaxReachableVertexWeightWCCAi(double mineWeight)
             : base((state, services) => new MaxVertextWeighterWithConnectedComponents(mineWeight, services.Get<MineDistCalculator>(state)))
         {
         }
