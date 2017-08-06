@@ -1,10 +1,12 @@
 using JetBrains.Annotations;
 using lib.Strategies.EdgeWeighting;
+using lib.viz;
 using static lib.Strategies.EdgeWeighting.MetaStrategyHelpers;
 
 namespace lib.Ai.StrategicFizzBuzz
 {
     [UsedImplicitly]
+    [ShouldNotRunOnline] // T-16:30
     public class MaxReachableVertexWeightAiWithMineGuardianAi : CompositeStrategicAi
     {
         public MaxReachableVertexWeightAiWithMineGuardianAi()

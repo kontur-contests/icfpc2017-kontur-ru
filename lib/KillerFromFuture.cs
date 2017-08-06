@@ -6,10 +6,12 @@ using lib.GraphImpl;
 using lib.StateImpl;
 using lib.Strategies.EdgeWeighting;
 using lib.Structures;
+using lib.viz;
 using MoreLinq;
 
 namespace lib.Ai
 {
+    [ShouldNotRunOnline] // T-16:30
     public class KillerFromFuture : IAi
     {
         private IAi Base = new AllComponentsMaxReachableVertexWeightAi();

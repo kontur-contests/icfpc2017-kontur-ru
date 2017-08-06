@@ -1,10 +1,12 @@
 using JetBrains.Annotations;
 using lib.GraphImpl;
 using lib.Strategies.EdgeWeighting;
+using lib.viz;
 
 namespace lib.Ai.StrategicFizzBuzz
 {
     [UsedImplicitly]
+    [ShouldNotRunOnline] // T-16:30
     public class MaxReachableVertexWeightAi : BiggestComponentEWStrategicAi
     {
         public MaxReachableVertexWeightAi() : this(100)

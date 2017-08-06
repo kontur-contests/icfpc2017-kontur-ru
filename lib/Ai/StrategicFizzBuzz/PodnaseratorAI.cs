@@ -4,6 +4,7 @@ using lib.GraphImpl;
 using lib.StateImpl;
 using lib.Strategies;
 using lib.Strategies.EdgeWeighting;
+using lib.viz;
 using MoreLinq;
 using static lib.Strategies.EdgeWeighting.MetaStrategyHelpers;
 
@@ -82,6 +83,7 @@ namespace lib.Ai.StrategicFizzBuzz
     }
 
     [Obsolete("Broken. Can't run strategy for different punter ids")]
+    [ShouldNotRunOnline] // T-16:30
     public class Podnaserator2000Ai : PodnaseratorAi
     {
         public Podnaserator2000Ai()

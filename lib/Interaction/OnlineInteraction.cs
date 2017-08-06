@@ -17,7 +17,7 @@ namespace lib.Interaction
     {
         private readonly string botName;
         private readonly OnlineProtocol connection;
-        private string BotName => botName ?? "kontur.ru";
+        private string BotName => "kontur.ru";
         public OnlineInteraction(int port, string botName=null)
         {
             this.botName = botName;

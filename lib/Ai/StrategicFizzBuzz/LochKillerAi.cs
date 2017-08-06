@@ -1,10 +1,12 @@
 ﻿using System;
 using lib.Strategies;
 using lib.Strategies.EdgeWeighting;
+using lib.viz;
 using static lib.Strategies.EdgeWeighting.MetaStrategyHelpers;
 
 namespace lib.Ai.StrategicFizzBuzz
 {
+    [ShouldNotRunOnline] // T-16:30
     public class LochKillerAi : CompositeStrategicAi
     {
         public LochKillerAi()
