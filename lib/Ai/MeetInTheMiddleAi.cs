@@ -39,9 +39,11 @@ namespace lib.Ai
                 .Select(x => x.Id);
 
             var myVerts = graph.Vertexes.Values
-                .Where(v => v.Edges.Any(e => e.Owner == state.punter))
+                .Where(v => 
+                    v.Edges.Any(e => e.Owner == state.punter) || v.Id == meetingPoint)
                 .Select(x => x.Id)
                 .ToArray();
+
             var shortest = ShortestPathGraph.Build(graph, myVerts);
 
             foreach (var mine in toDo)
