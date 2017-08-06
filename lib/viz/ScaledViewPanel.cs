@@ -149,7 +149,7 @@ namespace lib.viz
 			e.Graphics.ResetTransform();
 			e.Graphics.TranslateTransform(shift.X, shift.Y);
 			e.Graphics.ScaleTransform(ZoomScale, ZoomScale);
-            painter.Paint(e.Graphics, MouseLogicalPos, e.Graphics.VisibleClipBounds);
+            painter.Paint(e.Graphics, MouseLogicalPos, e.Graphics.VisibleClipBounds, ZoomScale);
 		}
 	}
 }
