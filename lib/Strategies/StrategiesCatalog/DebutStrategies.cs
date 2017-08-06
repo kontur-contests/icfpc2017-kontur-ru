@@ -10,7 +10,6 @@ namespace lib.Strategies.StrategiesCatalog
             Create((s, ss) => new NopStrategy()),
             Create((s, ss) => new CrazyStrategy(s, ss)),
             Create((s, ss) => new FutureIsNowStrategy(s, ss)),
-            Create((s, ss) => new GreedyStrategy(s, ss, (x, y) => x + y)),
             Create((s, ss) => new LochDinicKillerStrategy(s, ss)),
             Create((s, ss) => new MeetInTheMiddleStrategy(s, ss)),
             Create((s, ss) => new ExtendComponentStrategy(s, ss)),

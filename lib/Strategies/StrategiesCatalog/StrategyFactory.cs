@@ -18,10 +18,10 @@ namespace lib.Strategies.StrategiesCatalog
         public string Name { get; }
         public Func<State, IServices, IStrategy> StrategyProvider { get; }
 
-        public static StrategyFactory Create<TStrategy>(Func<State, IServices, TStrategy> strategyProvider)
+        public static StrategyFactory Create<TStrategy>(Func<State, IServices, TStrategy> strategyProvider, string namePrefix = null)
             where TStrategy : IStrategy
         {
-            return new StrategyFactory(typeof(TStrategy).GetType().Name, (s, ss) => strategyProvider(s, ss));
+            return new StrategyFactory(namePrefix + typeof(TStrategy).GetType().Name, (s, ss) => strategyProvider(s, ss));
         }
 
         public static StrategyFactory ForBiggestComponentEW<TEdgeWeighter>(Func<State, IServices, TEdgeWeighter> edgeWeighterProvider)
