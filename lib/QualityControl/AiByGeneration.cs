@@ -18,7 +18,7 @@ namespace lib.QualityControl
                 yield return () => new LochMaxVertexWeighterKillerAi();
                 yield return () => new Podnaserator2000Ai();
                 yield return () => new FutureIsNow();
-                yield return () => new LochDinicKiller();
+                yield return () => new LochDinicKillerAi();
                 yield return () => new MaxReachableVertexWeightAiWithMineGuardianAi();
 
             }

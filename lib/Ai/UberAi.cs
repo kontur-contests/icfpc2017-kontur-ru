@@ -24,7 +24,7 @@ namespace lib.Ai
                 new LochMaxVertexWeighterKillerAi(),
                 new Podnaserator2000Ai(),
                 new FutureIsNow(),
-                new LochDinicKiller(),
+                new LochDinicKillerAi(),
             };
         
         public int InitBot;
