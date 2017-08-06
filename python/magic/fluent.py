@@ -21,7 +21,7 @@ class Fluent:
                 value = np.random.random_sample(1)[0]
                 value = value * (limit[1] - limit[0]) + limit[0]
                 player[key] = value
-            self.players.append({'Name': str(i), 'Params': player, 'ClassName' : class_name})
+            self.players.append({'Name': uuid4().hex, 'Params': player, 'ClassName' : class_name})
         return self
 
 
@@ -81,6 +81,8 @@ class Fluent:
         self.results = execute_tasks(self.tasks,self.token)
         return self
 
+
+
     def dump(self,dump_file = None):
         self.result_dump_file = dump_file or os.path.join('dumps',
                                                      'result_dump_' + str(self.token) + '.json')
@@ -88,9 +90,14 @@ class Fluent:
             file.write(json.dumps(self.results,indent=2))
         return self
 
-    def restore_dump(self, dump_file):
-        with open(dump_file,'r') as file:
-            self.results = json.loads(file.read())
+    def restore_dump(self, *tokens):
+        self.results=[]
+        for token in tokens:
+            dump_file = os.path.join('dumps','result_dump_' + str(token) + '.json')
+            with open(dump_file,'r') as file:
+                results = json.loads(file.read())
+                for r in results:
+                    self.results.append(r)
         self.param_names = list(self.results[0]['Task']['Players'][0]['Params'])
         return self
 
