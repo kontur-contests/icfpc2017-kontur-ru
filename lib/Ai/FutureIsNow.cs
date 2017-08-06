@@ -7,7 +7,6 @@ using MoreLinq;
 
 namespace lib.Ai
 {
-    [ShoulNotRunOnline]
     public class FutureIsNow : IAi
     {
         public string Name => "Futurer";
@@ -29,8 +28,21 @@ namespace lib.Ai
             var sitesToDefend = state.aiSetupDecision.futures.SelectMany(f => new[]{f.source, f.target}).ToArray();
             var edge = new MovesSelector(state.map, graph, sitesToDefend, state.punter).GetNeighbourToGo();
             if (edge == null)
-                return AiMoveDecision.Pass(state.punter);
+            {
+                state.ccm = state.ccm ?? FillCcmState(state, graph);
+                return new ConnectClosestMinesAi().GetNextMove(state, services);
+            }
             return AiMoveDecision.Claim(state.punter, edge.From, edge.To);
+        }
+
+        private static ConnectClosestMinesAi.AiState FillCcmState(State state, Graph graph)
+        {
+            var myMines = graph.Mines
+                .Where(e => e.Value.Edges.Any(g => g.Owner == state.punter))
+                .Select(e => e.Key)
+                .ToHashSet();
+
+            return new ConnectClosestMinesAi.AiState {stage = 1, myMines = myMines};
         }
     }
 
