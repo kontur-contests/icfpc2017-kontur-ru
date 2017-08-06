@@ -1,10 +1,14 @@
 ﻿using System;
+using JetBrains.Annotations;
 using lib.GraphImpl;
 using lib.StateImpl;
 using lib.Strategies;
+using lib.viz;
 
 namespace lib.Ai.StrategicFizzBuzz
 {
+    [UsedImplicitly]
+    [ShouldNotRunOnline]
     public class MeetInTheMiddleAi : CompositeStrategicAi
     {
         public MeetInTheMiddleAi()

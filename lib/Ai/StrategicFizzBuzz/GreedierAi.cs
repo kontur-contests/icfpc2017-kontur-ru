@@ -1,7 +1,11 @@
-﻿using lib.Strategies;
+﻿using JetBrains.Annotations;
+using lib.Strategies;
+using lib.viz;
 
 namespace lib.Ai.StrategicFizzBuzz
 {
+    [UsedImplicitly]
+    [ShouldNotRunOnline]
     public class GreedierAi : StrategicAi
     {
         public GreedierAi() : base((state, services) => new GreedyStrategy(state, services, (fromScore, toScore) => fromScore + toScore))

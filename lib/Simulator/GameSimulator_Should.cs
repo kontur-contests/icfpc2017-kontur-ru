@@ -47,7 +47,7 @@ namespace lib
             a.ShouldNotThrow();
         }
 
-        [ShoulNotRunOnline]
+        [ShouldNotRunOnline]
         private class Ai : IAi
         {
             private readonly Move[] moves;

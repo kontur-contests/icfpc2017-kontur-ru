@@ -1,9 +1,11 @@
 using JetBrains.Annotations;
 using lib.Strategies.EdgeWeighting;
+using lib.viz;
 
 namespace lib.Ai.StrategicFizzBuzz
 {
     [UsedImplicitly]
+    [ShouldNotRunOnline]
     public class RandomEWAi : BiggestComponentEWStrategicAi
     {
         public RandomEWAi()

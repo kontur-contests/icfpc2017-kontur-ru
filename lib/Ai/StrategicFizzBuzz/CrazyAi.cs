@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Windows.Forms;
+using JetBrains.Annotations;
 using lib.Scores.Simple;
 using lib.Strategies;
 using lib.Structures;
@@ -10,6 +11,8 @@ using NUnit.Framework;
 
 namespace lib.Ai.StrategicFizzBuzz
 {
+    [UsedImplicitly]
+    [ShouldNotRunOnline]
     public class CrazyAi : CompositeStrategicAi
     {
         public CrazyAi()

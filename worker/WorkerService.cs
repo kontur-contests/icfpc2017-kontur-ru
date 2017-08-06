@@ -115,7 +115,7 @@ namespace worker
             System.Threading.Tasks.Task.Run(
                 () =>
                 {
-                    var ai = AiFactoryRegistry.GetNextAi();
+                    var ai = AiFactoryRegistry.GetNextAi(true);
                     var match = ArenaMatch.EmptyMatch;
 
                     if (!int.TryParse(msg.Value, out match.Port)) return;

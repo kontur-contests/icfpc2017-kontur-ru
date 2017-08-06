@@ -93,7 +93,7 @@ namespace lib.OnlineRunner
 
                     log.Info($"Collector {collectorId}: Take {match.Port}");
 
-                    ai = AiFactoryRegistry.GetNextAi();
+                    ai = AiFactoryRegistry.GetNextAi(true);
 
                     log.Info($"Collector {collectorId}: Match on port {match.Port} for {GetBotName(ai.Name)}");
                     

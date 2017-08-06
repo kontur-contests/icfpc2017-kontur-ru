@@ -9,7 +9,7 @@ using lib.viz;
 
 namespace lib.Ai
 {
-    [ShoulNotRunOnline]
+    [ShouldNotRunOnline]
     public class SplurgeExample : IAi
     {
         public string Name => "SplurgeExample";
