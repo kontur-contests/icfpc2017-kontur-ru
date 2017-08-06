@@ -58,7 +58,7 @@ class Fluent:
             place = np.random.randint(0,len(battle))
             for i in range(len(battle)):
                 if i!=place:
-                    battle[i]=dummies[np.random.randint(0,len(dummies))]
+                    battle[i] = np.random.choice(dummies.values)
 
 
             bs.append((battle,map))
@@ -118,6 +118,7 @@ class Fluent:
 
     def store_pointwise(self, filename, mode='w', header=True):
         keys = self.param_names
+        print(keys)
         with open(filename, mode) as file:
             if header:
                 file.write(','.join([
