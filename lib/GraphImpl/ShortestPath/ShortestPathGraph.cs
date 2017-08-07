@@ -15,22 +15,6 @@ namespace lib.GraphImpl.ShortestPath
         public ShortestPathVertex this[int vertexId] => vertexes.TryGetValue(vertexId, out var vertex) ? vertex : new ShortestPathVertex(vertexId, -1);
         public ICollection<ShortestPathVertex> Vertexes => vertexes.Values;
 
-
-        public static ShortestPathGraph Build(Graph graph, params int[] sourceVertexes)
-        {
-            return Build(graph, (ICollection<int>)sourceVertexes);
-        }
-
-        public static ShortestPathGraph Build(Graph graph, ICollection<int> sourceVertexes)
-        {
-            return Build(graph, edge => edge.Owner == -1, (ICollection<int>)sourceVertexes);
-        }
-
-        public static ShortestPathGraph Build(Graph graph, Func<Edge, bool> takeEdge, params int[] sourceVertexes)
-        {
-            return Build(graph, takeEdge, (ICollection<int>)sourceVertexes);
-        }
-
         public static ShortestPathGraph Build(Graph graph, Func<Edge, bool> takeEdge, ICollection<int> sourceVertexes)
         {
             var spGraph = new ShortestPathGraph();
