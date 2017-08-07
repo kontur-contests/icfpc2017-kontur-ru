@@ -12,7 +12,7 @@ namespace lib.Ai.StrategicFizzBuzz
             : base(
                 (state, services) => new LochDinicKillerStrategy(state, services),
                 AllComponentsEWStrategy((state, services) => new MaxVertextWeighter(100, state, services)),
-                (state, services) => new GreedyStrategy(state, services, (x, y) => x + y))
+                (state, services) => new GreedyStrategy(true, state, services, (x, y) => x + y))
         {
         }
 
@@ -25,7 +25,7 @@ namespace lib.Ai.StrategicFizzBuzz
             : base(
                 (state, services) => new AntiLochDinicStrategy(state, services, true),
                 AllComponentsEWStrategy((state, services) => new MaxVertextWeighter(100, state, services)),
-                (state, services) => new GreedyStrategy(state, services, (x, y) => x + y))
+                (state, services) => new GreedyStrategy(true, state, services, (x, y) => x + y))
         {
         }
 
@@ -38,7 +38,7 @@ namespace lib.Ai.StrategicFizzBuzz
             : base(
                 (state, services) => new AntiLochDinicStrategy(state, services),
                 AllComponentsEWStrategy((state, services) => new MaxVertextWeighter(100, state, services)),
-                (state, services) => new GreedyStrategy(state, services, (x, y) => x + y))
+                (state, services) => new GreedyStrategy(true, state, services, (x, y) => x + y))
         {
         }
 
@@ -52,7 +52,7 @@ namespace lib.Ai.StrategicFizzBuzz
             : base(
                 (state, services) => new AntiLochDinicStrategy(state, services),
                 AllComponentsEWStrategy((state, services) => new MaxVertextWeighter(100, state, services), 0),
-                (state, services) => new GreedyStrategy(state, services, (x, y) => x + y))
+                (state, services) => new GreedyStrategy(true, state, services, (x, y) => x + y))
         {
         }
 
@@ -65,7 +65,7 @@ namespace lib.Ai.StrategicFizzBuzz
             : base(
                 (state, services) => new AntiLochDinicStrategy(state, services),
                 AllComponentsEWStrategy((state, services) => new MaxVertextWeighter(100, state, services), 0.4),
-                (state, services) => new GreedyStrategy(state, services, (x, y) => x + y))
+                (state, services) => new GreedyStrategy(true, state, services, (x, y) => x + y))
         {
         }
 
@@ -78,7 +78,7 @@ namespace lib.Ai.StrategicFizzBuzz
             : base(
                 (state, services) => new AntiLochDinicStrategy(state, services),
                 AllComponentsEWStrategy((state, services) => new MaxVertextWeighter(100, state, services), 1),
-                (state, services) => new GreedyStrategy(state, services, (x, y) => x + y))
+                (state, services) => new GreedyStrategy(true, state, services, (x, y) => x + y))
         {
         }
 
@@ -91,7 +91,7 @@ namespace lib.Ai.StrategicFizzBuzz
             : base(
                 (state, services) => new AntiLochDinicStrategy(state, services),
                 AllComponentsEWStrategy((state, services) => new MaxVertextWeighter(100, state, services), 0.5),
-                (state, services) => new GreedyStrategy(state, services, (x, y) => x + y))
+                (state, services) => new GreedyStrategy(true, state, services, (x, y) => x + y))
         {
         }
 
@@ -104,7 +104,7 @@ namespace lib.Ai.StrategicFizzBuzz
             : base(
                 (state, services) => new AntiLochDinicStrategy(state, services),
                 AllComponentsEWStrategy((state, services) => new MaxVertextWeighter(100, state, services), 0.3),
-                (state, services) => new GreedyStrategy(state, services, (x, y) => x + y))
+                (state, services) => new GreedyStrategy(true, state, services, (x, y) => x + y))
         {
         }
 
@@ -117,7 +117,7 @@ namespace lib.Ai.StrategicFizzBuzz
             : base(
                 (state, services) => new AntiLochDinicStrategy(state, services),
                 AllComponentsEWStrategy((state, services) => new MaxVertextWeighter(100, state, services), 0.2),
-                (state, services) => new GreedyStrategy(state, services, (x, y) => x + y))
+                (state, services) => new GreedyStrategy(true, state, services, (x, y) => x + y))
         {
         }
 
@@ -130,7 +130,7 @@ namespace lib.Ai.StrategicFizzBuzz
             : base(
                 (state, services) => new AntiLochDinicStrategy(state, services),
                 AllComponentsEWStrategy((state, services) => new MaxVertextWeighter(100, state, services), 0.1),
-                (state, services) => new GreedyStrategy(state, services, (x, y) => x + y))
+                (state, services) => new GreedyStrategy(true, state, services, (x, y) => x + y))
         {
         }
 
@@ -142,7 +142,7 @@ namespace lib.Ai.StrategicFizzBuzz
             : base(
                 (state, services) => new AntiLochDinicStrategy(state, services),
                 AllComponentsEWStrategy((state, services) => new MaxVertextWeighter(100, state, services), 0.05),
-                (state, services) => new GreedyStrategy(state, services, (x, y) => x + y))
+                (state, services) => new GreedyStrategy(true, state, services, (x, y) => x + y))
         {
         }
 

@@ -12,7 +12,7 @@ namespace lib.Ai.StrategicFizzBuzz
         public LochKillerAi()
             : base(
                 AllComponentsEWStrategy((state, services) => new LochKillerEdgeWeighter(state, services)),
-                (state, services) => new GreedyStrategy(state, services, Math.Max))
+                (state, services) => new GreedyStrategy(true, state, services, Math.Max))
         {
         }
 

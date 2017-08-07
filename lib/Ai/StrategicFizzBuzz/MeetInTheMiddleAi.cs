@@ -13,7 +13,7 @@ namespace lib.Ai.StrategicFizzBuzz
             : base(
                 (state, services) => new MeetInTheMiddleSetupStrategy(state, services),
                 (state, services) => new MeetInTheMiddleStrategy(state, services),
-                (state, services) => new GreedyStrategy(state, services, Math.Max))
+                (state, services) => new GreedyStrategy(true, state, services, Math.Max))
         {
         }
 

@@ -16,7 +16,7 @@ namespace lib.Ai.StrategicFizzBuzz
     [ShouldNotRunOnline]
     public class GreedyAi : StrategicAi
     {
-        public GreedyAi() : base((state, services) => new GreedyStrategy(state, services, Math.Max))
+        public GreedyAi() : base((state, services) => new GreedyStrategy(true, state, services, Math.Max))
         {
         }
 

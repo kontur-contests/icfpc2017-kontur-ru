@@ -9,8 +9,11 @@ namespace lib.Strategies
 {
     public class GreedyStrategy : IStrategy
     {
-        public GreedyStrategy(State state, IServices services, Func<long, long, long> aggregateEdgeScores)
+        private readonly bool allowToUseOptions;
+
+        public GreedyStrategy(bool allowToUseOptions, State state, IServices services, Func<long, long, long> aggregateEdgeScores)
         {
+            this.allowToUseOptions = state.settings.options && allowToUseOptions && state.map.OptionsLeft(state.punter) > 0;
             AggregateEdgeScores = aggregateEdgeScores;
             PunterId = state.punter;
             MineDistCalulator = services.Get<MineDistCalculator>();
@@ -27,7 +30,7 @@ namespace lib.Strategies
             var calculator = new ConnectedCalculator(Graph, PunterId);
             var result = new List<TurnResult>();
             foreach (var vertex in Graph.Vertexes.Values)
-            foreach (var edge in vertex.Edges.Where(x => x.Owner == -1))
+            foreach (var edge in vertex.Edges.Where(x => x.CanBeOwnedBy(PunterId, allowToUseOptions)))
             {
                 var fromMines = calculator.GetConnectedMines(edge.From);
                 var toMines = calculator.GetConnectedMines(edge.To);
@@ -38,10 +41,21 @@ namespace lib.Strategies
                     new TurnResult
                     {
                         Estimation = addScore,
-                        Move = AiMoveDecision.Claim(PunterId, edge.River.Source, edge.River.Target)
+                        Move = CreateDecision(edge)
                     });
             }
             return result;
+        }
+
+        private AiMoveDecision CreateDecision(Edge edge)
+        {
+            if (edge == null)
+                throw new InvalidOperationException("Mine is already part of existing component! WTF?");
+            if (edge.IsFree)
+                return AiMoveDecision.Claim(PunterId, edge.From, edge.To);
+            if (edge.CanBeOwnedBy(PunterId, allowToUseOptions))
+                return AiMoveDecision.Option(PunterId, edge.From, edge.To);
+            throw new InvalidOperationException($"Attempt to claim owned river {edge.River}! WTF?");
         }
 
         private long CalcVertexScore(HashSet<int> mineIds, HashSet<int> usedMineIds, int vertexId)

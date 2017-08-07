@@ -16,7 +16,7 @@ namespace lib.Ai.StrategicFizzBuzz
             : base(
                 (state, services) => new ExtendComponentStrategy(true, state, services),
                 (state, services) => new BuildNewComponentStrategy(true, state, services),
-                (state, services) => new GreedyStrategy(state, services, Math.Max))
+                (state, services) => new GreedyStrategy(true, state, services, Math.Max))
         {
         }
 

@@ -73,10 +73,10 @@ namespace lib.Strategies
         private AiMoveDecision CreateDecision(Edge edge)
         {
             if (edge == null)
-                throw new InvalidOperationException("Mine is already part of component! WTF?");
-            if (edge.Owner == -1)
+                throw new InvalidOperationException("Mine is already part of existing component! WTF?");
+            if (edge.IsFree)
                 return AiMoveDecision.Claim(state.punter, edge.From, edge.To);
-            if (allowToUseOptions && edge.OptionOwner == -1 && edge.Owner != state.punter)
+            if (edge.CanBeOwnedBy(state.punter, allowToUseOptions))
                 return AiMoveDecision.Option(state.punter, edge.From, edge.To);
             throw new InvalidOperationException($"Attempt to claim owned river {edge.River}! WTF?");
         }
