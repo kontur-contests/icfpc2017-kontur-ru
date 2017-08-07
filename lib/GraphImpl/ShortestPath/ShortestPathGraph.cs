@@ -10,8 +10,7 @@ namespace lib.GraphImpl.ShortestPath
         {
         }
 
-        private readonly Dictionary<int, ShortestPathVertex> vertexes = new Dictionary<int, ShortestPathVertex>();
-
+        protected readonly Dictionary<int, ShortestPathVertex> vertexes = new Dictionary<int, ShortestPathVertex>();
         public ShortestPathVertex this[int vertexId] => vertexes.TryGetValue(vertexId, out var vertex) ? vertex : new ShortestPathVertex(vertexId, -1);
         public ICollection<ShortestPathVertex> Vertexes => vertexes.Values;
 

@@ -25,6 +25,8 @@ namespace lib.Strategies.EdgeWeighting
                 {
                     if (edge.Owner == -1)
                         return true;
+                    if (!edge.IsOwnedBy(component.OwnerPunterId))
+                        return false;
                     if (vertexComponent.ContainsKey(edge.To) && vertexComponent.ContainsKey(edge.From) && vertexComponent[edge.To] == vertexComponent[edge.From])
                         return false;
                     return true;
