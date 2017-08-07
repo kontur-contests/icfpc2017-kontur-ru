@@ -38,98 +38,106 @@ namespace worker
                     {
                         while (!cancelled)
                         {
-                            int minMapPlayersCount = 4;
-                            int maxMapPlayersCount = 8;
-                            int roundsCount = 100;
-                            bool failOnExceptions = false;
+                            try
+                            {
+                                int minMapPlayersCount = 4;
+                                int maxMapPlayersCount = 8;
+                                int roundsCount = 100;
+                                bool failOnExceptions = false;
 
-                            var ais = new List<AiFactory>()
-                                {
-                                    //AiFactoryRegistry.CreateFactory<OptAntiLochDinicKillerAi>(),
-                                    //AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_0>(),
-                                    //AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_005>(),
-                                    //AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_01>(),
-                                    //AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_02>(),
-                                    //AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_03>(),
-                                    //AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_04>(),
-                                    //AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_05>(),
-                                    //AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_1>(),
-                                    AiFactoryRegistry.CreateFactory<FutureIsNowAi>(),
-                                    AiFactoryRegistry.CreateFactory<ConnectClosestMinesAi>(),
-                                    //AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi>(),
-                                    AiFactoryRegistry.CreateFactory<LochDinicKillerAi>(),
-                                    AiFactoryRegistry.CreateFactory<LochMaxVertexWeighterKillerAi>(),
-                                    //AiFactoryRegistry.CreateFactory<AllComponentsMaxReachableVertexWeightAi>(),
-                                    //AiFactoryRegistry.CreateFactory<MaxReachableVertexWeightAi>(),
-                                    //AiFactoryRegistry.CreateFactory<ConnectClosestMinesAi>(),
-                                    AiFactoryRegistry.CreateFactory<GreedyAi>(),
-                                    AiFactoryRegistry.CreateFactory<RandomEWAi>(),
-                                    //AiFactoryRegistry.CreateFactory<TheUberfullessnessAi>(),
-                                }
-                                .Select(f => new PlayerTournamentResult(f)).ToList();
-                            var maps = MapLoader.LoadOnlineMaps()
-                                .Where(map => map.PlayersCount.InRange(minMapPlayersCount, maxMapPlayersCount))
-                                .ToList();
-
-                            var r = Enumerable.Range(0, roundsCount)
-                                .AsParallel()
-                                .Select(
-                                    i =>
+                                var ais = new List<AiFactory>()
                                     {
-                                        return maps
-                                            .AsParallel()
-                                            .Select(
-                                                map =>
-                                                {
-                                                    var matchPlayers = ais.Select(a => a.Clone()).Shuffle(random)
-                                                        .Repeat().Take(map.PlayersCount).ToList();
-                                                    var gameSimulator = new GameSimulatorRunner(
-                                                        new SimpleScoreCalculator(), true, !failOnExceptions);
-                                                    var gamers = matchPlayers.Select(p => p.Factory.Create()).ToList();
-                                                    var results = gameSimulator.SimulateGame(
-                                                        gamers, map.Map, new Settings(true, true, true));
-                                                    AssignMatchScores(results);
-                                                    foreach (var res in results)
+                                        //AiFactoryRegistry.CreateFactory<OptAntiLochDinicKillerAi>(),
+                                        //AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_0>(),
+                                        //AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_005>(),
+                                        //AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_01>(),
+                                        //AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_02>(),
+                                        //AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_03>(),
+                                        //AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_04>(),
+                                        //AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_05>(),
+                                        //AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_1>(),
+                                        AiFactoryRegistry.CreateFactory<FutureIsNowAi>(),
+                                        AiFactoryRegistry.CreateFactory<ConnectClosestMinesAi>(),
+                                        //AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi>(),
+                                        AiFactoryRegistry.CreateFactory<LochDinicKillerAi>(),
+                                        AiFactoryRegistry.CreateFactory<LochMaxVertexWeighterKillerAi>(),
+                                        //AiFactoryRegistry.CreateFactory<AllComponentsMaxReachableVertexWeightAi>(),
+                                        //AiFactoryRegistry.CreateFactory<MaxReachableVertexWeightAi>(),
+                                        //AiFactoryRegistry.CreateFactory<ConnectClosestMinesAi>(),
+                                        AiFactoryRegistry.CreateFactory<GreedyAi>(),
+                                        AiFactoryRegistry.CreateFactory<RandomEWAi>(),
+                                        //AiFactoryRegistry.CreateFactory<TheUberfullessnessAi>(),
+                                    }
+                                    .Select(f => new PlayerTournamentResult(f)).ToList();
+                                var maps = MapLoader.LoadOnlineMaps()
+                                    .Where(map => map.PlayersCount.InRange(minMapPlayersCount, maxMapPlayersCount))
+                                    .ToList();
+
+                                var r = Enumerable.Range(0, roundsCount)
+                                    .AsParallel()
+                                    .Select(
+                                        i =>
+                                        {
+                                            return maps
+                                                .AsParallel()
+                                                .Select(
+                                                    map =>
                                                     {
-                                                        int index = gamers.IndexOf(res.Gamer);
-                                                        var player = matchPlayers[index];
-                                                        player.Maps.Add(map.Name);
-                                                        player.GamesPlayed++;
-                                                        player.OptionUsageRate.Add(res.OptionsUsed);
-                                                        player.NormalizedMatchScores.Add(
-                                                            (double) res.MatchScore / matchPlayers.Count);
-                                                        player.GamesWon.Add(
-                                                            res.MatchScore == matchPlayers.Count ? 1 : 0);
-                                                        if (res.LastException != null)
-                                                            player.ExceptionsCount++;
-                                                        if (res.ScoreData.PossibleFuturesScore != 0)
-                                                            player.GainFuturesScoreRate.Add(
-                                                                (double) res.ScoreData.GainedFuturesScore /
-                                                                res.ScoreData.PossibleFuturesScore);
-                                                        if (res.ScoreData.TotalFuturesCount != 0)
-                                                            player.GainFuturesCountRate.Add(
-                                                                (double) res.ScoreData.GainedFuturesCount /
-                                                                res.ScoreData.TotalFuturesCount);
-                                                        player.TurnTime.AddAll(res.TurnTime);
-                                                    }
-                                                    return matchPlayers;
-                                                })
-                                            .Aggregate(
-                                                new List<PlayerTournamentResult>(), (l, d) =>
-                                                {
-                                                    l.AddRange(d);
-                                                    return l;
-                                                });
-                                    })
-                                .Aggregate(
-                                    new List<PlayerTournamentResult>(), (l, d) =>
-                                    {
-                                        l.AddRange(d);
-                                        return l;
-                                    });
+                                                        var matchPlayers = ais.Select(a => a.Clone()).Shuffle(random)
+                                                            .Repeat().Take(map.PlayersCount).ToList();
+                                                        var gameSimulator = new GameSimulatorRunner(
+                                                            new SimpleScoreCalculator(), true, !failOnExceptions);
+                                                        var gamers = matchPlayers.Select(p => p.Factory.Create())
+                                                            .ToList();
+                                                        var results = gameSimulator.SimulateGame(
+                                                            gamers, map.Map, new Settings(true, true, true));
+                                                        AssignMatchScores(results);
+                                                        foreach (var res in results)
+                                                        {
+                                                            int index = gamers.IndexOf(res.Gamer);
+                                                            var player = matchPlayers[index];
+                                                            player.Maps.Add(map.Name);
+                                                            player.GamesPlayed++;
+                                                            player.OptionUsageRate.Add(res.OptionsUsed);
+                                                            player.NormalizedMatchScores.Add(
+                                                                (double) res.MatchScore / matchPlayers.Count);
+                                                            player.GamesWon.Add(
+                                                                res.MatchScore == matchPlayers.Count ? 1 : 0);
+                                                            if (res.LastException != null)
+                                                                player.ExceptionsCount++;
+                                                            if (res.ScoreData.PossibleFuturesScore != 0)
+                                                                player.GainFuturesScoreRate.Add(
+                                                                    (double) res.ScoreData.GainedFuturesScore /
+                                                                    res.ScoreData.PossibleFuturesScore);
+                                                            if (res.ScoreData.TotalFuturesCount != 0)
+                                                                player.GainFuturesCountRate.Add(
+                                                                    (double) res.ScoreData.GainedFuturesCount /
+                                                                    res.ScoreData.TotalFuturesCount);
+                                                            player.TurnTime.AddAll(res.TurnTime);
+                                                        }
+                                                        return matchPlayers;
+                                                    })
+                                                .Aggregate(
+                                                    new List<PlayerTournamentResult>(), (l, d) =>
+                                                    {
+                                                        l.AddRange(d);
+                                                        return l;
+                                                    });
+                                        })
+                                    .Aggregate(
+                                        new List<PlayerTournamentResult>(), (l, d) =>
+                                        {
+                                            l.AddRange(d);
+                                            return l;
+                                        });
 
-                            r = PlayerTournamentResult.Merge(r).ToList();
-                            producer.ProduceAsync("games", null, JsonConvert.SerializeObject(r));
+                                r = PlayerTournamentResult.Merge(r).ToList();
+                                producer.ProduceAsync("games", null, JsonConvert.SerializeObject(r));
+                            }
+                            catch (Exception e)
+                            {
+                                logger.Warn(e);
+                            }
                         }
                         producer.Flush(TimeSpan.FromSeconds(10));
                     }
