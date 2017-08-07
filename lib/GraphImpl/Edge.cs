@@ -24,6 +24,7 @@ namespace lib.GraphImpl
         public int OptionOwner => River.OptionOwner;
         public bool IsFree => Owner == -1;
         public bool IsOwnedBy(int punterId) => Owner == punterId || OptionOwner == punterId;
+        public bool CanBeOwnedBy(int punterId, bool haveFreeOption) => Owner == -1 || haveFreeOption && OptionOwner == -1 && Owner != punterId;
         public int[] GetOwners() => new[] {Owner, OptionOwner}.Where(x => x != -1).ToArray();
 
         public static Edge Forward(River river) => new Edge(river, river.Source, river.Target);

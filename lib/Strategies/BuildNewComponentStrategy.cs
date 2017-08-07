@@ -47,7 +47,7 @@ namespace lib.Strategies
             while (queue.Count > 0)
             {
                 var current = queue.Dequeue();
-                foreach (var edge in current.CurrentVertex.Edges.Where(x => x.Owner == -1 || allowToUseOptions && x.OptionOwner == -1 && x.Owner != state.punter))
+                foreach (var edge in current.CurrentVertex.Edges.Where(x => x.CanBeOwnedBy(state.punter, allowToUseOptions)))
                 {
                     var next = graph.Vertexes[edge.To];
                     BuildQueueItem prev;

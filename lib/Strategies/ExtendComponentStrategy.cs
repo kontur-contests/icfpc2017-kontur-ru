@@ -46,12 +46,12 @@ namespace lib.Strategies
             while (queue.Count > 0)
             {
                 var current = queue.Dequeue();
-                if (current.CurrentVertex.Edges.Any(x => x.Owner == state.punter || allowToUseOptions && x.OptionOwner == state.punter))
+                if (current.CurrentVertex.Edges.Any(x => x.IsOwnedBy(state.punter)))
                 {
                     move = CreateDecision(current.Edge);
                     return true;
                 }
-                foreach (var edge in current.CurrentVertex.Edges.Where(x => x.Owner == -1 || allowToUseOptions && x.OptionOwner == -1 && x.Owner != state.punter))
+                foreach (var edge in current.CurrentVertex.Edges.Where(x => x.CanBeOwnedBy(state.punter, allowToUseOptions)))
                 {
                     var next = graph.Vertexes[edge.To];
                     if (!used.Contains(next.Id))
