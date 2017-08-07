@@ -28,7 +28,7 @@ namespace lib.GraphImpl.ShortestPath
 
         private class TestShortestPathGraph : ShortestPathGraph, IEnumerable<int>
         {
-            public IEnumerator<int> GetEnumerator() => Vertexes.Select(x => x.Id).GetEnumerator();
+            public IEnumerator<int> GetEnumerator() => Vertexes.Values.OrderBy(x => x.Id).Select(x => x.Id).GetEnumerator();
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
             public void Add(int vertexId, int distance, int[] neighborIds = null, int[] sameLevelNeighborIds = null)
@@ -39,6 +39,37 @@ namespace lib.GraphImpl.ShortestPath
                 foreach (var neighborId in sameLevelNeighborIds ?? new int[0])
                     AddSameLayerEdge(Edge.Forward(new River(neighborId, vertexId)));
             }
+        }
+
+        [Test]
+        public void GraphWithOptions()
+        {
+            var g = new TestGraph(Enumerable.Range(1, 6).ToArray())
+            {
+                {1, new[] {2}},
+                {2, new[] {4}},
+                {3, new[] {4, 6}},
+                {4},
+                {5, new[] {6}},
+                {6},
+            };
+
+            g.AddEdge(2, 3, 1);
+            g.AddEdge(3, 5, 1);
+
+            var spGraph = ShortestPathGraphWithOptions.Build(g, edge => edge.IsFree || edge.MustUseOption, new[] {1}, 1);
+            var testShortestPathGraph = new TestShortestPathGraph
+            {
+                {1, 0, new[] {2}},
+                {2, 1, new[] {4, 3}},
+                {3, 2, new[] {5, 6}},
+                {4, 2, null, new[] {3}},
+                {5, 4},
+                {6, 3, new[] {5}},
+            };
+            testShortestPathGraph[2].Edges.Single(e => e.To == 3).River.Owner = 1;
+            testShortestPathGraph[3].Edges.Single(e => e.To == 5).River.Owner = 1;
+            spGraph.ShouldBeEquivalentTo(testShortestPathGraph);
         }
 
         [Test]
