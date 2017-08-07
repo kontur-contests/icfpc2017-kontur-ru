@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using lib.Ai;
 using lib.Scores;
@@ -26,6 +27,9 @@ namespace lib
             var gameSimulator = new GameSimulator(map, settings, eatExceptions);
             gameSimulator.StartGame(gamers);
             var state = gameSimulator.NextMove();
+            
+            var turnTime = new StatValue();
+            
             while (!state.IsGameOver)
             {
                 var lastMove = state.PreviousMoves.Last();
@@ -33,23 +37,28 @@ namespace lib
                 if (!silent)
                     Console.WriteLine($"{lastMove}");
 
+                var time = Stopwatch.StartNew();
+                
                 state = gameSimulator.NextMove();
+
+                turnTime.Add(time.ElapsedMilliseconds);
             }
 
             return gamers
                 .Zip(gameSimulator.Futures, (ai, futures) => new {Gamer = ai, Futures = futures})
-                .Select((e, i) => new GameSimulationResult(e.Gamer, scoreCalculator.GetScoreData(i, state.CurrentMap, e.Futures), gameSimulator.GetLastException(e.Gamer)))
+                .Select((e, i) => new GameSimulationResult(e.Gamer, scoreCalculator.GetScoreData(i, state.CurrentMap, e.Futures), gameSimulator.GetLastException(e.Gamer), turnTime))
                 .ToList();
         }
     }
 
     public class GameSimulationResult
     {
-        public GameSimulationResult(IAi gamer, ScoreData gamerScore, Exception lastException)
+        public GameSimulationResult(IAi gamer, ScoreData gamerScore, Exception lastException, StatValue turnTime)
         {
             ScoreData = gamerScore;
             Gamer = gamer;
             LastException = lastException;
+            TurnTime = turnTime;
         }
 
         public IAi Gamer { get; }
@@ -57,5 +66,7 @@ namespace lib
         public long Score => ScoreData.TotalScore;
         public int MatchScore { get; set; }
         public Exception LastException { get; }
+        
+        public StatValue TurnTime { get; }
     }
 }

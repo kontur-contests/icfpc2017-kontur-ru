@@ -75,6 +75,7 @@ namespace BrutalTesterApp
                             player.GainFuturesScoreRate.Add((double)res.ScoreData.GainedFuturesScore / res.ScoreData.PossibleFuturesScore);
                         if (res.ScoreData.TotalFuturesCount != 0)
                             player.GainFuturesCountRate.Add((double)res.ScoreData.GainedFuturesCount / res.ScoreData.TotalFuturesCount);
+                        player.TurnTime.AddAll(res.TurnTime);
                     }
                     ShowStatus(ais, maps);
                 }
@@ -102,9 +103,9 @@ namespace BrutalTesterApp
             Console.WriteLine("Maps: " + maps.Select(m => m.Name).ToDelimitedString(", "));
             Console.WriteLine();
             var ordered = players.OrderByDescending(p => p.NormalizedMatchScores.Mean);
-            var cols = new[] { 20, -14, -14, -7, -14, -14, -14 };
-            FormatColumns(cols, "Name", "WinRate", "NMS", "N", "FNCount", "FNScore", "Exceptions");
-            Console.WriteLine(new string('=', 100));
+            var cols = new[] { 20, -14, -14, -7, -14, -14, -14, -14 };
+            FormatColumns(cols, "Name", "WinRate", "NMS", "N", "FNCount", "FNScore", "Turn, ms", "Exceptions");
+            Console.WriteLine(new string('=', 120));
             foreach (var player in ordered)
             {
                 FormatColumns(cols,
@@ -114,6 +115,7 @@ namespace BrutalTesterApp
                     player.GamesPlayed,
                     player.GainFuturesCountRate,
                     player.GainFuturesScoreRate,
+                    player.TurnTime,
                     player.ExceptionsCount > 0 ? player.ExceptionsCount.ToString() : "");
             }
         }
