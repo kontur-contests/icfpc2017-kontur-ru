@@ -11,7 +11,8 @@ namespace lib.Strategies.StrategiesCatalog
         {
             Create((s, ss) => new NopStrategy()),
             Create((s, ss) => new CrazyStrategy(s, ss)),
-            Create((s, ss) => new FutureIsNowStrategy(s, ss)),
+            Create((s, ss) => new FutureIsNowStrategy(false, s, ss)),
+            Create((s, ss) => new FutureIsNowStrategy(true, s, ss), "options-"),
             Create((s, ss) => new LochDinicKillerStrategy(s, ss)),
             Create((s, ss) => new MeetInTheMiddleStrategy(s, ss)),
             Create((s, ss) => new ExtendComponentStrategy(false, s, ss)),

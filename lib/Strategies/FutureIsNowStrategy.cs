@@ -10,11 +10,13 @@ namespace lib.Strategies
 {
     public class FutureIsNowStrategy : IStrategy
     {
+        private readonly bool allowToUseOptions;
         private readonly State state;
         private readonly Graph graph;
         
-        public FutureIsNowStrategy(State state, IServices services)
+        public FutureIsNowStrategy(bool allowToUseOptions, State state, IServices services)
         {
+            this.allowToUseOptions = state.settings.options && allowToUseOptions && state.map.OptionsLeft(state.punter) > 0;
             this.state = state;
             graph = services.Get<Graph>();
         }
@@ -30,22 +32,24 @@ namespace lib.Strategies
         private AiMoveDecision TryGetNextMove()
         {
             var sitesToDefend = state.aiSetupDecision.futures.SelectMany(f => new[] { f.source, f.target }).ToArray();
-            var edge = new MovesSelector(state.map, graph, sitesToDefend, state.punter).GetNeighbourToGo();
+            var edge = new MovesSelector(allowToUseOptions, state.map, graph, sitesToDefend, state.punter).GetNeighbourToGo();
             if (edge != null)
-                return AiMoveDecision.Claim(state.punter, edge.From, edge.To, "futures cant wait!!1");
+                return AiMoveDecision.ClaimOrOption(edge, state.punter, allowToUseOptions, "futures cant wait!!1");
             return null;
         }
     }
 
     public class MovesSelector
     {
+        private readonly bool haveFreeOption;
         private readonly Map map;
         private readonly Graph graph;
         private readonly int[] sitesToDefend;
         private readonly int punterId;
 
-        public MovesSelector(Map map, Graph graph, int[] sitesToDefend, int punterId)
+        public MovesSelector(bool haveFreeOption, Map map, Graph graph, int[] sitesToDefend, int punterId)
         {
+            this.haveFreeOption = haveFreeOption;
             this.map = map;
             this.graph = graph;
             this.sitesToDefend = sitesToDefend;
@@ -68,7 +72,7 @@ namespace lib.Strategies
             {
                 var otherComponents = components.Where(c => c != weakComponent.component).ToHashSet();
                 var otherOurSites = otherComponents.SelectMany(c => c).ToHashSet();
-                Dictionary<int, int> neighbourDistToOtherComp = GetDistFromNeighbourToDestinations_viaBfs(weakComponent.neighbours, otherOurSites);
+                var neighbourDistToOtherComp = GetDistFromNeighbourToDestinations_viaBfs(weakComponent.neighbours, otherOurSites);
                 var candidateSites = neighbourDistToOtherComp.MaxListBy(r => -r.Value); // min dist
 
                 if (candidateSites.Count > 0)
@@ -76,7 +80,7 @@ namespace lib.Strategies
                     int neighbourToGo = candidateSites.MaxBy(s => GetFanOutsCount(s.Key, weakComponent.component)).Key;
                     var weakComponentSiteIds = weakComponent.component;
                     return graph.Vertexes[neighbourToGo].Edges
-                        .First(e => weakComponentSiteIds.Contains(e.To) && e.Owner == -1);
+                        .First(e => weakComponentSiteIds.Contains(e.To) && e.CanBeOwnedBy(punterId, haveFreeOption));
                 }
             }
 
@@ -85,7 +89,7 @@ namespace lib.Strategies
 
         private int GetFanOutsCount(int siteId, HashSet<int> component)
         {
-            return graph.Vertexes[siteId].Edges.Count(e => e.Owner == -1 && !component.Contains(e.To));
+            return graph.Vertexes[siteId].Edges.Count(e => e.IsFree && !component.Contains(e.To));
         }
 
         private double MinesToDefendablesRatio(IEnumerable<int> component)
@@ -123,7 +127,7 @@ namespace lib.Strategies
                 var currentVertex = graph.Vertexes[currentId];
                 int currentInitiator = initiator[currentId];
                 int currentDistance = dist[currentId] + 1;
-                foreach (var edge in currentVertex.Edges.Where(e => e.Owner == -1 || e.Owner == punterId))
+                foreach (var edge in currentVertex.Edges.Where(e => e.IsFree || e.IsOwnedBy(punterId)))
                 {
                     if (destinationSiteIds.Contains(edge.To))
                     {
@@ -146,8 +150,9 @@ namespace lib.Strategies
 
         private List<int> GetFreeNeighbours(HashSet<int> component)
         {
+            // используем опцион только для поиска соседей - кандидатов на ход, для следующих ребер мы не уверены, что опционы еще будут
             return component
-                .SelectMany(s => graph.Vertexes[s].Edges.Where(e => e.Owner == -1 && !component.Contains(e.To))
+                .SelectMany(s => graph.Vertexes[s].Edges.Where(e => e.CanBeOwnedBy(punterId, haveFreeOption) && !component.Contains(e.To))
                 .Select(e => e.To))
                 .Distinct().ToList();
         }
@@ -163,7 +168,7 @@ namespace lib.Strategies
             {
                 var currentId = q.Dequeue();
                 var currentVertex = graph.Vertexes[currentId];
-                foreach (var edge in currentVertex.Edges.Where(e => e.Owner == punterId))
+                foreach (var edge in currentVertex.Edges.Where(e => e.IsOwnedBy(punterId)))
                 {
                     component.Add(edge.To);
                     component.Add(edge.From);
