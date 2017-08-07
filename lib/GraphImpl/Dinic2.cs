@@ -43,11 +43,11 @@ namespace lib.GraphImpl
 
 
         int[] components = new int[MAXN];
-        public List<Edge> GetOptimalMinCut(out int size)
+        public List<Edge> GetOptimalMinCut(int compSize, out int size)
         {
             var componentsList = new List<ComponentNode> { null };
 
-            for (int i = 0; i < nodesCount; i++)
+            for (int i = 0; i < nodesCount && edgeLists[i] != null; i++)
             {
                 if (components[i] != 0)
                     continue;
@@ -64,20 +64,26 @@ namespace lib.GraphImpl
                         var nextEdge = edgeLists[node][index];
                         var to = edges[nextEdge].b;
 
+                        if(components[to] == component.ComponentId)
+                            continue;
+
                         if (components[to] != 0)
                         {
-                            component.Edges.Add(components[i]);
-                            componentsList[components[i]].Edges.Add(component.ComponentId);
+                            component.Edges.Add(components[to]);
+                            componentsList[components[to]].Edges.Add(component.ComponentId);
                             continue;
                         }
-                        if(edges[nextEdge].flow > 0)
+                        if(edges[nextEdge].flow == edges[nextEdge].cap)
                             continue;
 
                         components[to] = component.ComponentId;
                         component.VerticesCount++;
                         queue.Enqueue(to);
                     }
+
+
                 }
+                componentsList.Add(component);
             }
 
             var compQueue = new Queue<ComponentNode>();
@@ -88,7 +94,7 @@ namespace lib.GraphImpl
             var ourComponents = new HashSet<int> { startComponent.ComponentId };
             var ourComponentSize = startComponent.VerticesCount;
             compQueue.Enqueue(startComponent);
-            while (queue.Length > 0)
+            while (compQueue.Count > 0)
             {
                 var com = compQueue.Dequeue();
                 foreach (var edge in com.Edges)
@@ -97,17 +103,17 @@ namespace lib.GraphImpl
                         continue;
                     usedComponents.Add(edge);
                     var nextComponent = componentsList[edge];
-                    if(ourComponentSize + nextComponent.ComponentId > nodesCount/2)
+                    if(ourComponentSize + nextComponent.VerticesCount > compSize / 2)
                         continue;
                     ourComponents.Add(nextComponent.ComponentId);
-                    ourComponentSize += nextComponent.ComponentId;
+                    ourComponentSize += nextComponent.VerticesCount;
                     compQueue.Enqueue(nextComponent);
                 }
             }
 
             var result = new List<Edge>();
 
-            for (int v = 0; v < nodesCount; v++)
+            for (int v = 0; v < nodesCount && edgeLists[v] != null; v++)
             {
                 foreach (var edge in edgeLists[v])
                 {
