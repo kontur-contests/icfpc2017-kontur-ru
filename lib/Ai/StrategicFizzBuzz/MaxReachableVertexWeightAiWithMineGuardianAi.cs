@@ -10,14 +10,14 @@ namespace lib.Ai.StrategicFizzBuzz
     public class MaxReachableVertexWeightAiWithMineGuardianAi : CompositeStrategicAi
     {
         public MaxReachableVertexWeightAiWithMineGuardianAi()
-            : this(3, 10, 100, 1.0)
+            : this(3, 10, 100)
         {
         }
 
-        public MaxReachableVertexWeightAiWithMineGuardianAi(int outEdgesWarningLevel, int guardedComponentSizeThreshold, int mineMultiplier, double allowedOptionsRatio)
+        public MaxReachableVertexWeightAiWithMineGuardianAi(int outEdgesWarningLevel, int guardedComponentSizeThreshold, int mineMultiplier)
             : base(
                 AllComponentsEWStrategy((state, services) => new MineGuardianEdgeWeighter(state, services, outEdgesWarningLevel, guardedComponentSizeThreshold)),
-                AllComponentsEWStrategy((state, services) => new MaxVertextWeighter(mineMultiplier, state, services, allowedOptionsRatio)))
+                AllComponentsEWStrategy((state, services) => new MaxVertextWeighter(mineMultiplier, state, services)))
         {
         }
 

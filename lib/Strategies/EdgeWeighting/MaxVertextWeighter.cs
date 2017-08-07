@@ -9,20 +9,18 @@ namespace lib.Strategies.EdgeWeighting
 {
     public class MaxVertextWeighter : IEdgeWeighter
     {
-        public MaxVertextWeighter(double mineMultiplier, State state, IServices services, double allowedOptionsRatio = 0)
+        public MaxVertextWeighter(double mineMultiplier, State state, IServices services)
         {
             MineDistCalculator = services.Get<MineDistCalculator>();
             Graph = services.Get<Graph>();
             SpGraphService = services.Get<ShortestPathGraphService>();
             MineMultiplier = mineMultiplier;
-            AllowedOptionsRatio = allowedOptionsRatio;
             State = state;
         }
 
         private State State;
 
         private double MineMultiplier { get; }
-        private double AllowedOptionsRatio { get; }
         private Graph Graph { get; }
         private ShortestPathGraphService SpGraphService { get; }
         private MineDistCalculator MineDistCalculator { get; }
@@ -42,8 +40,7 @@ namespace lib.Strategies.EdgeWeighting
                 .SelectMany(x => x.Vertices, (component, vertex) => new {component, vertex})
                 .ToDictionary(x => x.vertex, x => x.component);
             MutualComponentWeights = new Dictionary<Tuple<int, int>, long>();
-            var optionsCount = State.settings.options ? (int)Math.Ceiling(AllowedOptionsRatio * State.map.OptionsLeft(State.punter)) : 0;
-            SpGraph = SpGraphService.ForComponent(CurrentComponent, VertexComponent, optionsCount);
+            SpGraph = SpGraphService.ForComponent(CurrentComponent, VertexComponent);
             ClaimedMineIds = CurrentComponent.Mines;
             foreach (var edge in CurrentComponent.Vertices.SelectMany(v => Graph.Vertexes[v].Edges))
                 SubGraphWeight[edge.To] = CalcSubGraphWeight(edge.To);
