@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using lib.Ai;
@@ -8,11 +9,13 @@ namespace lib.Strategies
 {
     public class BuildNewComponentStrategy : IStrategy
     {
+        private readonly bool allowToUseOptions;
         private readonly State state;
         private readonly Graph graph;
 
-        public BuildNewComponentStrategy(State state, IServices services)
+        public BuildNewComponentStrategy(bool allowToUseOptions, State state, IServices services)
         {
+            this.allowToUseOptions = state.settings.options && allowToUseOptions && state.map.OptionsLeft(state.punter) > 0;
             this.state = state;
             graph = services.Get<Graph>();
         }
@@ -44,7 +47,7 @@ namespace lib.Strategies
             while (queue.Count > 0)
             {
                 var current = queue.Dequeue();
-                foreach (var edge in current.CurrentVertex.Edges.Where(x => x.Owner == -1))
+                foreach (var edge in current.CurrentVertex.Edges.Where(x => x.Owner == -1 || allowToUseOptions && x.OptionOwner == -1))
                 {
                     var next = graph.Vertexes[edge.To];
                     BuildQueueItem prev;
@@ -56,13 +59,13 @@ namespace lib.Strategies
                             if (bestMine == prev.SourceMine)
                             {
                                 var edge1 = prev.FirstEdge ?? edge;
-                                move = AiMoveDecision.Claim(state.punter, edge1.From, edge1.To);
+                                move = CreateDecision(edge1);
                                 return true;
                             }
                             if (bestMine == current.SourceMine)
                             {
                                 var edge1 = current.FirstEdge ?? edge;
-                                move = AiMoveDecision.Claim(state.punter, edge1.From, edge1.To);
+                                move = CreateDecision(edge1);
                                 return true;
                             }
                         }
@@ -82,6 +85,16 @@ namespace lib.Strategies
             }
             move = null;
             return false;
+        }
+        private AiMoveDecision CreateDecision(Edge edge)
+        {
+            if (edge == null)
+                throw new InvalidOperationException("Mine is already part of existing component! WTF?");
+            if (edge.Owner == -1)
+                return AiMoveDecision.Claim(state.punter, edge.From, edge.To);
+            if (allowToUseOptions && edge.OptionOwner == -1)
+                return AiMoveDecision.Option(state.punter, edge.From, edge.To);
+            throw new InvalidOperationException($"Attempt to claim owned river {edge.River}! WTF?");
         }
 
         private static Vertex SelectBestMine(Vertex a, Vertex b)

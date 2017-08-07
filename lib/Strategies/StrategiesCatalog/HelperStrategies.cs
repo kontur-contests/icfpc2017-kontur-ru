@@ -10,8 +10,10 @@ namespace lib.Strategies.StrategiesCatalog
         public static readonly Dictionary<string, StrategyFactory> Factories = new[]
         {
             Create((s, ss) => new NopStrategy()),
-            Create((s, ss) => new ExtendComponentStrategy(s, ss)),
-            Create((s, ss) => new BuildNewComponentStrategy(s, ss)),
+            Create((s, ss) => new ExtendComponentStrategy(false, s, ss)),
+            Create((s, ss) => new BuildNewComponentStrategy(false, s, ss)),
+            Create((s, ss) => new ExtendComponentStrategy(true, s, ss), "with-options"),
+            Create((s, ss) => new BuildNewComponentStrategy(true, s, ss), "with-options"),
             ForAllComponentsEW((s, ss) => new MineGuardianEdgeWeighter(s, ss)),
         }.ToDictionary(f => f.Name);
     }
