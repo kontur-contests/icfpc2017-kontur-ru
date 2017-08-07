@@ -13,7 +13,6 @@ namespace punter
 {
     class Program
     {
-        private static IAi ai;
         private static TextReader inputReader;
 
         private const string TeamName = "kontur.ru";
@@ -28,9 +27,6 @@ namespace punter
             // FutureIsNowSetupStrategyoptions-FutureIsNowStrategyoptions-ExtendComponentStrategyAllComponentsEWStrategy_MaxVertextWeighterUberAi
             // FutureIsNowSetupStrategyoptions-FutureIsNowStrategyoptions-ExtendComponentStrategyoptions-SumGreedyStrategyUberAi
             //ai = (IAi)UberfullessnessAi.All.FirstOrDefault(x => x.Name == "FutureIsNowSetupStrategyoptions-FutureIsNowStrategyoptions-ExtendComponentStrategyoptions-MaxGreedyStrategyUberAi") ?? new ConnectClosestMinesAi();
-
-            ai = (IAi)UberfullessnessAi.All.FirstOrDefault(x => x.Name == "FutureIsNowSetupStrategyoptions-FutureIsNowStrategyoptions-ExtendComponentStrategyoptions-SumGreedyStrategyUberAi") ?? new ConnectClosestMinesAi();
-            Console.Error.WriteLine($"Ai: {ai.Name}");
 
             Write(new HandshakeOut {me = TeamName});
             var handshakeIn = Read<HandshakeIn>();
@@ -58,6 +54,8 @@ namespace punter
                 punters = punters,
                 settings = settings
             };
+            var ai = CreateAi(state);
+            Console.Error.WriteLine($"Ai: {ai.Name}");
             var setupDecision = ai.Setup(state, new Services(state));
             if (!settings.futures && setupDecision.futures?.Any() == true)
             {
@@ -79,8 +77,21 @@ namespace punter
             };
         }
 
+        private static IAi CreateAi(State state)
+        {
+            if (!state.settings.options)
+                return new ConnectClosestMinesAi();
+            if (state.punters > 8)
+                return new ConnectClosestMinesAi();
+            return (IAi) UberfullessnessAi.All.FirstOrDefault(
+                         x => x.Name ==
+                              "FutureIsNowSetupStrategyoptions-FutureIsNowStrategyoptions-ExtendComponentStrategyoptions-SumGreedyStrategyUberAi") ??
+                     new ConnectClosestMinesAi();
+        }
+
         private static GameplayOut DoGameplay(Move[] moves, State state)
         {
+            var ai = CreateAi(state);
             state.ApplyMoves(moves);
             try
             {
