@@ -28,8 +28,8 @@ namespace lib.Strategies.EdgeWeighting
                         return true;
                     //if (edge.Owner != punter) // Options (не понятно как тут учитывать Options)
                     //    return false;
-                    if (edge.OptionOwner == -1 && edge.Owner == punter && edge.Owner != -1 && optionsLeft > 0) // Options (не понятно как тут учитывать Options)
-                        return true;
+//                    if (edge.OptionOwner == -1 && edge.Owner == punter && edge.Owner != -1 && optionsLeft > 0) // Options (не понятно как тут учитывать Options)
+//                        return true;
                     if (vertexComponent.ContainsKey(edge.To) && vertexComponent.ContainsKey(edge.From) && vertexComponent[edge.To] == vertexComponent[edge.From])
                         return false;
                     return true;
