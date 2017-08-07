@@ -109,9 +109,9 @@ namespace lib.Strategies
                         var weight = -1;
                         if (edge.IsOwnedBy(PunterId))
                             weight = weightMy;
-                        if (edge.Owner != -1 && edge.Owner != PunterId && edge.OptionOwner == -1)
+                        if (!edge.IsFree && edge.CanBeOwnedBy(PunterId, allowToUseOptions))
                             weight = weightEnemy;
-                        if (edge.Owner == -1)
+                        if (edge.IsFree)
                             weight = weightFree;
                         if (weight == -1)
                             continue;
