@@ -133,7 +133,7 @@ namespace lib.Strategies
             edgesToBlock.Keys.ToList().ForEach(
                 key =>
                 {
-                    if (edgesToBlock[key] < Graph.Vertexes.Count / 50.0)
+                    if (edgesToBlock[key] < Graph.Vertexes.Count / 50.0 || edgesToBlock[key] < 4)
                         edgesToBlock.Remove(key);
                 });
         }
