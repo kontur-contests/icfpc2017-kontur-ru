@@ -25,11 +25,12 @@ namespace BrutalTesterApp
             int minMapPlayersCount = 1;
             int maxMapPlayersCount = 4;
             int roundsCount = 100000;
-            bool failOnExceptions = false;
+            bool failOnExceptions = true;
 
             //var ais = AiFactoryRegistry.ForOnlineRunsFactories
             var ais = new List<AiFactory>()
             {
+                AiFactoryRegistry.CreateFactory<OptAntiLochDinicKillerAi>(),
                 AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_0>(),
                 AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_005>(),
                 AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_01>(),

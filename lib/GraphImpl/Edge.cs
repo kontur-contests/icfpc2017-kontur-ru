@@ -22,6 +22,8 @@ namespace lib.GraphImpl
         public int Owner => River.Owner;
         public int OptionOwner => River.OptionOwner;
         public bool IsFree => Owner == -1;
+        public bool IsOwnedBy(int punterId) => 
+            Owner == punterId || OptionOwner == punterId;
 
         public static Edge Forward(River river) => new Edge(river, river.Source, river.Target);
         public static Edge Backward(River river) => new Edge(river, river.Target, river.Source);
