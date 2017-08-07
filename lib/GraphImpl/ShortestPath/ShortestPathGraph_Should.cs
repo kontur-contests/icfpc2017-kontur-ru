@@ -52,7 +52,7 @@ namespace lib.GraphImpl.ShortestPath
                 {4}
             };
 
-            var spGraph = ShortestPathGraph.Build(g, 1);
+            var spGraph = ShortestPathGraph.Build(g, edge => edge.Owner == -1, new[] {1});
             spGraph.ShouldBeEquivalentTo(
                 new TestShortestPathGraph
                 {
@@ -74,7 +74,7 @@ namespace lib.GraphImpl.ShortestPath
                 {4}
             };
 
-            var spGraph = ShortestPathGraph.Build(g, 1, 4);
+            var spGraph = ShortestPathGraph.Build(g, edge => edge.Owner == -1, new[] {1, 4});
             spGraph.ShouldBeEquivalentTo(
                 new TestShortestPathGraph
                 {
@@ -102,7 +102,7 @@ namespace lib.GraphImpl.ShortestPath
                 {10},
             };
 
-            var spGraph = ShortestPathGraph.Build(g, 1);
+            var spGraph = ShortestPathGraph.Build(g, edge => edge.Owner == -1, new[] {1});
             spGraph.ShouldBeEquivalentTo(
                 new TestShortestPathGraph
                 {
