@@ -9,46 +9,51 @@ namespace lib.Ai
         public readonly Move move;
         public readonly string reason;
 
-        private AiMoveDecision(Move move, string reason = null)
+        public AiMoveDecision(Move move, string reason = null)
         {
             this.move = move;
             this.reason = reason;
         }
 
-        public static AiMoveDecision Move(Move move, string reason = null)
+        public static AiMoveDecision Claim(Edge edge, int punter, string reason = null)
         {
-            return new AiMoveDecision(move, reason);
+            if (edge == null)
+                throw new InvalidOperationException("Attempt to claim null edge! WTF?");
+            if (edge.IsFree)
+                return new AiMoveDecision(Move.Claim(punter, edge.From, edge.To), reason);
+            throw new InvalidOperationException($"Attempt to claim owned river {edge.River}! WTF?");
         }
 
-        public static AiMoveDecision Claim(int punter, int source, int target, string reason = null)
+        public static AiMoveDecision Option(Edge edge, int punter, string reason = null)
         {
-            return Move(Structures.Move.Claim(punter, source, target), reason);
-        }
-
-        public static AiMoveDecision Option(int punter, int source, int target, string reason = null)
-        {
-            return Move(Structures.Move.Option(punter, source, target), reason);
+            if (edge == null)
+                throw new InvalidOperationException("Attempt to option null edge! WTF?");
+            if (edge.IsFree)
+                throw new InvalidOperationException("Attempt to option free edge! WTF?");
+            if (!edge.CanBeOwnedBy(punter, true))
+                throw new InvalidOperationException($"Attempt to option owned river {edge.River}! WTF?");
+            return new AiMoveDecision(Move.Option(punter, edge.From, edge.To), reason);
         }
 
         public static AiMoveDecision Splurge(int punter, int[] siteIds, string reason = null)
         {
-            return Move(Structures.Move.Splurge(punter, siteIds), reason);
+            return new AiMoveDecision(Move.Splurge(punter, siteIds), reason);
         }
 
         public static AiMoveDecision Pass(int punter, string reason = null)
         {
-            return Move(Structures.Move.Pass(punter), reason);
+            return new AiMoveDecision(Move.Pass(punter), reason);
         }
 
         public static AiMoveDecision ClaimOrOption(Edge edge, int punter, bool haveFreeOption, string reason = null)
         {
             if (edge == null)
-                throw new InvalidOperationException("Attempt to claim null edge! WTF?");
+                throw new InvalidOperationException("Attempt to claim or option null edge! WTF?");
             if (edge.IsFree)
-                return Claim(punter, edge.From, edge.To, reason);
+                return new AiMoveDecision(Move.Claim(punter, edge.From, edge.To), reason);
             if (edge.CanBeOwnedBy(punter, haveFreeOption))
-                return Option(punter, edge.From, edge.To, reason);
-            throw new InvalidOperationException($"Attempt to claim owned river {edge.River}! WTF?");
+                return new AiMoveDecision(Move.Option(punter, edge.From, edge.To), reason);
+            throw new InvalidOperationException($"Attempt to claim or option owned river {edge.River}! WTF?");
         }
 
     }

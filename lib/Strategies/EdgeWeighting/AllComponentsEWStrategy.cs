@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using lib.Ai;
@@ -47,7 +46,7 @@ namespace lib.Strategies.EdgeWeighting
                 .Select(e => new TurnResult
                 {
                     Estimation = EdgeWeighter.EstimateWeight(e),
-                    Move = AiMoveDecision.Claim(PunterId, e.River.Source, e.River.Target)
+                    Move = AiMoveDecision.Claim(e, PunterId)
                 });
 
             var optionVertices = !State.settings.options || State.map.OptionsLeft(State.punter) <= 0
@@ -57,7 +56,7 @@ namespace lib.Strategies.EdgeWeighting
                     .Select(e => new TurnResult
                     {
                         Estimation = EdgeWeighter.EstimateWeight(e) * OptionPenaltyMultiplier,
-                        Move = AiMoveDecision.Option(PunterId, e.River.Source, e.River.Target)
+                        Move = AiMoveDecision.Option(e, PunterId)
                     }).ToList();
 
             return claimVertices.Concat(optionVertices)

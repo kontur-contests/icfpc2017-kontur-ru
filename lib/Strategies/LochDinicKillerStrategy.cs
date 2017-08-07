@@ -34,7 +34,7 @@ namespace lib.Strategies
                     edge => edge.IsFree ? new TurnResult
                     {
                         Estimation = EstimateWeight(edge),
-                        Move = AiMoveDecision.Claim(PunterId, edge.River.Source, edge.River.Target),
+                        Move = AiMoveDecision.Claim(edge, PunterId),
                     } : null)
                 .Where(river => river != null && river.Estimation > 0)
                 .ToList();
