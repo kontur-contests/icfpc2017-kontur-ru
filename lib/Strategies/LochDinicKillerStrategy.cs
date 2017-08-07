@@ -62,25 +62,28 @@ namespace lib.Strategies
                 .ToHashSet();
 
             var mines = Graph.Mines.Where(mine => mine.Value.Edges.Any(edge => edge.IsFree)).ToList();
-            for (var i = 0; i < Math.Min(10, mines.Count * (mines.Count - 1)); i++)
+            if (mines.Count >= 2)
             {
-                var mine1 = mines[Math.Min(Random.Value.Next(mines.Count), mines.Count - 1)];
-                var mine2 = mines[Math.Min(Random.Value.Next(mines.Count), mines.Count - 1)];
-                while (mine2.Key == mine1.Key) mine2 = mines[Math.Min(Random.Value.Next(mines.Count), mines.Count - 1)];
-
-                // Чтобы не ходить по своим рёбрам в динице. Таким образом, длинные мосты блочаться один раз.
-                const int nonExistentPunterId = 1000000; 
-                var dinic = new Dinic(Graph, nonExistentPunterId, mine1.Key, mine2.Key, out var flow);
-                if (flow == 0)
-                    continue;
-                if (flow > maxCount)
-                    continue;
-
-                foreach (var edge in dinic.GetMinCut())
+                for (var i = 0; i < Math.Min(10, mines.Count * (mines.Count - 1)); i++)
                 {
-                    if (bannedMines.Contains(edge.From) || bannedMines.Contains(edge.To))
+                    var mine1 = mines[Random.Value.Next(mines.Count)];
+                    var mine2 = mines[Random.Value.Next(mines.Count)];
+                    while (mine2.Key == mine1.Key) mine2 = mines[Math.Min(Random.Value.Next(mines.Count), mines.Count - 1)];
+
+                    // Чтобы не ходить по своим рёбрам в динице. Таким образом, длинные мосты блочаться один раз.
+                    const int nonExistentPunterId = 1000000; 
+                    var dinic = new Dinic(Graph, nonExistentPunterId, mine1.Key, mine2.Key, out var flow);
+                    if (flow == 0)
                         continue;
-                    edgesToBlock[edge] = edgesToBlock.GetOrDefault(edge, 0) + 1.0 / flow;
+                    if (flow > maxCount)
+                        continue;
+
+                    foreach (var edge in dinic.GetMinCut())
+                    {
+                        if (bannedMines.Contains(edge.From) || bannedMines.Contains(edge.To))
+                            continue;
+                        edgesToBlock[edge] = edgesToBlock.GetOrDefault(edge, 0) + 1.0 / flow;
+                    }
                 }
             }
         }

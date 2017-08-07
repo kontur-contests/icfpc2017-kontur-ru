@@ -103,34 +103,37 @@ namespace lib.Strategies
             var summes = interestingPoints.Select(p => sum += p.w).ToArray();
 
             var mines = Graph.Mines.Where(mine => mine.Value.Edges.Any(edge => edge.IsFree)).ToList();
-            for (var i = 0; i < 20; i++)
+            if (mines.Count >= 2)
             {
-                var mine1 = mines[Math.Min(Random.Value.Next(mines.Count), mines.Count - 1)];
-                var p = interestingPoints[ChooseRandom(summes)];
-                while (p.p== mine1.Key) p = interestingPoints[ChooseRandom(summes)];
-
-                // Чтобы не ходить по своим рёбрам в динице. Таким образом, длинные мосты блочаться один раз.
-                const int nonExistentPunterId = 1000000;
-                var dinic = new Dinic2(Graph, nonExistentPunterId, mine1.Key, p.p, out var flow);
-                if (flow == 0)
-                    continue;
-                if (flow > maxCount)
-                    continue;
-
-                var compSize = GetOpenComponentSize(mine1.Key);
-                var mincut = dinic.GetOptimalMinCut(compSize,  out int size);
-
-                if (size > compSize / 2)
-                    size = compSize - size;
-                
-                foreach (var edge in mincut.Select(edge1 => edge1))
+                for (var i = 0; i < 20; i++)
                 {
-                    if (bannedMines.Contains(edge.From) || bannedMines.Contains(edge.To))
-                        continue;
-                    edgesToBlock[edge] = edgesToBlock.GetOrDefault(edge, 0) + size*1.0/flow;
-                }
-            }
+                    var mine1 = mines[Random.Value.Next(mines.Count)];
+                    var p = interestingPoints[ChooseRandom(summes)];
+                    while (p.p== mine1.Key) p = interestingPoints[ChooseRandom(summes)];
 
+                    // Чтобы не ходить по своим рёбрам в динице. Таким образом, длинные мосты блочаться один раз.
+                    const int nonExistentPunterId = 1000000;
+                    var dinic = new Dinic2(Graph, nonExistentPunterId, mine1.Key, p.p, out var flow);
+                    if (flow == 0)
+                        continue;
+                    if (flow > maxCount)
+                        continue;
+
+                    var compSize = GetOpenComponentSize(mine1.Key);
+                    var mincut = dinic.GetOptimalMinCut(compSize,  out int size);
+
+                    if (size > compSize / 2)
+                        size = compSize - size;
+                
+                    foreach (var edge in mincut.Select(edge1 => edge1))
+                    {
+                        if (bannedMines.Contains(edge.From) || bannedMines.Contains(edge.To))
+                            continue;
+                        edgesToBlock[edge] = edgesToBlock.GetOrDefault(edge, 0) + size*1.0/flow;
+                    }
+                }
+                
+            }
             edgesToBlock.Keys.ToList().ForEach(
                 key =>
                 {
