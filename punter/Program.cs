@@ -25,7 +25,12 @@ namespace punter
             else
                 inputReader = new StreamReader(args[0]);
             //ai = new ConnectClosestMinesAi();
-            ai = (IAi)UberfullessnessAi.All.FirstOrDefault(x => x.Name == "FutureIsNowSetupStrategyoptions-FutureIsNowStrategyoptions-ExtendComponentStrategyoptions-MaxGreedyStrategyUberAi") ?? new ConnectClosestMinesAi();
+            // FutureIsNowSetupStrategyoptions-FutureIsNowStrategyoptions-ExtendComponentStrategyAllComponentsEWStrategy_MaxVertextWeighterUberAi
+            // FutureIsNowSetupStrategyoptions-FutureIsNowStrategyoptions-ExtendComponentStrategyoptions-SumGreedyStrategyUberAi
+            //ai = (IAi)UberfullessnessAi.All.FirstOrDefault(x => x.Name == "FutureIsNowSetupStrategyoptions-FutureIsNowStrategyoptions-ExtendComponentStrategyoptions-MaxGreedyStrategyUberAi") ?? new ConnectClosestMinesAi();
+
+            ai = (IAi)UberfullessnessAi.All.FirstOrDefault(x => x.Name == "FutureIsNowSetupStrategyoptions-FutureIsNowStrategyoptions-ExtendComponentStrategyoptions-SumGreedyStrategyUberAi") ?? new ConnectClosestMinesAi();
+            Console.Error.WriteLine($"Ai: {ai.Name}");
 
             Write(new HandshakeOut {me = TeamName});
             var handshakeIn = Read<HandshakeIn>();
