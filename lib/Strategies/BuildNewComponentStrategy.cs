@@ -98,9 +98,9 @@ namespace lib.Strategies
             throw new InvalidOperationException($"Attempt to claim owned river {edge.River}! WTF?");
         }
 
-        private static Vertex SelectBestMine(Vertex a, Vertex b)
+        private Vertex SelectBestMine(Vertex a, Vertex b)
         {
-            return a.Edges.Count(x => x.Owner == -1) < b.Edges.Count(x => x.Owner == -1) ? a : b;
+            return a.Edges.Count(x => x.CanBeOwnedBy(state.punter, allowToUseOptions)) < b.Edges.Count(x => x.CanBeOwnedBy(state.punter, allowToUseOptions)) ? a : b;
         }
 
         private class BuildQueueItem
