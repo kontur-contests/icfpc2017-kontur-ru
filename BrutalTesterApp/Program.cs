@@ -68,7 +68,7 @@ namespace BrutalTesterApp
             var maps = MapLoader.LoadOnlineMaps()
                 .Where(map => map.PlayersCount.InRange(minMapPlayersCount, maxMapPlayersCount))
                 //.Where(map => map.Name == "boston-sparse")
-				.Where(map => args.Contains(map.Name))
+				.Where(map => args.Length == 2 || args.Contains(map.Name))
                 .ToList();
 
             var r = Enumerable.Range(0, roundsCount)

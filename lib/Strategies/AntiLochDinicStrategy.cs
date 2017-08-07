@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using lib.Ai;
 using lib.Ai.StrategicFizzBuzz;
 using lib.GraphImpl;
@@ -16,10 +15,6 @@ namespace lib.Strategies
     {
         public class AntiLochDinicStrategy : IStrategy
         {
-            private static readonly ThreadLocal<Random> Random =
-                new ThreadLocal<Random>(() => new Random(Guid.NewGuid().GetHashCode()));
-
-
             private readonly Dictionary<Edge, double> edgesToBlock = new Dictionary<Edge, double>();
 
             public AntiLochDinicStrategy(State state, IServices services, bool options = false)
@@ -30,7 +25,7 @@ namespace lib.Strategies
 
                 this.options &= state.settings.options;
                 this.options &=
-                    state.map.OptionsUsed.GetOrDefaultNoSideEffects(PunterId, 0) >= state.map.Mines.Length;
+                    state.map.OptionsUsed.GetOrDefaultNoSideEffects(PunterId, 0) < state.map.Mines.Length;
             }
 
 
@@ -125,6 +120,8 @@ namespace lib.Strategies
                             weight = weightEnemy;
                         if (edge.Owner == -1)
                             weight = weightFree;
+                        if (weight == -1)
+                            continue;
 
                         int u = edge.To;
                         int du = dist[v] + weight;
@@ -149,7 +146,7 @@ namespace lib.Strategies
                 {
                     int df = dist[finish];
                     int finish2 = parrent[finish];
-                    int df2 = dist[finish];
+                    int df2 = dist[finish2];
                     if (df - df2 == weightEnemy)
                     {
                         result = new Edge(finish, finish2, -2, -1);

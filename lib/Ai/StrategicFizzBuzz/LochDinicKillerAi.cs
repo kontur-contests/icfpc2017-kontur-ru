@@ -24,7 +24,7 @@ namespace lib.Ai.StrategicFizzBuzz
         public OptAntiLochDinicKillerAi()
             : base(
                 (state, services) => new AntiLochDinicStrategy(state, services, true),
-                AllComponentsEWStrategy((state, services) => new MaxVertextWeighter(100, state, services)),
+                AllComponentsEWStrategy((state, services) => new MaxVertextWeighter(100, state, services), -1),
                 (state, services) => new GreedyStrategy(state, services, (x, y) => x + y))
         {
         }
