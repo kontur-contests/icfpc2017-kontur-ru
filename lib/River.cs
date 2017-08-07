@@ -59,7 +59,7 @@ namespace lib
 
         public override string ToString()
         {
-            return $"{nameof(Source)}: {Source}, {nameof(Target)}: {Target}, {nameof(Owner)}: {Owner}";
+            return $"{nameof(Source)}: {Source}, {nameof(Target)}: {Target}, {nameof(Owner)}: {Owner}, {nameof(OptionOwner)}: {OptionOwner}";
         }
 
     }
