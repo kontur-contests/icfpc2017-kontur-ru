@@ -19,6 +19,19 @@ namespace lib.Ai.StrategicFizzBuzz
         public override string Version => "0.4";
     }
 
+    public class LochDinicKillerAi2 : CompositeStrategicAi
+    {
+        public LochDinicKillerAi2()
+            : base(
+                (state, services) => new LochDinicKillerStrategy2(state, services),
+                AllComponentsEWStrategy((state, services) => new MaxVertextWeighter(100, state, services)),
+                (state, services) => new GreedyStrategy(state, services, (x, y) => x + y))
+        {
+        }
+
+        public override string Version => "0.4";
+    }
+
     public class OptAntiLochDinicKillerAi : CompositeStrategicAi
     {
         public OptAntiLochDinicKillerAi()
