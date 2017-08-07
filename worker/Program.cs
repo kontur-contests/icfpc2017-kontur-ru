@@ -11,15 +11,13 @@ namespace worker
             HostFactory.Run(x =>
             {
                 x.Service<WorkerService>(s =>
-                {
-                    var player = new ExperimentSelector();
-                    
+                {                    
                     var config = new Dictionary<string, object>
                     {
                         { "group.id", "icfpc2017-worker" },
                         { "bootstrap.servers", "icfpc-broker.dev.kontur.ru" }
                     };
-                    s.ConstructUsing(name => new WorkerService(config, new[] {"tasks", "matches"}, "results", player));
+                    s.ConstructUsing(name => new WorkerService(config));
                     s.WhenStarted(ws => ws.Start());
                     s.WhenStopped(ws => ws.Stop());
                 });
