@@ -4,8 +4,8 @@ namespace lib.GraphImpl
 {
     public class Edge : IEquatable<Edge>
     {
-        public Edge(int from, int to, int owner)
-            : this(new River(from, to, owner), from, to)
+        public Edge(int from, int to, int owner, int optionOwner)
+            : this(new River(from, to, owner, optionOwner), from, to)
         {
         }
 
@@ -20,6 +20,7 @@ namespace lib.GraphImpl
         public int From { get; }
         public int To { get; }
         public int Owner => River.Owner;
+        public int OptionOwner => River.OptionOwner;
         public bool IsFree => Owner == -1;
 
         public static Edge Forward(River river) => new Edge(river, river.Source, river.Target);

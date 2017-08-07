@@ -22,16 +22,17 @@ namespace BrutalTesterApp
         static void Main(string[] args)
         {
             Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
-            int minMapPlayersCount = 1;
-            int maxMapPlayersCount = 4;
+            int minMapPlayersCount = 8;
+            int maxMapPlayersCount = 8;
             int roundsCount = 100000;
             bool failOnExceptions = false;
 
-            var ais = AiFactoryRegistry.ForOnlineRunsFactories
-            /*var ais = new List<AiFactory>()
+            //var ais = AiFactoryRegistry.ForOnlineRunsFactories
+            var ais = new List<AiFactory>()
             {
                 AiFactoryRegistry.CreateFactory<FutureIsNowAi>(),
             //    AiFactoryRegistry.CreateFactory<ConnectClosestMinesAi>(),
+                AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi>(),
                 AiFactoryRegistry.CreateFactory<LochDinicKillerAi>(),
                 //AiFactoryRegistry.CreateFactory<AgileMaxVertexWeighterAi>(),
                 //AiFactoryRegistry.CreateFactory<LochMaxVertexWeighterKillerAi>(),
@@ -41,6 +42,7 @@ namespace BrutalTesterApp
                 AiFactoryRegistry.CreateFactory<ConnectClosestMinesAi>(),
                 AiFactoryRegistry.CreateFactory<GreedyAi>(),
                 AiFactoryRegistry.CreateFactory<RandomEWAi>(),
+                AiFactoryRegistry.CreateFactory<TheUberfullessnessAi>(),
 
                 
             //    AiFactoryRegistry.CreateFactory<Podnaserator2000Ai>(),
@@ -49,9 +51,12 @@ namespace BrutalTesterApp
             //    AiFactoryRegistry.CreateFactory<GreedierAi>(),
             //    AiFactoryRegistry.CreateFactory<AgileMaxVertexWeighterAi>(),
             //    AiFactoryRegistry.CreateFactory<AgileMaxVertexWeighterAi>(),
-            }*/
+            }
             .Select(f => new PlayerTournamentResult(f)).ToList();
-            var maps = MapLoader.LoadOnlineMaps().Where(map => map.PlayersCount.InRange(minMapPlayersCount, maxMapPlayersCount)).ToList();
+            var maps = MapLoader.LoadOnlineMaps()
+                //.Where(map => map.PlayersCount.InRange(minMapPlayersCount, maxMapPlayersCount))
+                .Where(map => map.Name == "boston-sparse")
+                .ToList();
 
             for (int i = 0; i < roundsCount; i++)
             {
@@ -60,7 +65,7 @@ namespace BrutalTesterApp
                     var matchPlayers = ais.Shuffle(random).Repeat().Take(map.PlayersCount).ToList();
                     var gameSimulator = new GameSimulatorRunner(new SimpleScoreCalculator(), true, !failOnExceptions);
                     var gamers = matchPlayers.Select(p => p.Factory.Create()).ToList();
-                    var results = gameSimulator.SimulateGame(gamers, map.Map, new Settings(true, true));
+                    var results = gameSimulator.SimulateGame(gamers, map.Map, new Settings(true, true, true));
                     AssignMatchScores(results);
                     foreach (var res in results)
                     {
@@ -94,7 +99,7 @@ namespace BrutalTesterApp
             }
         }
 
-        private static void ShowStatus(List<PlayerTournamentResult> players, List<NamedMap> maps)
+        private static void ShowStatus(List<PlayerTournamentResult> players, IList<NamedMap> maps)
         {
             if (DateTime.Now < lastUpdate + TimeSpan.FromMilliseconds(500)) return;
             lastUpdate = DateTime.Now;

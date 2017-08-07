@@ -11,6 +11,26 @@ namespace lib.Ai
 {
     public static class MapExtensions
     {
+        public static void Show(this Map map)
+        {
+            var form = new Form
+            {
+                WindowState = FormWindowState.Maximized
+            };
+            var mapPainter = new MapPainter
+            {
+                Map = map,
+                PainterAugmentor = new DefaultPainterAugmentor(),
+                Futures = new Dictionary<int, Future[]>(),
+            };
+            var panel = new ScaledViewPanel(mapPainter)
+            {
+                Dock = DockStyle.Fill
+            };
+            form.Controls.Add(panel);
+            form.ShowDialog();
+        }
+
         public static void ShowWithPath(this Map map, List<int> pathSiteIds, Future[] futures)
         {
             var form = new Form()

@@ -41,7 +41,7 @@ namespace lib.GraphImpl
                 int v = queue.Dequeue();
                 foreach (var edge in graph.Vertexes[v].Edges)
                 {
-                    if (edge.Owner != owner)
+                    if (edge.Owner != owner && edge.OptionOwner != owner)
                         continue;
 
                     int u = edge.To;

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using lib.Ai;
@@ -53,31 +54,38 @@ namespace lib.Strategies
 
         public Edge GetNeighbourToGo()
         {
-            var components = sitesToDefend.Select(s => GetConnectedComponent(s).ToList())
+            List<HashSet<int>> components = sitesToDefend.Select(GetConnectedComponent)
                 .DistinctBy(c => c.Min()).ToList();
             if (components.Count == 1) return null;
             var q =
-                from c in components
-                let neighbours = GetFreeNeighbours(c)
-                select new { c, neighbours };
+                from component in components
+                let neighbours = GetFreeNeighbours(component)
+                select new { component, neighbours };
 
-            var weakComponents = q.OrderBy(t => t.neighbours.Count - MinesToDefendablesRatio(t.c));
+            var weakComponents = q.OrderBy(t => t.neighbours.Count - MinesToDefendablesRatio(t.component));
 
             foreach (var weakComponent in weakComponents)
             {
-                var otherComponents = components.Where(c => c != weakComponent.c).ToHashSet();
-                var res = Bfs(weakComponent.neighbours, otherComponents.SelectMany(c => c).ToHashSet());
-                var candidateSites = res.MaxListBy(r => -r.Value);
+                var otherComponents = components.Where(c => c != weakComponent.component).ToHashSet();
+                var otherOurSites = otherComponents.SelectMany(c => c).ToHashSet();
+                Dictionary<int, int> neighbourDistToOtherComp = GetDistFromNeighbourToDestinations_viaBfs(weakComponent.neighbours, otherOurSites);
+                var candidateSites = neighbourDistToOtherComp.MaxListBy(r => -r.Value); // min dist
 
                 if (candidateSites.Count > 0)
                 {
-                    int neighbourToGo = candidateSites[0].Key;
-                    var weakComponentSiteIds = weakComponent.c;
-                    return graph.Vertexes[neighbourToGo].Edges.First(e => weakComponentSiteIds.Contains(e.To) && e.Owner == -1);
+                    int neighbourToGo = candidateSites.MaxBy(s => GetFanOutsCount(s.Key, weakComponent.component)).Key;
+                    var weakComponentSiteIds = weakComponent.component;
+                    return graph.Vertexes[neighbourToGo].Edges
+                        .First(e => weakComponentSiteIds.Contains(e.To) && e.Owner == -1);
                 }
             }
 
             return null;
+        }
+
+        private int GetFanOutsCount(int siteId, HashSet<int> component)
+        {
+            return graph.Vertexes[siteId].Edges.Count(e => e.Owner == -1 && !component.Contains(e.To));
         }
 
         private double MinesToDefendablesRatio(IEnumerable<int> component)
@@ -92,9 +100,9 @@ namespace lib.Strategies
             return mines / defendables;
         }
 
-        private Dictionary<int, int> Bfs(List<int> neighbours, HashSet<int> destinationSiteIds)
+        private Dictionary<int, int> GetDistFromNeighbourToDestinations_viaBfs(List<int> neighbours, HashSet<int> destinationSiteIds)
         {
-            var distanceToDestination = new Dictionary<int, int>();
+            var initiatorDistanceToDestination = new Dictionary<int, int>();
             var q = new Queue<int>();
             var initiator = new Dictionary<int, int>();
             var dist = new Dictionary<int, int>();
@@ -104,7 +112,7 @@ namespace lib.Strategies
                 dist[neighbour] = 1;
                 if (destinationSiteIds.Contains(neighbour))
                 {
-                    distanceToDestination[neighbour] = 1;
+                    initiatorDistanceToDestination[neighbour] = 1;
                 }
                 else
                     q.Enqueue(neighbour);
@@ -113,29 +121,34 @@ namespace lib.Strategies
             {
                 var currentId = q.Dequeue();
                 var currentVertex = graph.Vertexes[currentId];
-                foreach (var edge in currentVertex.Edges.Where(e => e.Owner == -1))
+                int currentInitiator = initiator[currentId];
+                int currentDistance = dist[currentId] + 1;
+                foreach (var edge in currentVertex.Edges.Where(e => e.Owner == -1 || e.Owner == punterId))
                 {
-                    int currentInitiator = initiator[currentId];
                     if (destinationSiteIds.Contains(edge.To))
                     {
-                        distanceToDestination[currentInitiator] = dist[currentId] + 1;
+                        initiatorDistanceToDestination[currentInitiator] = 
+                            Math.Min(
+                                initiatorDistanceToDestination.GetOrDefault(currentInitiator, int.MaxValue), 
+                                currentDistance);
                         break;
                     }
                     if (!initiator.ContainsKey(edge.To))
                     {
                         q.Enqueue(edge.To);
                         initiator[edge.To] = currentInitiator;
-                        dist[edge.To] = dist[currentId] + 1;
+                        dist[edge.To] = currentDistance;
                     }
                 }
             }
-            return distanceToDestination;
+            return initiatorDistanceToDestination;
         }
 
-        private List<int> GetFreeNeighbours(List<int> component)
+        private List<int> GetFreeNeighbours(HashSet<int> component)
         {
             return component
-                .SelectMany(s => graph.Vertexes[s].Edges.Where(e => e.Owner == -1).Select(e => e.To))
+                .SelectMany(s => graph.Vertexes[s].Edges.Where(e => e.Owner == -1 && !component.Contains(e.To))
+                .Select(e => e.To))
                 .Distinct().ToList();
         }
 

@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using lib.Ai;
@@ -8,20 +9,24 @@ namespace lib.Strategies.EdgeWeighting
 {
     public class AllComponentsEWStrategy : IStrategy, IMetaStrategy
     {
-        public AllComponentsEWStrategy(IEdgeWeighter edgeWeighter, State state, IServices services)
+        public AllComponentsEWStrategy(IEdgeWeighter edgeWeighter, State state, IServices services, double optionPenaltyMultiplier = 1.0)
         {
             PunterId = state.punter;
             EdgeWeighter = edgeWeighter;
+            State = state;
             Graph = services.Get<Graph>();
             MineDistCalulator = services.Get<MineDistCalculator>();
             ConnectedComponentsService = services.Get<ConnectedComponentsService>();
+            OptionPenaltyMultiplier = optionPenaltyMultiplier;
         }
 
         private MineDistCalculator MineDistCalulator { get; }
         private IEdgeWeighter EdgeWeighter { get; }
+        private State State { get; }
         private int PunterId { get; }
         private ConnectedComponentsService ConnectedComponentsService { get; }
         private Graph Graph { get; }
+        private double OptionPenaltyMultiplier { get; }
         
         public List<TurnResult> NextTurns()
         {
@@ -32,15 +37,30 @@ namespace lib.Strategies.EdgeWeighting
         private List<TurnResult> GetTurnsForComponents(Graph graph, ConnectedComponent[] connectedComponents, ConnectedComponent currentComponent)
         {
             EdgeWeighter.Init(connectedComponents, currentComponent);
-            return currentComponent.Vertices
+
+            var vertices = currentComponent.Vertices
                 .SelectMany(v => graph.Vertexes[v].Edges)
+                .ToList();
+
+            var claimVertices = vertices
                 .Where(e => e.Owner == -1 && !AreConnected(currentComponent, e.From, e.To))
-                .Select(
-                    e => new TurnResult
+                .Select(e => new TurnResult
+                {
+                    Estimation = EdgeWeighter.EstimateWeight(e),
+                    Move = AiMoveDecision.Claim(PunterId, e.River.Source, e.River.Target)
+                });
+
+            var optionVertices = !State.settings.options || State.map.OptionsUsed.GetOrDefaultNoSideEffects(State.punter, 0) >= State.map.Mines.Length
+                ? Enumerable.Empty<TurnResult>()
+                : vertices
+                    .Where(e => e.Owner != -1 && e.OptionOwner == -1 && !AreConnected(currentComponent, e.From, e.To))
+                    .Select(e => new TurnResult
                     {
-                        Estimation = EdgeWeighter.EstimateWeight(e),
-                        Move = AiMoveDecision.Claim(PunterId, e.River.Source, e.River.Target)
-                    })
+                        Estimation = EdgeWeighter.EstimateWeight(e) * OptionPenaltyMultiplier,
+                        Move = AiMoveDecision.Option(PunterId, e.River.Source, e.River.Target)
+                    }).ToList();
+
+            return claimVertices.Concat(optionVertices)
                 .Where(t => t.Estimation > 0)
                 .ToList();
         }

@@ -54,10 +54,11 @@ namespace lib.OnlineRunner
                 .ConfigureAwait(false).GetAwaiter()
                 .GetResult()
                 .Where(x => x.IsSuitableForOnlineGame())
+                .OrderBy(x => x.TotalSeats - x.TakenSeats)
                 .ToArray();
 
             return matches
-                .OrderBy(x => Guid.NewGuid())
+                //.OrderBy(x => Guid.NewGuid())
                 .FirstOrDefault();
         }
 

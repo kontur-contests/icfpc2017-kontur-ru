@@ -90,6 +90,11 @@ namespace lib.viz
             {
                 claims.AddRange(move.splurge.route);
             }
+            else if (move?.option != null)
+            {
+                claims.Add(move.option.source);
+                claims.Add(move.option.target);
+            }
 
             if (claims.Count >= 2)
             {
@@ -114,10 +119,7 @@ namespace lib.viz
             var data = PainterAugmentor.GetData(river);
             var source = map.SiteById[river.Source];
             var target = map.SiteById[river.Target];
-            using (var pen = new Pen(data.Color, data.PenWidth / zoomScale) {DashStyle = data.DashStyle})
-            {
-                g.DrawLine(pen, source.Point(), target.Point());
-            }
+            DrawDiverWithPenWidth(g, zoomScale, river, data, source.Point(), target.Point());
         }
 
         private void DrawSite(Graphics g, Site site)
@@ -168,10 +170,7 @@ namespace lib.viz
             var end = new VF(targetSite.Point());
             var drawPoint = ((start + end) * 0.5).Translate(-5, 0).ToPointF;
 
-            using (var pen = new Pen(data.Color, 3 * data.PenWidth / zoomScale))
-            {
-                g.DrawLine(pen, start.ToPointF, end.ToPointF);
-            }
+            DrawDiverWithPenWidth(g, zoomScale, river, data, start.ToPointF, end.ToPointF, 3);
             using (var font = new Font(FontFamily.GenericSansSerif, 6 / zoomScale))
             {
                 var stringBoxSize = g.MeasureString(data.HoverText, font, drawPoint, StringFormat.GenericDefault);
@@ -184,6 +183,17 @@ namespace lib.viz
                 DrawSiteText(g, sourceSite, font);
                 DrawSiteText(g, targetSite, font);
                 g.DrawString(data.HoverText, font, Brushes.Black, drawPoint);
+            }
+        }
+
+        private static void DrawDiverWithPenWidth(Graphics g, float zoomScale, River river, RiverPainterData data, PointF source, PointF target, float penWidthMultiplier = 1)
+        {
+            using (var pen = new Pen(data.Color, penWidthMultiplier * data.PenWidth / zoomScale) { DashStyle = DashStyle.Solid })
+            using (var optionPen = new Pen(data.OptionColor, penWidthMultiplier * 2 * data.PenWidth / zoomScale) { DashStyle = DashStyle.Dash, DashPattern = new[] { 2f/ penWidthMultiplier, 2f/penWidthMultiplier } })
+            {
+                g.DrawLine(pen, source, target);
+                if (river.OptionOwner != -1)
+                    g.DrawLine(optionPen, source, target);
             }
         }
 

@@ -83,6 +83,13 @@ namespace lib
                 : (d[key] = defaultValue);
         }
 
+        public static TV GetOrDefaultNoSideEffects<TK, TV>(this IDictionary<TK, TV> d, TK key, TV defaultValue)
+        {
+            return d.TryGetValue(key, out TV v)
+                ? v
+                : defaultValue;
+        }
+
         public static void Replace<TKey, TValue>(
             this Dictionary<TKey, TValue> d, TKey key, Func<TValue, TValue> replacer)
             where TValue : new()

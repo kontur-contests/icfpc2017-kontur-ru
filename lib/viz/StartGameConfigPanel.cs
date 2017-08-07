@@ -70,6 +70,12 @@ namespace lib
                 Dock = DockStyle.Bottom,
                 CheckState = CheckState.Checked
             };
+            var enablOptions = new CheckBox
+            {
+                Text = "ENABLE OPTIONS",
+                Dock = DockStyle.Bottom,
+                CheckState = CheckState.Checked
+            };
             enableFutures.CheckStateChanged += (sender, args) =>
             {
                 EnableFuturesChanged?.Invoke(enableFutures.Checked);
@@ -77,6 +83,10 @@ namespace lib
             enablSplurges.CheckStateChanged += (sender, args) =>
             {
                 EnableSplurgesChanged?.Invoke(enablSplurges.Checked);
+            };
+            enablOptions.CheckStateChanged += (sender, args) =>
+            {
+                EnableOptionsChanged?.Invoke(enablOptions.Checked);
             };
             selectedAisList.DoubleClick += (sender, args) =>
             {
@@ -89,6 +99,10 @@ namespace lib
             EnableSplurgesChanged += enable =>
             {
                 Settings.splurges = enable;
+            };
+            EnableOptionsChanged += enable =>
+            {
+                Settings.options = enable;
             };
             AiSelected += factory =>
             {
@@ -130,6 +144,7 @@ namespace lib
             Controls.Add(selectedAisList);
             Controls.Add(enableFutures);
             Controls.Add(enablSplurges);
+            Controls.Add(enablOptions);
         }
 
         private void ClearSelected()
@@ -142,13 +157,14 @@ namespace lib
         public List<IAi> SelectedAis { get; } = new List<IAi>();
         public NamedMap SelectedMap { get; private set; }
 
-        public Settings Settings { get; private set; } = new Settings(true, false);
+        public Settings Settings { get; private set; } = new Settings(true, true, true);
 
         public event Action<NamedMap> MapChanged;
         public event Action<AiFactory> AiSelected;
         public event Action<int> AiAtIndexRemoved;
         public event Action<bool> EnableFuturesChanged;
         public event Action<bool> EnableSplurgesChanged;
+        public event Action<bool> EnableOptionsChanged;
 
         public void SetMaps(NamedMap[] maps)
         {

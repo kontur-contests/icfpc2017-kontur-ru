@@ -8,10 +8,16 @@ namespace lib.Structures
         public ClaimMove claim;
         public PassMove pass;
         public SplurgeMove splurge;
+        public OptionMove option;
 
         public static Move Claim(int punter, int source, int target)
         {
-            return new Move {claim = new ClaimMove {punter = punter, source = source, target = target}};
+            return new Move { claim = new ClaimMove { punter = punter, source = source, target = target } };
+        }
+
+        public static Move Option(int punter, int source, int target)
+        {
+            return new Move { option = new OptionMove { punter = punter, source = source, target = target } };
         }
 
         public static Move Pass(int punter)
@@ -32,6 +38,8 @@ namespace lib.Structures
                 return pass.ToString();
             if (splurge != null)
                 return splurge.ToString();
+            if (option != null)
+                return option.ToString();
             return "Invalid move";
         }
 
@@ -39,22 +47,27 @@ namespace lib.Structures
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return Equals(claim, other.claim) && Equals(pass, other.pass) && Equals(splurge, other.splurge);
+            return Equals(claim, other.claim) && Equals(pass, other.pass) && Equals(splurge, other.splurge) && Equals(option, other.option);
         }
 
         public override bool Equals(object obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != GetType()) return false;
+            if (obj.GetType() != this.GetType()) return false;
             return Equals((Move) obj);
         }
+
 
         public override int GetHashCode()
         {
             unchecked
             {
-                return ((claim != null ? claim.GetHashCode() : 0) * 397) ^ (pass != null ? pass.GetHashCode() : 0);
+                int hashCode = (claim != null ? claim.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (pass != null ? pass.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (splurge != null ? splurge.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (option != null ? option.GetHashCode() : 0);
+                return hashCode;
             }
         }
 
@@ -70,6 +83,8 @@ namespace lib.Structures
 
         public static Move DecodeFrom(BinaryReader reader)
         {
+            //TODO: поддержка других ходов.
+            // Это нужно только для сохранения логов в Firebase
             byte marker = reader.ReadByte();
             if (marker == 0) return null;
             int punter = reader.ReadInt32();
@@ -80,6 +95,8 @@ namespace lib.Structures
 
         public void EncodeTo(BinaryWriter w)
         {
+            //TODO: поддержка других ходов.
+            // Это нужно только для сохранения логов в Firebase
             if (claim == null) return;
             w.Write((byte) 1);
             w.Write(claim.punter);
@@ -98,6 +115,8 @@ namespace lib.Structures
                 return move.pass.punter;
             if (move.splurge != null)
                 return move.splurge.punter;
+            if (move.option != null)
+                return move.option.punter;
             return -1;
         }
     }

@@ -22,6 +22,10 @@ namespace lib
 
         [JsonProperty("sites", Order = 1)] public Site[] Sites = new Site[0];
 
+        public ImmutableDictionary<int, int> OptionsUsed = ImmutableDictionary<int, int>.Empty;
+
+        public int OptionsLeft(int punter) => Mines.Length - OptionsUsed.GetOrDefaultNoSideEffects(punter, 0);
+
         public Map()
         {
         }
@@ -35,7 +39,8 @@ namespace lib
         {
             if (move.claim != null)
                 return ApplyClaim(move.claim.punter, move.claim.source, move.claim.target, move);
-
+            if (move.option != null)
+                return ApplyOption(move.option.punter, move.option.source, move.option.target, move);
             var current = this;
             if (move.splurge != null && move.splurge.SplurgeLength() > 0)
             {
@@ -50,6 +55,24 @@ namespace lib
             return current;
         }
 
+        private Map ApplyOption(int punterId, int source, int target, Move move)
+        {
+            var oldRiver = new River(source, target);
+            var actualRiver = RiversList.FirstOrDefault(r => r.Equals(oldRiver))
+                              ?? throw new InvalidOperationException($"Try to claim unexistent river {source}--{target}. Move: {move}");
+            if (actualRiver.Owner == -1)
+                throw new InvalidOperationException($"Try to buy option of river without owner {actualRiver}. Move: {move}");
+            if (actualRiver.OptionOwner != -1)
+                throw new InvalidOperationException($"Try to buy option of river with option owner {actualRiver}. Move: {move}");
+            int punterOptionsUsed = OptionsUsed.GetOrDefaultNoSideEffects(punterId, 0);
+            if (punterOptionsUsed >= Mines.Length)
+                throw new InvalidOperationException($"Try to buy option while there are no options left. Move: {move}");
+            var mapRivers = RiversList.Remove(oldRiver).Add(new River(source, target, actualRiver.Owner, punterId));
+            return new Map(
+                Sites, mapRivers, Mines, 
+                OptionsUsed.SetItem(punterId, punterOptionsUsed + 1));
+        }
+
         private Map ApplyClaim(int punterId, int source, int target, Move move)
         {
             var oldRiver = new River(source, target);
@@ -58,7 +81,7 @@ namespace lib
             if (actualRiver.Owner != -1)
                 throw new InvalidOperationException($"Try to claim river {actualRiver}. Move: {move}");
             var mapRivers = RiversList.Remove(oldRiver).Add(new River(source, target, punterId));
-            return new Map(Sites, mapRivers, Mines);
+            return new Map(Sites, mapRivers, Mines, OptionsUsed);
         }
 
         public string Md5Hash()
@@ -67,14 +90,16 @@ namespace lib
         }
 
         public Map(Site[] sites, River[] rivers, int[] mines)
-            : this(sites, rivers.ToImmutableHashSet(), mines)
+            : this(sites, rivers.ToImmutableHashSet(), mines, ImmutableDictionary<int, int>.Empty)
         {
         }
-        public Map(Site[] sites, ImmutableHashSet<River> rivers, int[] mines)
+
+        public Map(Site[] sites, ImmutableHashSet<River> rivers, int[] mines, ImmutableDictionary<int, int> optionsUsed)
         {
             Sites = sites;
             RiversList = rivers;
             Mines = mines;
+            OptionsUsed = optionsUsed;
         }
     }
 }

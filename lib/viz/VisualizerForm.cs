@@ -40,6 +40,7 @@ namespace lib.viz
 
             startGameConfigPanel.EnableFuturesChanged += _ => UpdateMap(rightPanel);
             startGameConfigPanel.EnableSplurgesChanged += _ => UpdateMap(rightPanel);
+            startGameConfigPanel.EnableOptionsChanged += _ => UpdateMap(rightPanel);
 
             Controls.Add(rightPanel);
             Controls.Add(startGameConfigPanel);
