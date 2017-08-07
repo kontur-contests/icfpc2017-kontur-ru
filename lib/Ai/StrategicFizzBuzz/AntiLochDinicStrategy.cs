@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading;
-using System.Windows.Forms;
 using lib.GraphImpl;
 using lib.Scores.Simple;
 using lib.StateImpl;
 using lib.Strategies;
 using lib.Structures;
-using lib.viz;
 using NUnit.Framework;
 
 namespace lib.Ai.StrategicFizzBuzz
@@ -30,6 +27,7 @@ namespace lib.Ai.StrategicFizzBuzz
                 Graph = services.Get<Graph>();
                 PunterId = state.punter;
 
+                this.options &= state.settings.options;
                 this.options &=
                     state.map.OptionsUsed.GetOrDefaultNoSideEffects(PunterId, 0) >= state.map.Mines.Length;
             }
