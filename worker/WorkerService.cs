@@ -44,7 +44,7 @@ namespace worker
                                 int maxMapPlayersCount = 8;
                                 int roundsCount = 10;
                                 bool failOnExceptions = false;
-
+                    
                                 var ais = new List<AiFactory>()
                                     {
                                         //AiFactoryRegistry.CreateFactory<OptAntiLochDinicKillerAi>(),
@@ -73,6 +73,8 @@ namespace worker
                                     .Where(map => map.PlayersCount.InRange(minMapPlayersCount, maxMapPlayersCount))
                                     .ToList();
 
+                                logger.Info($"Start round");
+                                
                                 var r = Enumerable.Range(0, roundsCount)
                                     .AsParallel()
                                     .Select(
@@ -83,6 +85,7 @@ namespace worker
                                                 .Select(
                                                     map =>
                                                     {
+                                                        logger.Info($"map {map.Name}");
                                                         var matchPlayers = ais.Select(a => a.Clone()).Shuffle(random)
                                                             .Repeat().Take(map.PlayersCount).ToList();
                                                         var gameSimulator = new GameSimulatorRunner(
@@ -132,6 +135,7 @@ namespace worker
                                         });
 
                                 r = PlayerTournamentResult.Merge(r).ToList();
+                                logger.Info($"Round complete");
                                 producer.ProduceAsync("games", null, JsonConvert.SerializeObject(r));
                             }
                             catch (Exception e)
