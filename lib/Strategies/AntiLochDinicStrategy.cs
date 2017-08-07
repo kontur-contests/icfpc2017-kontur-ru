@@ -119,7 +119,7 @@ namespace lib.Strategies
                     foreach (var edge in Graph.Vertexes[v].Edges)
                     {
                         var weight = -1;
-                        if (edge.Owner == PunterId)
+                        if (edge.IsOwnedBy(PunterId))
                             weight = weightMy;
                         if (edge.Owner != -1 && edge.Owner != PunterId && edge.OptionOwner == -1)
                             weight = weightEnemy;
@@ -170,7 +170,7 @@ namespace lib.Strategies
                 {
                     var currentId = q.Dequeue();
                     var currentVertex = Graph.Vertexes[currentId];
-                    foreach (var edge in currentVertex.Edges.Where(e => e.Owner == PunterId))
+                    foreach (var edge in currentVertex.Edges.Where(e => e.IsOwnedBy(PunterId)))
                     {
                         if (!used.Contains(edge.To))
                         {

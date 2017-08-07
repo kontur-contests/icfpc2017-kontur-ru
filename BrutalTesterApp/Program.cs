@@ -25,7 +25,7 @@ namespace BrutalTesterApp
             int minMapPlayersCount = 1;
             int maxMapPlayersCount = 4;
             int roundsCount = 100000;
-            bool failOnExceptions = true;
+            bool failOnExceptions = false;
 
             //var ais = AiFactoryRegistry.ForOnlineRunsFactories
             var ais = new List<AiFactory>()
