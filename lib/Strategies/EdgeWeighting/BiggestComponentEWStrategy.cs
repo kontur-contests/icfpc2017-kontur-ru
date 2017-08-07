@@ -9,13 +9,15 @@ namespace lib.Strategies.EdgeWeighting
 {
     public class BiggestComponentEWStrategy : IStrategy, IMetaStrategy
     {
-        public BiggestComponentEWStrategy(IEdgeWeighter edgeWeighter, State state, IServices services)
+        public BiggestComponentEWStrategy(IEdgeWeighter edgeWeighter, State state, IServices services, double optionPenaltyMultiplier = 1.0)
         {
             PunterId = state.punter;
             EdgeWeighter = edgeWeighter;
             MineDistCalulator = services.Get<MineDistCalculator>();
             ConnectedComponentsService = services.Get<ConnectedComponentsService>();
             Graph = services.Get<Graph>();
+            State = state;
+            OptionPenaltyMultiplier = optionPenaltyMultiplier;
         }
 
         private MineDistCalculator MineDistCalulator { get; }
@@ -23,6 +25,8 @@ namespace lib.Strategies.EdgeWeighting
         private int PunterId { get; }
         private ConnectedComponentsService ConnectedComponentsService { get; }
         private Graph Graph { get; }
+        private State State { get; }
+        private double OptionPenaltyMultiplier { get; }
 
         public List<TurnResult> NextTurns()
         {
@@ -48,15 +52,32 @@ namespace lib.Strategies.EdgeWeighting
             var connectedComponents = ConnectedComponentsService.For(PunterId);
             var maxComponent = connectedComponents.MaxBy(comp => comp.Vertices.Count);
             EdgeWeighter.Init(connectedComponents, maxComponent);
-            return maxComponent.Vertices
+
+            var vertices = maxComponent.Vertices
                 .SelectMany(v => Graph.Vertexes[v].Edges)
+                .ToList();
+
+            var claimVertices = vertices
                 .Where(e => e.Owner == -1 && !AreConnected(maxComponent, e.From, e.To))
                 .Select(
                     e => new TurnResult
                     {
                         Estimation = EdgeWeighter.EstimateWeight(e),
                         Move = AiMoveDecision.Claim(PunterId, e.River.Source, e.River.Target)
-                    })
+                    });
+
+
+            var optionVertices = !State.settings.options || State.map.OptionsLeft(State.punter) <= 0
+                ? Enumerable.Empty<TurnResult>()
+                : vertices
+                    .Where(e => e.Owner != -1 && e.OptionOwner == -1 && !AreConnected(maxComponent, e.From, e.To))
+                    .Select(e => new TurnResult
+                    {
+                        Estimation = EdgeWeighter.EstimateWeight(e) * OptionPenaltyMultiplier,
+                        Move = AiMoveDecision.Option(PunterId, e.River.Source, e.River.Target)
+                    }).ToList();
+
+            return claimVertices.Concat(optionVertices)
                 .Where(t => t.Estimation > 0)
                 .ToList();
         }

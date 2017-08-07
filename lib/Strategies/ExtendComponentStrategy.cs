@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using lib.Ai;
@@ -48,7 +47,7 @@ namespace lib.Strategies
                 var current = queue.Dequeue();
                 if (current.CurrentVertex.Edges.Any(x => x.IsOwnedBy(state.punter)))
                 {
-                    move = CreateDecision(current.Edge);
+                    move = AiMoveDecision.ClaimOrOption(current.Edge, state.punter, allowToUseOptions);
                     return true;
                 }
                 foreach (var edge in current.CurrentVertex.Edges.Where(x => x.CanBeOwnedBy(state.punter, allowToUseOptions)))
@@ -68,17 +67,6 @@ namespace lib.Strategies
             }
             move = null;
             return false;
-        }
-
-        private AiMoveDecision CreateDecision(Edge edge)
-        {
-            if (edge == null)
-                throw new InvalidOperationException("Mine is already part of component! WTF?");
-            if (edge.Owner == -1)
-                return AiMoveDecision.Claim(state.punter, edge.From, edge.To);
-            if (allowToUseOptions && edge.OptionOwner == -1 && edge.Owner != state.punter)
-                return AiMoveDecision.Option(state.punter, edge.From, edge.To);
-            throw new InvalidOperationException($"Attempt to claim owned river {edge.River}! WTF?");
         }
 
         private class ExtendQueueItem

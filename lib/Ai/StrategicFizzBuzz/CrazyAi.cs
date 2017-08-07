@@ -18,7 +18,7 @@ namespace lib.Ai.StrategicFizzBuzz
         public CrazyAi()
             : base(
                 (state, services) => new CrazyStrategy(state, services),
-                (state, services) => new GreedyStrategy(state, services, Math.Max))
+                (state, services) => new GreedyStrategy(true, state, services, Math.Max))
         {
         }
 

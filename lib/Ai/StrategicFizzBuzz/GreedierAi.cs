@@ -8,7 +8,7 @@ namespace lib.Ai.StrategicFizzBuzz
     [ShouldNotRunOnline]
     public class GreedierAi : StrategicAi
     {
-        public GreedierAi() : base((state, services) => new GreedyStrategy(state, services, (fromScore, toScore) => fromScore + toScore))
+        public GreedierAi() : base((state, services) => new GreedyStrategy(true, state, services, (fromScore, toScore) => fromScore + toScore))
         {
         }
 

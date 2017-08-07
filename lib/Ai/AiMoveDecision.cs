@@ -1,3 +1,5 @@
+using System;
+using lib.GraphImpl;
 using lib.Structures;
 
 namespace lib.Ai
@@ -37,5 +39,17 @@ namespace lib.Ai
         {
             return Move(Structures.Move.Pass(punter), reason);
         }
+
+        public static AiMoveDecision ClaimOrOption(Edge edge, int punter, bool haveFreeOption, string reason = null)
+        {
+            if (edge == null)
+                throw new InvalidOperationException("Attempt to claim null edge! WTF?");
+            if (edge.IsFree)
+                return Claim(punter, edge.From, edge.To, reason);
+            if (edge.CanBeOwnedBy(punter, haveFreeOption))
+                return Option(punter, edge.From, edge.To, reason);
+            throw new InvalidOperationException($"Attempt to claim owned river {edge.River}! WTF?");
+        }
+
     }
 }
