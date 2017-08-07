@@ -6,6 +6,8 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Confluent.Kafka;
+using Confluent.Kafka.Serialization;
 using ConsoleApp;
 using lib;
 using lib.Ai;
@@ -24,6 +26,42 @@ namespace BrutalTesterApp
         private static DateTime lastUpdate = DateTime.MinValue;
 
         static void Main(string[] args)
+        {
+            var config = new Dictionary<string, object>
+            {
+                { "group.id", "icfpc2017-worker-3698E208-D087-4F06-AFDD-43F44DEC76CC" },
+                { "bootstrap.servers", "icfpc-broker.dev.kontur.ru" }
+            };
+            using (var consumer = new Consumer<Null, string>(config, null, new StringDeserializer(Encoding.UTF8)))
+            {
+                consumer.OnPartitionsAssigned += (_, partitions) =>
+                {
+                    consumer.Assign(partitions);
+                };
+
+                consumer.OnPartitionsRevoked += (_, partitions) =>
+                {
+                    consumer.Unassign();
+                };
+
+                consumer.Subscribe("games");
+
+                while (true)
+                {
+                    Message<Null, string> msg;
+
+                    if (!consumer.Consume(out msg, TimeSpan.FromSeconds(1)))
+                    {
+                        continue;
+                    }
+                    
+                    var result = JsonConvert.DeserializeObject<PlayerTournamentResult[]>(msg.Value);
+                    Console.Out.WriteLine(msg.Value);
+                }
+            }
+        }
+
+        static void Main2(string[] args)
         {
             if (args[0] == @"\merge")
             {
