@@ -51,7 +51,7 @@ namespace lib.Strategies
                     move = CreateDecision(current.Edge);
                     return true;
                 }
-                foreach (var edge in current.CurrentVertex.Edges.Where(x => x.Owner == -1 || allowToUseOptions && x.OptionOwner == -1))
+                foreach (var edge in current.CurrentVertex.Edges.Where(x => x.Owner == -1 || allowToUseOptions && x.OptionOwner == -1 && x.Owner != state.punter))
                 {
                     var next = graph.Vertexes[edge.To];
                     if (!used.Contains(next.Id))
@@ -76,7 +76,7 @@ namespace lib.Strategies
                 throw new InvalidOperationException("Mine is already part of component! WTF?");
             if (edge.Owner == -1)
                 return AiMoveDecision.Claim(state.punter, edge.From, edge.To);
-            if (allowToUseOptions && edge.OptionOwner == -1)
+            if (allowToUseOptions && edge.OptionOwner == -1 && edge.Owner != state.punter)
                 return AiMoveDecision.Option(state.punter, edge.From, edge.To);
             throw new InvalidOperationException($"Attempt to claim owned river {edge.River}! WTF?");
         }
