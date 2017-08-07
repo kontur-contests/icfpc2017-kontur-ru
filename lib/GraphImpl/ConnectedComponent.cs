@@ -45,7 +45,7 @@ namespace lib.Strategies
                 while (queue.Count > 0)
                 {
                     var node = queue.Dequeue();
-                    foreach (var edge in node.Edges.Where(edge => edge.Owner == owner).Where(edge => !component.Vertices.Contains(edge.To)))
+                    foreach (var edge in node.Edges.Where(edge => edge.IsOwnedBy(owner)).Where(edge => !component.Vertices.Contains(edge.To)))
                     {
                         var edgeNode = graph.Vertexes[edge.To];
                         if (edgeNode.IsMine)
@@ -62,8 +62,6 @@ namespace lib.Strategies
             return result;
         }
 
-
-
         public static List<ConnectedComponent> GetAllComponents(Graph graph)
         {
             var queue = new Queue<Vertex>();
@@ -79,7 +77,7 @@ namespace lib.Strategies
                 if (usedVertexes.Contains(vertex.Key))
                     continue;
 
-                var owners = vertex.Value.Edges.Select(edge => edge.Owner).Distinct().ToList();
+                var owners = vertex.Value.Edges.SelectMany(edge => edge.GetOwners()).Distinct().ToList();
 
                 foreach (var owner in owners)
                 {
@@ -99,7 +97,7 @@ namespace lib.Strategies
                     while (queue.Count > 0)
                     {
                         var node = queue.Dequeue();
-                        foreach (var edge in node.Edges.Where(edge => edge.Owner == owner).Where(edge => !component.Vertices.Contains(edge.To)))
+                        foreach (var edge in node.Edges.Where(edge => edge.IsOwnedBy(owner)).Where(edge => !component.Vertices.Contains(edge.To)))
                         {
                             var edgeNode = graph.Vertexes[edge.To];
                             if (edgeNode.IsMine)
