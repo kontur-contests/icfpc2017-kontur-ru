@@ -46,6 +46,7 @@ namespace BrutalTesterApp
 
                 consumer.Subscribe("games");
 
+                var actual = JsonConvert.DeserializeObject<PlayerTournamentResult[]>(File.ReadAllText("final.json"));
                 while (true)
                 {
                     Message<Null, string> msg;
@@ -56,7 +57,12 @@ namespace BrutalTesterApp
                     }
                     
                     var result = JsonConvert.DeserializeObject<PlayerTournamentResult[]>(msg.Value);
-                    Console.Out.WriteLine(msg.Value);
+                    if (actual == null)
+                        actual = result;
+                    else
+                        actual = PlayerTournamentResult.Merge(actual.Concat(result)).ToArray();
+                    ShowStatus(actual.ToList(), actual.SelectMany(m => m.Maps).Distinct().ToList());
+                    File.WriteAllText("final.json", JsonConvert.SerializeObject(actual), Encoding.UTF8);
                 }
             }
         }
@@ -187,10 +193,10 @@ namespace BrutalTesterApp
             Console.WriteLine("Maps: " + maps.Distinct().ToDelimitedString(", "));
             Console.WriteLine();
             var ordered = players.OrderByDescending(p => p.NormalizedMatchScores.Mean);
-            var cols = new[] { 25, -13, -13, -7, -13, -13, -13, -13, -13 };
+            var cols = new[] { 140, -13, -13, -7, -13, -13, -13, -13, -13 };
             FormatColumns(cols, "Name", "WinRate", "NMS", "N", "OptUsed", "FNScore", "Turn, ms", "Exceptions");
             Console.WriteLine(new string('=', 120));
-            foreach (var player in ordered)
+            foreach (var player in ordered.Take(50))
             {
                 FormatColumns(cols,
                     player.Factory.Name,

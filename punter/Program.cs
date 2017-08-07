@@ -24,8 +24,9 @@ namespace punter
                 inputReader = Console.In;
             else
                 inputReader = new StreamReader(args[0]);
-            ai = new ConnectClosestMinesAi();
-        
+            //ai = new ConnectClosestMinesAi();
+            ai = (IAi)UberfullessnessAi.All.FirstOrDefault(x => x.Name == "FutureIsNowSetupStrategyoptions-FutureIsNowStrategyoptions-ExtendComponentStrategyoptions-MaxGreedyStrategyUberAi") ?? new ConnectClosestMinesAi();
+
             Write(new HandshakeOut {me = TeamName});
             var handshakeIn = Read<HandshakeIn>();
             if (handshakeIn.you != TeamName)
