@@ -1,4 +1,5 @@
 using System;
+using Newtonsoft.Json;
 
 namespace lib
 {
@@ -21,10 +22,20 @@ namespace lib
         public double Dispersion => Math.Sqrt(Count * Sum2 - Sum * Sum) / Count;
         public double ConfIntervalSize => 2 * Math.Sqrt(Count * Sum2 - Sum * Sum) / Count / Math.Sqrt(Count);
         public double Mean => Sum / Count;
-        public double Sum { get; private set; }
-        public double Sum2 { get; private set; }
-        public long Count { get; private set; }
+        public double Sum { get; set; }
+        public double Sum2 { get; set; }
+        public long Count { get; set; }
         public bool ShowDispersion = false;
         public double Delta => ShowDispersion ? ConfIntervalSize : Dispersion;
+
+        public StatValue Clone()
+        {
+            return new StatValue
+            {
+                ShowDispersion = ShowDispersion,
+                Sum = Sum,
+                Sum2 = Sum2
+            };
+        }
     }
 }
