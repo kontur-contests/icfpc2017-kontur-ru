@@ -41,21 +41,10 @@ namespace lib.Strategies
                     new TurnResult
                     {
                         Estimation = addScore,
-                        Move = CreateDecision(edge)
+                        Move = AiMoveDecision.ClaimOrOption(edge, PunterId, allowToUseOptions)
                     });
             }
             return result;
-        }
-
-        private AiMoveDecision CreateDecision(Edge edge)
-        {
-            if (edge == null)
-                throw new InvalidOperationException("Mine is already part of existing component! WTF?");
-            if (edge.IsFree)
-                return AiMoveDecision.Claim(PunterId, edge.From, edge.To);
-            if (edge.CanBeOwnedBy(PunterId, allowToUseOptions))
-                return AiMoveDecision.Option(PunterId, edge.From, edge.To);
-            throw new InvalidOperationException($"Attempt to claim owned river {edge.River}! WTF?");
         }
 
         private long CalcVertexScore(HashSet<int> mineIds, HashSet<int> usedMineIds, int vertexId)

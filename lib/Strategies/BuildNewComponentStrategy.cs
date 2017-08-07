@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using lib.Ai;
@@ -59,13 +58,13 @@ namespace lib.Strategies
                             if (bestMine == prev.SourceMine)
                             {
                                 var edge1 = prev.FirstEdge ?? edge;
-                                move = CreateDecision(edge1);
+                                move = AiMoveDecision.ClaimOrOption(edge1, state.punter, allowToUseOptions);
                                 return true;
                             }
                             if (bestMine == current.SourceMine)
                             {
                                 var edge1 = current.FirstEdge ?? edge;
-                                move = CreateDecision(edge1);
+                                move = AiMoveDecision.ClaimOrOption(edge1, state.punter, allowToUseOptions);
                                 return true;
                             }
                         }
@@ -85,17 +84,6 @@ namespace lib.Strategies
             }
             move = null;
             return false;
-        }
-
-        private AiMoveDecision CreateDecision(Edge edge)
-        {
-            if (edge == null)
-                throw new InvalidOperationException("Mine is already part of existing component! WTF?");
-            if (edge.IsFree)
-                return AiMoveDecision.Claim(state.punter, edge.From, edge.To);
-            if (edge.CanBeOwnedBy(state.punter, allowToUseOptions))
-                return AiMoveDecision.Option(state.punter, edge.From, edge.To);
-            throw new InvalidOperationException($"Attempt to claim owned river {edge.River}! WTF?");
         }
 
         private Vertex SelectBestMine(Vertex a, Vertex b)
