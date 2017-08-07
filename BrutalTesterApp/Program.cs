@@ -22,40 +22,38 @@ namespace BrutalTesterApp
         static void Main(string[] args)
         {
             Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
-            int minMapPlayersCount = 8;
-            int maxMapPlayersCount = 8;
+            int minMapPlayersCount = 1;
+            int maxMapPlayersCount = 4;
             int roundsCount = 100000;
             bool failOnExceptions = false;
 
             //var ais = AiFactoryRegistry.ForOnlineRunsFactories
             var ais = new List<AiFactory>()
             {
-                AiFactoryRegistry.CreateFactory<FutureIsNowAi>(),
-            //    AiFactoryRegistry.CreateFactory<ConnectClosestMinesAi>(),
-                AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi>(),
+                AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_0>(),
+                AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_005>(),
+                AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_01>(),
+                AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_02>(),
+                AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_03>(),
+                AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_04>(),
+                AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_05>(),
+                AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_1>(),
+                //AiFactoryRegistry.CreateFactory<FutureIsNowAi>(),
+                //AiFactoryRegistry.CreateFactory<ConnectClosestMinesAi>(),
+                //AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi>(),
                 AiFactoryRegistry.CreateFactory<LochDinicKillerAi>(),
-                //AiFactoryRegistry.CreateFactory<AgileMaxVertexWeighterAi>(),
                 //AiFactoryRegistry.CreateFactory<LochMaxVertexWeighterKillerAi>(),
-                AiFactoryRegistry.CreateFactory<AllComponentsMaxReachableVertexWeightAi>(),
+                //AiFactoryRegistry.CreateFactory<AllComponentsMaxReachableVertexWeightAi>(),
                 //AiFactoryRegistry.CreateFactory<MaxReachableVertexWeightAi>(),
-                //AiFactoryRegistry.CreateFactory<Podnaserator2000Ai>(),
-                AiFactoryRegistry.CreateFactory<ConnectClosestMinesAi>(),
+                //AiFactoryRegistry.CreateFactory<ConnectClosestMinesAi>(),
                 AiFactoryRegistry.CreateFactory<GreedyAi>(),
                 AiFactoryRegistry.CreateFactory<RandomEWAi>(),
-                AiFactoryRegistry.CreateFactory<TheUberfullessnessAi>(),
-
-                
-            //    AiFactoryRegistry.CreateFactory<Podnaserator2000Ai>(),
-            //    AiFactoryRegistry.CreateFactory<LochKillerAi>(),
-            //    AiFactoryRegistry.CreateFactory<GreedyAi>(),
-            //    AiFactoryRegistry.CreateFactory<GreedierAi>(),
-            //    AiFactoryRegistry.CreateFactory<AgileMaxVertexWeighterAi>(),
-            //    AiFactoryRegistry.CreateFactory<AgileMaxVertexWeighterAi>(),
+                //AiFactoryRegistry.CreateFactory<TheUberfullessnessAi>(),
             }
             .Select(f => new PlayerTournamentResult(f)).ToList();
             var maps = MapLoader.LoadOnlineMaps()
-                //.Where(map => map.PlayersCount.InRange(minMapPlayersCount, maxMapPlayersCount))
-                .Where(map => map.Name == "boston-sparse")
+                .Where(map => map.PlayersCount.InRange(minMapPlayersCount, maxMapPlayersCount))
+                //.Where(map => map.Name == "boston-sparse")
                 .ToList();
 
             for (int i = 0; i < roundsCount; i++)
@@ -72,6 +70,7 @@ namespace BrutalTesterApp
                         int index = gamers.IndexOf(res.Gamer);
                         var player = matchPlayers[index];
                         player.GamesPlayed++;
+                        player.OptionUsageRate.Add(res.OptionsUsed);
                         player.NormalizedMatchScores.Add((double)res.MatchScore / matchPlayers.Count);
                         player.GamesWon.Add(res.MatchScore == matchPlayers.Count ? 1 : 0);
                         if (res.LastException != null)
@@ -108,8 +107,8 @@ namespace BrutalTesterApp
             Console.WriteLine("Maps: " + maps.Select(m => m.Name).ToDelimitedString(", "));
             Console.WriteLine();
             var ordered = players.OrderByDescending(p => p.NormalizedMatchScores.Mean);
-            var cols = new[] { 20, -14, -14, -7, -14, -14, -14, -14 };
-            FormatColumns(cols, "Name", "WinRate", "NMS", "N", "FNCount", "FNScore", "Turn, ms", "Exceptions");
+            var cols = new[] { 25, -13, -13, -7, -13, -13, -13, -13, -13 };
+            FormatColumns(cols, "Name", "WinRate", "NMS", "N", "OptUsed", "FNScore", "Turn, ms", "Exceptions");
             Console.WriteLine(new string('=', 120));
             foreach (var player in ordered)
             {
@@ -118,7 +117,7 @@ namespace BrutalTesterApp
                     player.GamesWon,
                     player.NormalizedMatchScores,
                     player.GamesPlayed,
-                    player.GainFuturesCountRate,
+                    player.OptionUsageRate,
                     player.GainFuturesScoreRate,
                     player.TurnTime,
                     player.ExceptionsCount > 0 ? player.ExceptionsCount.ToString() : "");

@@ -21,5 +21,9 @@ namespace ConsoleApp
         {
             ShowDispersion = true
         };
+        public StatValue OptionUsageRate = new StatValue
+        {
+            ShowDispersion = true
+        };
     }
 }
