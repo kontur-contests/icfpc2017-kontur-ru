@@ -79,9 +79,7 @@ namespace punter
 
         private static IAi CreateAi(State state)
         {
-            if (!state.settings.options)
-                return new ConnectClosestMinesAi();
-            if (state.punters > 8)
+            if (!state.settings.options || !state.settings.futures)
                 return new ConnectClosestMinesAi();
             return (IAi) UberfullessnessAi.All.FirstOrDefault(
                          x => x.Name ==
