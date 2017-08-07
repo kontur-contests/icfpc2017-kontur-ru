@@ -33,8 +33,7 @@ namespace lib.Strategies
             {
                 Init();
 
-                return Graph.Vertexes.Values
-                    .SelectMany(v => v.Edges)
+                return edgesToBlock.Keys
                     .Select(
                         edge => new TurnResult
                         {
