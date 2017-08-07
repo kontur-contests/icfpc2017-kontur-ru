@@ -66,7 +66,9 @@ namespace lib.Strategies
                 var mine2 = mines[Math.Min(Random.Value.Next(mines.Count), mines.Count - 1)];
                 while (mine2.Key == mine1.Key) mine2 = mines[Math.Min(Random.Value.Next(mines.Count), mines.Count - 1)];
 
-                var dinic = new Dinic(Graph, PunterId, mine1.Key, mine2.Key, out var flow);
+                // Чтобы не ходить по своим рёбрам в динице. Таким образом, длинные мосты блочаться один раз.
+                const int nonExistentPunterId = 1000000; 
+                var dinic = new Dinic(Graph, nonExistentPunterId, mine1.Key, mine2.Key, out var flow);
                 if (flow == 0)
                     continue;
                 if (flow > maxCount)
