@@ -50,7 +50,7 @@ namespace lib.Strategies.EdgeWeighting
                     Move = AiMoveDecision.Claim(PunterId, e.River.Source, e.River.Target)
                 });
 
-            var optionVertices = !State.settings.options || State.map.OptionsUsed.GetOrDefaultNoSideEffects(State.punter, 0) >= State.map.Mines.Length
+            var optionVertices = !State.settings.options || State.map.OptionsLeft(State.punter) <= 0
                 ? Enumerable.Empty<TurnResult>()
                 : vertices
                     .Where(e => e.Owner != -1 && e.OptionOwner == -1 && !AreConnected(currentComponent, e.From, e.To))
