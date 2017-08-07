@@ -41,9 +41,10 @@ namespace BrutalTesterApp
             bool failOnExceptions = true;
 
             //var ais = AiFactoryRegistry.ForOnlineRunsFactories
-            var ais = new List<AiFactory>()
-            {
-                AiFactoryRegistry.CreateFactory<OptAntiLochDinicKillerAi>(),
+            var ais = UberfullessnessAi.All.Select(x => new AiFactory(x.Name, () => x)).ToList()
+            //var ais = new List<AiFactory>()
+            //{
+                //AiFactoryRegistry.CreateFactory<OptAntiLochDinicKillerAi>(),
                 //AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_0>(),
                 //AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_005>(),
                 //AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_01>(),
@@ -51,19 +52,20 @@ namespace BrutalTesterApp
                 //AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_03>(),
                 //AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_04>(),
                 //AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_05>(),
-                AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_1>(),
-                AiFactoryRegistry.CreateFactory<FutureIsNowAi>(),
-                AiFactoryRegistry.CreateFactory<ConnectClosestMinesAi>(),
+                //AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_1>(),
+                //AiFactoryRegistry.CreateFactory<FutureIsNowAi>(),
+                //AiFactoryRegistry.CreateFactory<ConnectClosestMinesAi>(),
                 //AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi>(),
-                AiFactoryRegistry.CreateFactory<LochDinicKillerAi>(),
-                AiFactoryRegistry.CreateFactory<LochMaxVertexWeighterKillerAi>(),
+                //AiFactoryRegistry.CreateFactory<LochDinicKillerAi>(),
+                //AiFactoryRegistry.CreateFactory<LochMaxVertexWeighterKillerAi>(),
                 //AiFactoryRegistry.CreateFactory<AllComponentsMaxReachableVertexWeightAi>(),
                 //AiFactoryRegistry.CreateFactory<MaxReachableVertexWeightAi>(),
                 //AiFactoryRegistry.CreateFactory<ConnectClosestMinesAi>(),
-                AiFactoryRegistry.CreateFactory<GreedyAi>(),
-                AiFactoryRegistry.CreateFactory<RandomEWAi>(),
+                //AiFactoryRegistry.CreateFactory<GreedyAi>(),
+                //AiFactoryRegistry.CreateFactory<RandomEWAi>(),
                 //AiFactoryRegistry.CreateFactory<TheUberfullessnessAi>(),
-            }
+                
+            //}
             .Select(f => new PlayerTournamentResult(f)).ToList();
             var maps = MapLoader.LoadOnlineMaps()
                 .Where(map => map.PlayersCount.InRange(minMapPlayersCount, maxMapPlayersCount))

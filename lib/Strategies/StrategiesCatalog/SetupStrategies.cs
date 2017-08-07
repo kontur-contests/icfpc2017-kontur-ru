@@ -10,7 +10,7 @@ namespace lib.Strategies.StrategiesCatalog
             {
                 Create((s, ss) => new NopSetupStrategy()),
                 Create((s, ss) => new FutureIsNowSetupStrategy(s, ss)),
-                Create((s, ss) => new MeetInTheMiddleSetupStrategy(s, ss)),
+                //Create((s, ss) => new MeetInTheMiddleSetupStrategy(s, ss)),
             }.ToDictionary(f => f.Name);
     }
 }
