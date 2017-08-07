@@ -23,7 +23,7 @@ namespace BrutalTesterApp
         {
             Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
             int minMapPlayersCount = 1;
-            int maxMapPlayersCount = 4;
+            int maxMapPlayersCount = 2;
             int roundsCount = 100000;
             bool failOnExceptions = false;
 
@@ -31,22 +31,22 @@ namespace BrutalTesterApp
             var ais = new List<AiFactory>()
             {
                 AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_0>(),
-                AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_005>(),
+                //AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_005>(),
                 AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_01>(),
-                AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_02>(),
-                AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_03>(),
-                AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_04>(),
-                AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_05>(),
-                AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_1>(),
-                //AiFactoryRegistry.CreateFactory<FutureIsNowAi>(),
+                //AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_02>(),
+                //AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_03>(),
+                //AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_04>(),
+                //AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_05>(),
+                //AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_1>(),
+                ////AiFactoryRegistry.CreateFactory<FutureIsNowAi>(),
                 //AiFactoryRegistry.CreateFactory<ConnectClosestMinesAi>(),
                 //AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi>(),
                 AiFactoryRegistry.CreateFactory<LochDinicKillerAi>(),
                 AiFactoryRegistry.CreateFactory<OptAntiLochDinicKillerAi>(),
                 //AiFactoryRegistry.CreateFactory<LochMaxVertexWeighterKillerAi>(),
-                //AiFactoryRegistry.CreateFactory<AllComponentsMaxReachableVertexWeightAi>(),
-                //AiFactoryRegistry.CreateFactory<MaxReachableVertexWeightAi>(),
-                //AiFactoryRegistry.CreateFactory<ConnectClosestMinesAi>(),
+                AiFactoryRegistry.CreateFactory<AllComponentsMaxReachableVertexWeightAi>(),
+                AiFactoryRegistry.CreateFactory<MaxReachableVertexWeightAi>(),
+                AiFactoryRegistry.CreateFactory<ConnectClosestMinesAi>(),
                 AiFactoryRegistry.CreateFactory<GreedyAi>(),
                 AiFactoryRegistry.CreateFactory<RandomEWAi>(),
                 //AiFactoryRegistry.CreateFactory<TheUberfullessnessAi>(),
