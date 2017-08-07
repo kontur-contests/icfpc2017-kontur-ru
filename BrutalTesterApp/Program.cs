@@ -38,24 +38,25 @@ namespace BrutalTesterApp
             int minMapPlayersCount = 2;
             int maxMapPlayersCount = int.Parse(args[0]);
             int roundsCount = int.Parse(args[1]);
-            bool failOnExceptions = false;
+            bool failOnExceptions = true;
 
             //var ais = AiFactoryRegistry.ForOnlineRunsFactories
             var ais = new List<AiFactory>()
             {
-                AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_0>(),
-                AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_005>(),
-                AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_01>(),
-                AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_02>(),
-                AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_03>(),
-                AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_04>(),
-                AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_05>(),
+                AiFactoryRegistry.CreateFactory<OptAntiLochDinicKillerAi>(),
+                //AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_0>(),
+                //AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_005>(),
+                //AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_01>(),
+                //AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_02>(),
+                //AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_03>(),
+                //AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_04>(),
+                //AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_05>(),
                 AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_1>(),
-                //AiFactoryRegistry.CreateFactory<FutureIsNowAi>(),
-                //AiFactoryRegistry.CreateFactory<ConnectClosestMinesAi>(),
+                AiFactoryRegistry.CreateFactory<FutureIsNowAi>(),
+                AiFactoryRegistry.CreateFactory<ConnectClosestMinesAi>(),
                 //AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi>(),
                 AiFactoryRegistry.CreateFactory<LochDinicKillerAi>(),
-                //AiFactoryRegistry.CreateFactory<LochMaxVertexWeighterKillerAi>(),
+                AiFactoryRegistry.CreateFactory<LochMaxVertexWeighterKillerAi>(),
                 //AiFactoryRegistry.CreateFactory<AllComponentsMaxReachableVertexWeightAi>(),
                 //AiFactoryRegistry.CreateFactory<MaxReachableVertexWeightAi>(),
                 //AiFactoryRegistry.CreateFactory<ConnectClosestMinesAi>(),

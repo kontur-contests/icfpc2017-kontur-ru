@@ -41,14 +41,14 @@ namespace lib.GraphImpl
                 int v = queue.Dequeue();
                 foreach (var edge in graph.Vertexes[v].Edges)
                 {
-                    if (edge.Owner != owner && edge.OptionOwner != owner)
-                        continue;
-
-                    int u = edge.To;
-                    if (dist.ContainsKey(u))
-                        continue;
-                    dist.Add(u, dist[v] + 1);
-                    queue.Enqueue(u);
+                    if (edge.IsOwnedBy(owner))
+                    {
+                        int u = edge.To;
+                        if (dist.ContainsKey(u))
+                            continue;
+                        dist.Add(u, dist[v] + 1);
+                        queue.Enqueue(u);
+                    }
                 }
             }
 

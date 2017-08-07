@@ -34,7 +34,7 @@ namespace lib.GraphImpl
 
         public Vertex[] GetNotOwnedMines(int punter)
         {
-            return Mines.Values.Where(v => v.Edges.All(e => e.Owner != punter)).ToArray();
+            return Mines.Values.Where(v => v.Edges.All(e => !e.IsOwnedBy(punter))).ToArray();
         }
 
         [Obsolete("test purposes only")]

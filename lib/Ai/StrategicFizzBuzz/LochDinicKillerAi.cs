@@ -1,6 +1,6 @@
-﻿using lib.Ai.StrategicFizzBuzz.lib.Strategies;
-using lib.Strategies;
+﻿using lib.Strategies;
 using lib.Strategies.EdgeWeighting;
+using lib.Strategies.lib.Strategies;
 using lib.viz;
 using static lib.Strategies.EdgeWeighting.MetaStrategyHelpers;
 
@@ -11,6 +11,19 @@ namespace lib.Ai.StrategicFizzBuzz
         public LochDinicKillerAi()
             : base(
                 (state, services) => new LochDinicKillerStrategy(state, services),
+                AllComponentsEWStrategy((state, services) => new MaxVertextWeighter(100, state, services)),
+                (state, services) => new GreedyStrategy(state, services, (x, y) => x + y))
+        {
+        }
+
+        public override string Version => "0.4";
+    }
+
+    public class OptAntiLochDinicKillerAi : CompositeStrategicAi
+    {
+        public OptAntiLochDinicKillerAi()
+            : base(
+                (state, services) => new AntiLochDinicStrategy(state, services, true),
                 AllComponentsEWStrategy((state, services) => new MaxVertextWeighter(100, state, services)),
                 (state, services) => new GreedyStrategy(state, services, (x, y) => x + y))
         {

@@ -9,7 +9,7 @@ namespace lib.GraphImpl
 {
     public class Dinic
     {
-        private static int MAXN = 5000;
+        private static int MAXN = 50000;
         public static int INF = (int)1e9;
 
         private int n, s, t;
@@ -136,14 +136,14 @@ namespace lib.GraphImpl
             {
                 foreach (var edge in vertex.Value.Edges)
                 {
-                    if (edge.Owner != -1)// && edge.Owner != punterId)
-                        continue;
+                    if (edge.IsFree || edge.IsOwnedBy(punterId))
+                    {
+                        int cap = edge.IsOwnedBy(punterId)
+                            ? INF
+                            : 1;
 
-                    int cap = edge.Owner == punterId
-                        ? INF
-                        : 1;
-
-                    add_edge(edge.From, edge.To, cap);
+                        add_edge(edge.From, edge.To, cap);
+                    }
                 }
             }
 

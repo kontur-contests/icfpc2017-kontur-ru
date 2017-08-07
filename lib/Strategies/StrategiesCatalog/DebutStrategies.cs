@@ -14,8 +14,10 @@ namespace lib.Strategies.StrategiesCatalog
             Create((s, ss) => new FutureIsNowStrategy(s, ss)),
             Create((s, ss) => new LochDinicKillerStrategy(s, ss)),
             Create((s, ss) => new MeetInTheMiddleStrategy(s, ss)),
-            Create((s, ss) => new ExtendComponentStrategy(s, ss)),
-            Create((s, ss) => new BuildNewComponentStrategy(s, ss)),
+            Create((s, ss) => new ExtendComponentStrategy(false, s, ss)),
+            Create((s, ss) => new BuildNewComponentStrategy(false, s, ss)),
+            Create((s, ss) => new ExtendComponentStrategy(true, s, ss), "options-"),
+            Create((s, ss) => new BuildNewComponentStrategy(true, s, ss), "options-"),
             ForAllComponentsEW((s, ss) => new LochKillerEdgeWeighter(s, ss)),
         }.ToDictionary(f => f.Name);
     }

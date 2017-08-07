@@ -42,8 +42,8 @@ namespace lib.Strategies.EdgeWeighting
             MutualComponentWeights = new Dictionary<Tuple<int, int>, long>();
             SpGraph = SpGraphService.ForComponent(CurrentComponent, VertexComponent, State.punter, State.map.OptionsLeft(State.punter));
             ClaimedMineIds = CurrentComponent.Mines;
-            foreach (var vertex in CurrentComponent.Vertices)
-                SubGraphWeight[vertex] = CalcSubGraphWeight(vertex);
+            foreach (var edge in CurrentComponent.Vertices.SelectMany(v => Graph.Vertexes[v].Edges))
+                SubGraphWeight[edge.To] = CalcSubGraphWeight(edge.To);
         }
 
         public double EstimateWeight(Edge edge)

@@ -47,7 +47,7 @@ namespace lib
                 var old = move.splurge.route[0];
                 foreach (var step in move.splurge.route.Skip(1))
                 {
-                    current = current.ApplyClaim(move.splurge.punter, old, step, move);
+                    current = current.ApplySplurgeItem(move.splurge.punter, old, step, move);
                     old = step;
                 }
                 return current;
@@ -64,6 +64,8 @@ namespace lib
                 throw new InvalidOperationException($"Try to buy option of river without owner {actualRiver}. Move: {move}");
             if (actualRiver.OptionOwner != -1)
                 throw new InvalidOperationException($"Try to buy option of river with option owner {actualRiver}. Move: {move}");
+            if (actualRiver.Owner == punterId)
+                throw new InvalidOperationException($"Try to buy option for self-owned rived. Move: {move}");
             int punterOptionsUsed = OptionsUsed.GetOrDefaultNoSideEffects(punterId, 0);
             if (punterOptionsUsed >= Mines.Length)
                 throw new InvalidOperationException($"Try to buy option while there are no options left. Move: {move}");
@@ -82,6 +84,31 @@ namespace lib
                 throw new InvalidOperationException($"Try to claim river {actualRiver}. Move: {move}");
             var mapRivers = RiversList.Remove(oldRiver).Add(new River(source, target, punterId));
             return new Map(Sites, mapRivers, Mines, OptionsUsed);
+        }
+
+        private Map ApplySplurgeItem(int punterId, int source, int target, Move move)
+        {
+            var oldRiver = new River(source, target);
+            var actualRiver = RiversList.FirstOrDefault(r => r.Equals(oldRiver))
+                              ?? throw new InvalidOperationException($"Try to claim unexistent river {source}--{target}. Move: {move}");
+            if (actualRiver.Owner == -1)
+            {
+                var mapRivers = RiversList.Remove(oldRiver).Add(new River(source, target, punterId));
+                return new Map(Sites, mapRivers, Mines, OptionsUsed);
+            }
+            if (actualRiver.OptionOwner == -1)
+            {
+                if (actualRiver.Owner == punterId)
+                    throw new InvalidOperationException($"Try to buy option for self-owned rived. Move: {move}");
+                int punterOptionsUsed = OptionsUsed.GetOrDefaultNoSideEffects(punterId, 0);
+                if (punterOptionsUsed >= Mines.Length)
+                    throw new InvalidOperationException($"Try to buy option while there are no options left. Move: {move}");
+                var mapRivers = RiversList.Remove(oldRiver).Add(new River(source, target, actualRiver.Owner, punterId));
+                return new Map(
+                    Sites, mapRivers, Mines,
+                    OptionsUsed.SetItem(punterId, punterOptionsUsed + 1));
+            }
+            throw new InvalidOperationException($"Try to splurge river with option owner {actualRiver}. Move: {move}");
         }
 
         public string Md5Hash()

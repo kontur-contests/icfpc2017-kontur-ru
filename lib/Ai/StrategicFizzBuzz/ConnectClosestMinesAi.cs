@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Windows.Forms;
-using lib.GraphImpl;
 using lib.StateImpl;
 using lib.Strategies;
 using lib.Structures;
@@ -15,8 +14,8 @@ namespace lib.Ai.StrategicFizzBuzz
     {
         public ConnectClosestMinesAi()
             : base(
-                (state, services) => new ExtendComponentStrategy(state, services),
-                (state, services) => new BuildNewComponentStrategy(state, services),
+                (state, services) => new ExtendComponentStrategy(true, state, services),
+                (state, services) => new BuildNewComponentStrategy(true, state, services),
                 (state, services) => new GreedyStrategy(state, services, Math.Max))
         {
         }
