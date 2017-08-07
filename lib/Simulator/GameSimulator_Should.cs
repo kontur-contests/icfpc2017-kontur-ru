@@ -67,7 +67,7 @@ namespace lib
 
             public AiMoveDecision GetNextMove(State state, IServices services)
             {
-                return AiMoveDecision.Move(moves.ElementAtOrDefault(index++) ?? Move.Pass(state.punter));
+                return new AiMoveDecision(moves.ElementAtOrDefault(index++) ?? Move.Pass(state.punter));
             }
         }
     }

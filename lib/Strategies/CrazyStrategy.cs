@@ -39,7 +39,7 @@ namespace lib.Strategies
                         new TurnResult
                         {
                             Estimation = Random.Value.NextDouble(),
-                            Move = AiMoveDecision.Claim(PunterId, edge.River.Source, edge.River.Target, "Because I'm crazy!")
+                            Move = AiMoveDecision.Claim(edge, PunterId, "Because I'm crazy!")
                         });
             }
             return result;

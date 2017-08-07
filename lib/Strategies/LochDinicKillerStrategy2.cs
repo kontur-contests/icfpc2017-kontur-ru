@@ -6,7 +6,6 @@ using lib.Ai;
 using lib.GraphImpl;
 using lib.StateImpl;
 using lib.Strategies.EdgeWeighting;
-using NUnit.Compatibility;
 
 namespace lib.Strategies
 {
@@ -29,10 +28,12 @@ namespace lib.Strategies
             ConnectedComponentsService = services.Get<ConnectedComponentsService>();
             SpGraphService = services.Get<ShortestPathGraphService>();
             PunterId = state.punter;
+            PuntersCount = state.punters;
         }
 
         private Graph Graph { get; }
         private int PunterId { get; }
+        private int PuntersCount { get; }
 
         public List<TurnResult> NextTurns()
         {
@@ -41,12 +42,12 @@ namespace lib.Strategies
             return Graph.Vertexes.Values
                 .SelectMany(v => v.Edges)
                 .Select(
-                    edge => new TurnResult
+                    edge => edge.IsFree ? new TurnResult
                     {
                         Estimation = EstimateWeight(edge),
-                        Move = AiMoveDecision.Claim(PunterId, edge.River.Source, edge.River.Target),
-                    })
-                .Where(river => river.Estimation > 0)
+                        Move = AiMoveDecision.Claim(edge, PunterId),
+                    } : null)
+                .Where(river => river != null && river.Estimation > 0)
                 .ToList();
         }
 
@@ -70,18 +71,18 @@ namespace lib.Strategies
             edgesToBlock.Clear();
 
             var mineToSave = Graph.Mines
-                .Where(mine => mine.Value.Edges.All(edge => edge.Owner != PunterId))
-                .FirstOrDefault(mine => mine.Value.Edges.Count(edge => edge.Owner < 0) < PunterId)
+                .Where(mine => mine.Value.Edges.All(edge => !edge.IsOwnedBy(PunterId)))
+                .FirstOrDefault(mine => mine.Value.Edges.Count(edge => edge.IsFree) < PuntersCount)
                 .Value;
             if (mineToSave != null)
             {
-                var edgeToSave = mineToSave.Edges.OrderBy(_ => Random.Value.Next()).FirstOrDefault(edge => edge.Owner < 0);
+                var edgeToSave = mineToSave.Edges.OrderBy(_ => Random.Value.Next()).FirstOrDefault(edge => edge.IsFree);
                 if (edgeToSave != null)
                     edgesToBlock[edgeToSave] = 10;
             }
 
             var bannedMines = Graph.Mines
-                .Where(mine => mine.Value.Edges.Select(edge => edge.Owner).Distinct().Count() == PunterId + 1)
+                .Where(mine => mine.Value.Edges.SelectMany(edge => edge.GetOwners()).Distinct().Count() == PuntersCount)
                 .Select(mine => mine.Key)
                 .ToHashSet();
 
@@ -101,7 +102,7 @@ namespace lib.Strategies
             var sum = 0.0;
             var summes = interestingPoints.Select(p => sum += p.w).ToArray();
 
-            var mines = Graph.Mines.Where(mine => mine.Value.Edges.Any(edge => edge.Owner < 0)).ToList();
+            var mines = Graph.Mines.Where(mine => mine.Value.Edges.Any(edge => edge.IsFree)).ToList();
             for (var i = 0; i < 20; i++)
             {
                 var mine1 = mines[Math.Min(Random.Value.Next(mines.Count), mines.Count - 1)];
@@ -150,7 +151,7 @@ namespace lib.Strategies
                 var vtx = Graph.Vertexes[n];
                 foreach (var edge in vtx.Edges)
                 {
-                    if (edge.Owner == PunterId || used.Contains(edge.To))
+                    if (edge.IsOwnedBy(PunterId) || used.Contains(edge.To))
                         continue;
                     used.Add(edge.To);
                     queue.Enqueue(edge.To);

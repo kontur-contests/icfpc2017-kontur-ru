@@ -45,7 +45,7 @@ namespace lib.Strategies.EdgeWeighting
                         e => new TurnResult
                         {
                             Estimation = 1,
-                            Move = AiMoveDecision.Claim(PunterId, e.River.Source, e.River.Target, "No edges yet, selecting first mine")
+                            Move = AiMoveDecision.Claim(e, PunterId, "No edges yet, selecting first mine")
                         })
                     .ToList();
 
@@ -63,7 +63,7 @@ namespace lib.Strategies.EdgeWeighting
                     e => new TurnResult
                     {
                         Estimation = EdgeWeighter.EstimateWeight(e),
-                        Move = AiMoveDecision.Claim(PunterId, e.River.Source, e.River.Target)
+                        Move = AiMoveDecision.Claim(e, PunterId)
                     });
 
 
@@ -74,7 +74,7 @@ namespace lib.Strategies.EdgeWeighting
                     .Select(e => new TurnResult
                     {
                         Estimation = EdgeWeighter.EstimateWeight(e) * OptionPenaltyMultiplier,
-                        Move = AiMoveDecision.Option(PunterId, e.River.Source, e.River.Target)
+                        Move = AiMoveDecision.Option(e, PunterId)
                     }).ToList();
 
             return claimVertices.Concat(optionVertices)
