@@ -58,18 +58,6 @@ namespace lib.Strategies
 
             private void Init()
             {
-                var mineToSave = Graph.Mines
-                    .Where(mine => mine.Value.Edges.All(edge => edge.Owner != PunterId))
-                    .FirstOrDefault(mine => mine.Value.Edges.Count(edge => edge.Owner < 0) < PunterId)
-                    .Value;
-                if (mineToSave != null)
-                {
-                    var edgeToSave = mineToSave.Edges.OrderBy(_ => Random.Value.Next())
-                        .FirstOrDefault(edge => edge.Owner < 0);
-                    if (edgeToSave != null)
-                        edgesToBlock[edgeToSave] = 10;
-                }
-
                 var mines = Graph.Mines.Select(x => x.Key).ToList();
                 var comps = mines.ToDictionary(x => x, GetConnectedComponent);
 
