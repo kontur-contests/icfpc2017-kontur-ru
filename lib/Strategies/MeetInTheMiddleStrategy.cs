@@ -62,7 +62,7 @@ namespace lib.Strategies
 
             var myVerts = graph.Vertexes.Values.Where(
                     v =>
-                    v.Edges.Any(e => e.Owner == state.punter) || v.Id == meetingPoint)
+                    v.Edges.Any(e => e.IsOwnedBy(state.punter)) || v.Id == meetingPoint)
                 .Select(x => x.Id)
                 .ToList();
 
