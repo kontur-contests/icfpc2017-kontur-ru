@@ -12,7 +12,7 @@ namespace lib.Strategies.StrategiesCatalog
         public static readonly Dictionary<string, StrategyFactory> Factories = new[]
         {
             Create((s, ss) => new NopStrategy()),
-            Create((s, ss) => new CrazyStrategy(s, ss)),
+            //Create((s, ss) => new CrazyStrategy(s, ss)),
             //Create((s, ss) => new FutureIsNowStrategy(false, s, ss)),
             Create((s, ss) => new FutureIsNowStrategy(true, s, ss), "options-"),
             Create((s, ss) => new LochDinicKillerStrategy(s, ss)),
