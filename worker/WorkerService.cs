@@ -7,9 +7,14 @@ using System.Text;
 using System.Threading;
 using Confluent.Kafka;
 using Confluent.Kafka.Serialization;
+using ConsoleApp;
+using lib;
+using lib.Ai.StrategicFizzBuzz;
 using lib.Arena;
 using lib.Interaction;
 using lib.Replays;
+using lib.Scores.Simple;
+using lib.Structures;
 using lib.viz;
 using MoreLinq;
 using Newtonsoft.Json;
@@ -21,30 +26,13 @@ namespace worker
     {
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
         private readonly Dictionary<string, object> config;
-        private readonly string[] inputTopicNames;
-        private readonly string outputTopicName;
-        private readonly IExperiment experiment;
         private bool cancelled;
         private Thread workerThread;
-        private readonly string commitHash;
+        static Random random = new Random();
 
-        public WorkerService(Dictionary<string, object> conf, string[] input, string output, IExperiment experiment)
+        public WorkerService(Dictionary<string, object> conf)
         {
             config = conf;
-            inputTopicNames = input;
-            outputTopicName = output;
-            this.experiment = experiment;
-            try
-            {
-                commitHash = File.ReadAllLines(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "commit_hash.txt"))
-                    .FirstOrDefault();
-            }
-            catch (Exception e)
-            {
-                commitHash = "Unknown";
-                logger.Warn("Can't read commit_hash.txt");
-                logger.Error(e);
-            }
         }
 
         public void Start()
@@ -52,118 +40,107 @@ namespace worker
             workerThread = new Thread(
                 () =>
                 {
-                    using (var consumer = new Consumer<Null, string>(
-                        config, null, new StringDeserializer(Encoding.UTF8)))
                     using (var producer = new Producer<Null, string>(config, null, new StringSerializer(Encoding.UTF8)))
                     {
-                        consumer.OnPartitionEOF += (_, end) => logger.Info(
-                            $"Reached end of topic {end.Topic} partition {end.Partition}, next message will be at offset {end.Offset}");
-
-                        consumer.OnError += (_, error) => logger.Error($"Error: {error}");
-
-                        consumer.OnPartitionsAssigned += (_, partitions) =>
-                        {
-                            logger.Info(
-                                $"Assigned partitions: [{string.Join(", ", partitions)}], member id: {consumer.MemberId}");
-                            consumer.Assign(partitions);
-                        };
-
-                        consumer.OnPartitionsRevoked += (_, partitions) =>
-                        {
-                            logger.Info($"Revoked partitions: [{string.Join(", ", partitions)}]");
-                            consumer.Unassign();
-                        };
-
-                        consumer.OnStatistics += (_, json) => logger.Info($"Statistics: {json}");
-
-                        consumer.Subscribe(inputTopicNames);
-
                         while (!cancelled)
                         {
-                            Message<Null, string> msg;
+                            int minMapPlayersCount = 4;
+                            int maxMapPlayersCount = 8;
+                            int roundsCount = 100;
+                            bool failOnExceptions = false;
 
-                            if (!consumer.Consume(out msg, TimeSpan.FromSeconds(1)))
-                            {
-                                continue;
-                            }
+                            var ais = new List<AiFactory>()
+                                {
+                                    //AiFactoryRegistry.CreateFactory<OptAntiLochDinicKillerAi>(),
+                                    //AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_0>(),
+                                    //AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_005>(),
+                                    //AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_01>(),
+                                    //AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_02>(),
+                                    //AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_03>(),
+                                    //AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_04>(),
+                                    //AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_05>(),
+                                    //AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_1>(),
+                                    AiFactoryRegistry.CreateFactory<FutureIsNowAi>(),
+                                    AiFactoryRegistry.CreateFactory<ConnectClosestMinesAi>(),
+                                    //AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi>(),
+                                    AiFactoryRegistry.CreateFactory<LochDinicKillerAi>(),
+                                    AiFactoryRegistry.CreateFactory<LochMaxVertexWeighterKillerAi>(),
+                                    //AiFactoryRegistry.CreateFactory<AllComponentsMaxReachableVertexWeightAi>(),
+                                    //AiFactoryRegistry.CreateFactory<MaxReachableVertexWeightAi>(),
+                                    //AiFactoryRegistry.CreateFactory<ConnectClosestMinesAi>(),
+                                    AiFactoryRegistry.CreateFactory<GreedyAi>(),
+                                    AiFactoryRegistry.CreateFactory<RandomEWAi>(),
+                                    //AiFactoryRegistry.CreateFactory<TheUberfullessnessAi>(),
+                                }
+                                .Select(f => new PlayerTournamentResult(f)).ToList();
+                            var maps = MapLoader.LoadOnlineMaps()
+                                .Where(map => map.PlayersCount.InRange(minMapPlayersCount, maxMapPlayersCount))
+                                .ToList();
 
-                            logger.Info(
-                                $"Got message | Topic: {msg.Topic} Partition: {msg.Partition} Offset: {msg.Offset} {msg.Value}");
+                            var r = Enumerable.Range(0, roundsCount)
+                                .AsParallel()
+                                .Select(
+                                    i =>
+                                    {
+                                        return maps
+                                            .AsParallel()
+                                            .Select(
+                                                map =>
+                                                {
+                                                    var matchPlayers = ais.Select(a => a.Clone()).Shuffle(random)
+                                                        .Repeat().Take(map.PlayersCount).ToList();
+                                                    var gameSimulator = new GameSimulatorRunner(
+                                                        new SimpleScoreCalculator(), true, !failOnExceptions);
+                                                    var gamers = matchPlayers.Select(p => p.Factory.Create()).ToList();
+                                                    var results = gameSimulator.SimulateGame(
+                                                        gamers, map.Map, new Settings(true, true, true));
+                                                    AssignMatchScores(results);
+                                                    foreach (var res in results)
+                                                    {
+                                                        int index = gamers.IndexOf(res.Gamer);
+                                                        var player = matchPlayers[index];
+                                                        player.Maps.Add(map.Name);
+                                                        player.GamesPlayed++;
+                                                        player.OptionUsageRate.Add(res.OptionsUsed);
+                                                        player.NormalizedMatchScores.Add(
+                                                            (double) res.MatchScore / matchPlayers.Count);
+                                                        player.GamesWon.Add(
+                                                            res.MatchScore == matchPlayers.Count ? 1 : 0);
+                                                        if (res.LastException != null)
+                                                            player.ExceptionsCount++;
+                                                        if (res.ScoreData.PossibleFuturesScore != 0)
+                                                            player.GainFuturesScoreRate.Add(
+                                                                (double) res.ScoreData.GainedFuturesScore /
+                                                                res.ScoreData.PossibleFuturesScore);
+                                                        if (res.ScoreData.TotalFuturesCount != 0)
+                                                            player.GainFuturesCountRate.Add(
+                                                                (double) res.ScoreData.GainedFuturesCount /
+                                                                res.ScoreData.TotalFuturesCount);
+                                                        player.TurnTime.AddAll(res.TurnTime);
+                                                    }
+                                                    return matchPlayers;
+                                                })
+                                            .Aggregate(
+                                                new List<PlayerTournamentResult>(), (l, d) =>
+                                                {
+                                                    l.AddRange(d);
+                                                    return l;
+                                                });
+                                    })
+                                .Aggregate(
+                                    new List<PlayerTournamentResult>(), (l, d) =>
+                                    {
+                                        l.AddRange(d);
+                                        return l;
+                                    });
 
-                            try
-                            {
-                                if (msg.Topic == "tasks")
-                                    ProcessTask(msg, producer);
-
-                                if (msg.Topic == "matches")
-                                    ProcessMatch(msg);
-                            }
-                            catch (Exception e)
-                            {
-                                logger.Warn(e);
-                            }
+                            r = PlayerTournamentResult.Merge(r).ToList();
+                            producer.ProduceAsync("games", null, JsonConvert.SerializeObject(r));
                         }
-
                         producer.Flush(TimeSpan.FromSeconds(10));
                     }
                 });
             workerThread.Start();
-        }
-
-        private void ProcessMatch(Message<Null, string> msg)
-        {
-            System.Threading.Tasks.Task.Run(
-                () =>
-                {
-                    var ai = AiFactoryRegistry.GetNextAi(true);
-                    var match = ArenaMatch.EmptyMatch;
-
-                    if (!int.TryParse(msg.Value, out match.Port)) return;
-                    logger.Info($"Match on port {match.Port} for {GetBotName(ai.Name)}");
-
-                    var interaction = new OnlineInteraction(match.Port, GetBotName(ai.Name));
-                    if (!interaction.Start()) return;
-
-                    logger.Info($"Running game on port {match.Port}");
-                    var metaAndData = interaction.RunGame(ai);
-                    logger.Info($"Finished game on port {match.Port}, {metaAndData.Item1.PunterCount} players");
-                    metaAndData.Item1.CommitHash = commitHash;
-                    new ReplayRepo().SaveReplay(metaAndData.Item1, metaAndData.Item2);
-                    logger.Info($"Saved replay {metaAndData.Item1.Scores.ToDelimitedString(", ")}");
-                });
-        }
-
-        private void ProcessTask(Message<Null, string> msg, ISerializingProducer<Null, string> producer)
-        {
-            System.Threading.Tasks.Task.Run(
-                () =>
-                {
-                    var task = JsonConvert.DeserializeObject<Task>(msg.Value);
-                    Result result;
-                    try
-                    {
-                        result = experiment.Play(task);
-                    }
-                    catch (Exception exception)
-                    {
-                        result = new Result
-                        {
-                            Error = exception.Message + "\n\n" + exception.StackTrace
-                        };
-                    }
-                    result.Task = task;
-                    result.Token = task.Token;
-                    var resultString = JsonConvert.SerializeObject(result);
-
-                    var deliveryReport = producer.ProduceAsync(outputTopicName, null, resultString);
-
-                    deliveryReport.ContinueWith(
-                        x =>
-                        {
-                            logger.Info(
-                                $"Sent result | Partition: {x.Result.Partition}, Offset: {x.Result.Offset}");
-                        });
-                });
         }
 
         public void Stop()
@@ -171,10 +148,17 @@ namespace worker
             cancelled = true;
             workerThread.Join();
         }
-
-        private static string GetBotName(string botTypeName)
+        
+        private static void AssignMatchScores(List<GameSimulationResult> results)
         {
-            return $"kontur.ru_{string.Join("", botTypeName.Where(char.IsUpper).ToArray())}";
+            results = results.OrderByDescending(r => r.Score).ToList();
+            var score = results.Count;
+            results[0].MatchScore = score;
+            for (int i = 1; i < results.Count; i++)
+            {
+                if (results[i].MatchScore < results[i - 1].MatchScore) score = results.Count - i;
+                results[i].MatchScore = score;
+            }
         }
     }
 }

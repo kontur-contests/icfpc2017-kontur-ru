@@ -22,6 +22,10 @@
     <PackageReference Include="Topshelf.NLog" Version="4.0.3" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\BrutalTesterApp\BrutalTesterApp.csproj">
+      <Project>{A57A4286-58CB-4D82-BB8F-D3DA51A2B656}</Project>
+      <Name>BrutalTesterApp</Name>
+    </ProjectReference>
     <ProjectReference Include="..\lib\lib.csproj" />
   </ItemGroup>
   <ItemGroup>
