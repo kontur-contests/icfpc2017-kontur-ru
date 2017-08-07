@@ -25,7 +25,7 @@ namespace lib.Ai.StrategicFizzBuzz
             : base(
                 (state, services) => new LochDinicKillerStrategy2(state, services),
                 AllComponentsEWStrategy((state, services) => new MaxVertextWeighter(100, state, services)),
-                (state, services) => new GreedyStrategy(state, services, (x, y) => x + y))
+                (state, services) => new GreedyStrategy(true, state, services, (x, y) => x + y))
         {
         }
 
