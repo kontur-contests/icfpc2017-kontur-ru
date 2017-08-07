@@ -9,7 +9,7 @@ namespace lib.GraphImpl
 {
     public class Dinic
     {
-        private static int MAXN = 5000;
+        private static int MAXN = 50000;
         public static int INF = (int)1e9;
 
         private int n, s, t;
