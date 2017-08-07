@@ -42,7 +42,7 @@ namespace worker
                             {
                                 int minMapPlayersCount = 4;
                                 int maxMapPlayersCount = 8;
-                                int roundsCount = 100;
+                                int roundsCount = 10;
                                 bool failOnExceptions = false;
 
                                 var ais = new List<AiFactory>()
