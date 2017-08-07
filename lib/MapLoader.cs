@@ -75,7 +75,7 @@ namespace lib
         [NotNull]
         public static Dictionary<string, int> LoadOnlineMapSizes()
         {
-            string text = File.ReadAllText(Path.Combine(LocateMapsFolder(), ".online-map-sizes"));
+            string text = File.ReadAllText(Path.Combine(LocateMapsFolder(), "online-map-sizes"));
             return JsonConvert.DeserializeObject<Dictionary<string, int>>(text);
         }
     }
