@@ -17,19 +17,15 @@ namespace lib.Strategies
         {
             private readonly Dictionary<Edge, double> edgesToBlock = new Dictionary<Edge, double>();
 
-            public AntiLochDinicStrategy(State state, IServices services, bool options = false)
+            public AntiLochDinicStrategy(bool allowToUseOptions, State state, IServices services)
             {
-                this.options = options;
+                this.allowToUseOptions = state.settings.options && allowToUseOptions && state.map.OptionsLeft(state.punter) > 0;
                 Graph = services.Get<Graph>();
                 PunterId = state.punter;
-
-                this.options &= state.settings.options;
-                this.options &=
-                    state.map.OptionsUsed.GetOrDefaultNoSideEffects(PunterId, 0) < state.map.Mines.Length;
             }
 
 
-            private readonly bool options;
+            private readonly bool allowToUseOptions;
             private Graph Graph { get; }
             private int PunterId { get; }
 
@@ -43,9 +39,7 @@ namespace lib.Strategies
                         edge => new TurnResult
                         {
                             Estimation = EstimateWeight(edge),
-                            Move = edge.Owner == -1
-                                ? AiMoveDecision.Claim(PunterId, edge.River.Source, edge.River.Target)
-                                : AiMoveDecision.Option(PunterId, edge.River.Source, edge.River.Target)
+                            Move = AiMoveDecision.ClaimOrOption(edge, PunterId, allowToUseOptions)
                         })
                     .Where(river => river.Estimation > 0)
                     .ToList();
@@ -82,7 +76,7 @@ namespace lib.Strategies
             {
                 result = null;
 
-                if (!options)
+                if (!allowToUseOptions)
                     return false;
 
                 var dist = new Dictionary<int, int>();
