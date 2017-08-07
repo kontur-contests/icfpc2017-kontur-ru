@@ -33,7 +33,7 @@ namespace lib.GraphImpl
                 {
                     int u = e[ee].b;
                     if (d[u] == -1 && e[ee].flow > 0)
-                        result.Add(new Edge(rinds[v], rinds[u], -1));
+                        result.Add(new Edge(rinds[v], rinds[u], -1, -1));
                 }
             }
             return result;
@@ -205,8 +205,8 @@ namespace lib.GraphImpl
             var cut = dinic.GetMinCut();
             cut.ShouldBeEquivalentTo(new List<Edge>
             {
-                new Edge(0, 3, -1),
-                new Edge(2, 4, -1),
+                new Edge(0, 3, -1, -1),
+                new Edge(2, 4, -1, -1),
 
             });
         }

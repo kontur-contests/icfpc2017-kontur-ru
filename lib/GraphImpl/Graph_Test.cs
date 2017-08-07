@@ -20,19 +20,19 @@ namespace lib.GraphImpl
                     {
                         1, new Vertex(1, false)
                         {
-                            Edges = {new Edge(1, 2, -1)}
+                            Edges = {new Edge(1, 2, -1, -1)}
                         }
                     },
                     {
                         2, new Vertex(2, true)
                         {
-                            Edges = {new Edge(2, 1, -1), new Edge(2, 3, 1)}
+                            Edges = {new Edge(2, 1, -1, -1), new Edge(2, 3, 1, -1)}
                         }
                     },
                     {
                         3, new Vertex(3, false)
                         {
-                            Edges = {new Edge(3, 2, 1)}
+                            Edges = {new Edge(3, 2, 1, -1)}
                         }
                     }
                 });

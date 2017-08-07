@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using lib.Ai;
 using lib.Structures;
 
@@ -8,7 +9,7 @@ namespace lib.StateImpl
     {
         public static void ApplyMoves(this State state, Move[] moves)
         {
-            foreach (var move in moves)
+            foreach (var move in moves.Skip(state.punter).Concat(moves.Take(state.punter)))
             {
                 state.map = state.map.ApplyMove(move);
                 if (move.pass != null)

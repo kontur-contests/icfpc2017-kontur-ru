@@ -24,6 +24,8 @@ namespace lib
 
         public ImmutableDictionary<int, int> OptionsUsed = ImmutableDictionary<int, int>.Empty;
 
+        public int OptionsLeft(int punter) => Mines.Length - OptionsUsed.GetOrDefaultNoSideEffects(punter, 0);
+
         public Map()
         {
         }
@@ -62,8 +64,8 @@ namespace lib
                 throw new InvalidOperationException($"Try to buy option of river without owner {actualRiver}. Move: {move}");
             if (actualRiver.OptionOwner != -1)
                 throw new InvalidOperationException($"Try to buy option of river with option owner {actualRiver}. Move: {move}");
-            int punterOptionsUsed = OptionsUsed.GetOrDefault(punterId, 0);
-            if (punterOptionsUsed < Mines.Length)
+            int punterOptionsUsed = OptionsUsed.GetOrDefaultNoSideEffects(punterId, 0);
+            if (punterOptionsUsed >= Mines.Length)
                 throw new InvalidOperationException($"Try to buy option while there are no options left. Move: {move}");
             var mapRivers = RiversList.Remove(oldRiver).Add(new River(source, target, actualRiver.Owner, punterId));
             return new Map(
