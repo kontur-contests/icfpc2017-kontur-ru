@@ -1,0 +1,164 @@
+@import url('https://fonts.googleapis.com/css?family=PT+Sans');
+
+h1 {
+    font-weight: inherit;
+    margin-bottom: 1em;
+
+    font-size: 20px;
+}
+
+.minute-header {
+    color: #666;
+    font-size: 11pt;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+}
+
+.minute-header > *:first-child {
+    margin-left: -1em;
+}
+
+.minute-header > *:first-child:before {
+    content: none;
+}
+
+.minute-header > *:before {
+    content: '\00b7  ';
+}
+
+.minute-header__live {
+    opacity: inherit;
+    transition: opacity 1s;
+
+}
+
+.minute-header__live-hidden {
+    opacity: 0;
+    transition: opacity 1s;
+}
+
+.minute-header__link {
+    opacity: .5;
+}
+
+.minute-header__link:hover {
+    opacity: 1;
+}
+
+.minute-header__link a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.columns {
+
+}
+
+.columns__column {
+    display: inline-block;
+    width: 550px;
+
+    vertical-align: top;
+}
+
+.columns__column_value {
+    width: 250px;
+}
+
+.columns__column:first-child {
+    margin-right: 5em;
+}
+
+.counters {
+    overflow-x: hidden;
+}
+
+.counters a {
+    color: inherit;
+}
+
+.counters__counter:first-child {
+    margin-right: 3em;
+}
+
+.counters__counter {
+    display: inline-block;
+
+    vertical-align: top;
+}
+
+.counters__counter__value {
+    display: block;
+    margin-left: -0.05em;
+    margin-bottom: -.15em;
+
+    font-size: 1em;
+}
+
+.counters__counter__value_small span {
+    font-style: italic;
+}
+
+.counters__counter__note {
+    font-size: 10pt;
+}
+
+.chart {
+    margin: 0 0;
+}
+
+.chart__bar {
+    fill: none;
+}
+
+.chart__bar_selected {
+
+}
+
+.chart__bar_one {
+    fill: #eaa;
+}
+
+.chart__bar_selected .chart__bar_one {
+    fill: #e66;
+}
+
+.chart__bar_two {
+    fill: #aea;
+}
+
+.chart__bar_selected .chart__bar_two {
+    fill: #6e6;
+}
+
+.chart__bar__text {
+    fill: #aaa;
+
+    font-size: 10pt;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.chart__bar_selected .chart__bar__text {
+    fill: #fff;
+}
+
+.chart__x-scale-line {
+    fill: #ccc;
+}
+
+.chart__x-scale-date {
+    opacity: 0.5;
+
+    font-size: 10pt;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.sign {
+    opacity: 0.5;
+}
+
+.sign:before {
+    content: '\2009';
+}

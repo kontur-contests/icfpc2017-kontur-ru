@@ -1,0 +1,130 @@
+<% extend 'layout.ect' %>
+
+<% block 'title': %>
+    kontur.ru @ ICPFC 2017
+<% end %>
+
+        <div class="columns">
+            <div class="columns__column">
+                <div class="chart chart__replays"></div>
+            </div>
+
+            <div class="columns__column columns__column_value">
+                <div class="counters">
+                    <div class="counters__counter counters__counter__value">
+                        All&nbsp;AIs&nbsp;and&nbsp;maps
+                    </div>
+                    <div class="counters__counter counters__counter__value">
+                        Won:&nbsp;<span class="placeholder__replaysWonRate">0</span><span class="sign">%</span>&nbsp;of&nbsp;<span class="placeholder__replays">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <br/>
+
+
+        <div class='chart-insertion-point'></div>
+
+
+        <br/>
+
+
+        <div class="columns">
+            <div class="columns__column">
+                <div class="chart chart__replaysByMapSize_0"></div>
+            </div>
+
+            <div class="columns__column columns__column_value">
+                <div class="counters">
+                    <div class="counters__counter counters__counter__value">
+                        Map:&nbsp;<span class="placeholder__replaysByMapSize_0_name">_</span>
+                    </div>
+                    <div class="counters__counter counters__counter__value">
+                        Won:&nbsp;<span class="placeholder__replaysByMapSize_0_wonRate">0</span><span class="sign">%</span>&nbsp;of&nbsp;<span class="placeholder__replaysByMapSize_0_count">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="columns">
+            <div class="columns__column">
+                <div class="chart chart__replaysByMapSize_1"></div>
+            </div>
+
+            <div class="columns__column columns__column_value">
+                <div class="counters">
+                    <div class="counters__counter counters__counter__value">
+                        Map:&nbsp;<span class="placeholder__replaysByMapSize_1_name">_</span>
+                    </div>
+                    <div class="counters__counter counters__counter__value">
+                        Won:&nbsp;<span class="placeholder__replaysByMapSize_1_wonRate">0</span><span class="sign">%</span>&nbsp;of&nbsp;<span class="placeholder__replaysByMapSize_1_count">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="columns">
+            <div class="columns__column">
+                <div class="chart chart__replaysByMapSize_2"></div>
+            </div>
+
+            <div class="columns__column columns__column_value">
+                <div class="counters">
+                    <div class="counters__counter counters__counter__value">
+                        Map:&nbsp;<span class="placeholder__replaysByMapSize_2_name">_</span>
+                    </div>
+                    <div class="counters__counter counters__counter__value">
+                        Won:&nbsp;<span class="placeholder__replaysByMapSize_2_wonRate">0</span><span class="sign">%</span>&nbsp;of&nbsp;<span class="placeholder__replaysByMapSize_2_count">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="columns">
+            <div class="columns__column">
+                <div class="chart chart__replaysByMapSize_3"></div>
+            </div>
+
+            <div class="columns__column columns__column_value">
+                <div class="counters">
+                    <div class="counters__counter counters__counter__value">
+                        Map:&nbsp;<span class="placeholder__replaysByMapSize_3_name">_</span>
+                    </div>
+                    <div class="counters__counter counters__counter__value">
+                        Won:&nbsp;<span class="placeholder__replaysByMapSize_3_wonRate">0</span><span class="sign">%</span>&nbsp;of&nbsp;<span class="placeholder__replaysByMapSize_3_count">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="columns">
+            <div class="columns__column">
+                <div class="chart chart__replaysByMapSize_4"></div>
+            </div>
+
+            <div class="columns__column columns__column_value">
+                <div class="counters">
+                    <div class="counters__counter counters__counter__value">
+                        Map:&nbsp;<span class="placeholder__replaysByMapSize_4_name">_</span>
+                    </div>
+                    <div class="counters__counter counters__counter__value">
+                        Won:&nbsp;<span class="placeholder__replaysByMapSize_4_wonRate">0</span><span class="sign">%</span>&nbsp;of&nbsp;<span class="placeholder__replaysByMapSize_4_count">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                updateData();
+
+                setInterval(updateData, 10 * 1000);
+            });
+        </script>

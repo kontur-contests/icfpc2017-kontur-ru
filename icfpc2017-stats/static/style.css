@@ -1,0 +1,36 @@
+body {
+    background: #fff;
+    color: #000;
+
+    font-family: 'PT Sans', 'Helvetica Neue', sans-serif;
+    font-size: 12pt;
+    font-weight: 300;
+
+    margin: 2vw 4vw 0;
+}
+
+.live-indicator {
+    color: #ccc;
+
+    padding: 0.1em 0.4em;
+}
+
+.live-indicator_offline {
+    color: #e66;
+}
+
+.live-indicator_online {
+    color: #6e6;
+}
+
+.live-indicator:after {
+    content: 'starting';
+}
+
+.live-indicator_offline:after {
+    content: 'offline';
+}
+
+.live-indicator_online:after {
+    content: 'live';
+}
