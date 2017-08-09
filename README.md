@@ -58,6 +58,9 @@ Hey all, fill in your areas of responsibility please!
 * Ivan Dashkevich
 * Michael Khrushchev
 * Michael Samoylenko
+  * Some parts of the Vizualizer to have some fun and relax (with Pavel Egorov)
+  * Infrastructure for implementing bots via strategies to make it easier to implement new ideas and combine them with all the prior stuff.
+  * MaxVertexWeight strategy to make greedier decisions based on the far-reachable sites (with Pavel Ageev)
 * Pavel Ageev
 * Pavel Egorov
   * Visualizer to help teammates procrastinate (and maybe debug their strategies). 
