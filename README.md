@@ -39,7 +39,7 @@ The final AI do the following:
 
 Hey all, fill in your areas of responsibility please!
 
-* Alexey Dubrovin
+* Alexey Dubrovin. Offline game runner. Online protocol improvements and fixes. Online game runner improvement with Alexey Kirpichnikov — it use Kafka workers instead only one instance. Some help to other teammates.
 * Alexey Kirpichnikov
 * Alexey Kungurtsev
 * Andrew Kostousov
