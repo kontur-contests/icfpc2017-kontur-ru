@@ -43,7 +43,8 @@ Hey all, fill in your areas of responsibility please!
 * Alexey Kirpichnikov
 * Alexey Kungurtsev
 * Andrew Kostousov
-* Anton Tolstov
+* Anton Tolstov. Visualizer improvements: futures, splurges, auto replay. Support splurges in the protocol.
+Development of the transport protocol at the initial stage.
 * Denis Ionov
 * Grigory Ovchinnikov
 * Igor Lukanin
