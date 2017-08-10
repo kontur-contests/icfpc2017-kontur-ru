@@ -53,8 +53,8 @@ Hey all, fill in your areas of responsibility please!
   * Support of splurges in the protocol.
   * Development of the transport protocol at the initial stage.
 * Denis Ionov
-  * Game simulator that implements all rules of game. It helps us to play with our AI, and determine which are the best
-  * Some code to visualiser to better understanding of bot moves during the game
+  * Game simulator implementing all the rules of the game to help us run our AIs, and select the best ones.
+  * Some code to visualiser for better understanding how AIs work in the real game.
 * Grigory Ovchinnikov
   * Support of futures in the protocol
   * Backend of online games statistics service
@@ -62,7 +62,7 @@ Hey all, fill in your areas of responsibility please!
 * Ivan Dashkevich
 * Michael Khrushchev
 * Michael Samoylenko
-  * Some parts of the Vizualizer to have some fun and relax (with Pavel Egorov)
+  * Some parts of the Visualizer to have some fun and relax (with Pavel Egorov)
   * Infrastructure for implementing bots via strategies to make it easier to implement new ideas and combine them with all the prior stuff.
   * MaxVertexWeight strategy to make greedier decisions based on the far-reachable sites (with Pavel Ageev)
 * Pavel Ageev
