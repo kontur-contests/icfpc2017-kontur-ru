@@ -73,6 +73,6 @@ Hey all, fill in your areas of responsibility please!
 * Stanislav Fedjanin
   * Development of online protocol and fixes
 * Timofey Yefimov
-  * Punters parameters optimization, attempts to make trainable AI.
+  * Punters parameters optimization, attempts to make a trainable AI.
 * Yuri Okulovsky
 
