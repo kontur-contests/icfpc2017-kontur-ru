@@ -88,7 +88,7 @@ namespace lib.viz
 
         private void RefreshMetasList()
         {
-            var metas = repo.GetRecentMetas(50);
+            var metas = repo.GetRecentMetas(500);
             UpdateList(metas);
         }
 

@@ -62,10 +62,11 @@ namespace lib.viz
 
         public void Paint(Graphics g, PointF mouseLogicalPos, RectangleF clipRect, float zoomScale)
         {
+            g.SmoothingMode = SmoothingMode.HighQuality;
             zoomScale /= 1.5f;
             if (map == null) return;
             var sw = Stopwatch.StartNew();
-            HightlightLastMove(g, gameState?.PreviousMoves?.LastOrDefault(), zoomScale);
+            //HightlightLastMove(g, gameState?.PreviousMoves?.LastOrDefault(), zoomScale);
             foreach (var river in map.Rivers)
                 DrawRiver(g, river, zoomScale);
             foreach (var site in map.Sites)
