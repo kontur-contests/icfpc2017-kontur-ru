@@ -22,13 +22,9 @@ namespace lib.OnlineRunner
 
         public static async Task<FirebaseClient> Connect()
         {
-            var auth = new FirebaseAuthProvider(new FirebaseConfig("TOKEN_IS_REMOVED"));
-            var link = await auth.SignInWithEmailAndPasswordAsync("EMAIL-REMOVED", "PASSWORD-REMOVED-AND-CHANGED");
-
             return new FirebaseClient(
                 "https://icfpc2017.firebaseio.com", new FirebaseOptions
                 {
-                    AuthTokenAsyncFactory = () => Task.FromResult(link.FirebaseToken)
                 });
         }
 

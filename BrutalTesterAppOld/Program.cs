@@ -8,6 +8,7 @@ using lib;
 using lib.Ai;
 using lib.Ai.StrategicFizzBuzz;
 using lib.Scores.Simple;
+using lib.StateImpl;
 using lib.Structures;
 using lib.viz;
 using MoreLinq;
@@ -19,37 +20,38 @@ namespace BrutalTesterApp
         static Random random = new Random();
         private static DateTime lastUpdate = DateTime.MinValue;
 
+        private static IAi CreateAi()
+        {
+            return (IAi)UberfullessnessAi.All.FirstOrDefault(
+                       x => x.Name ==
+                            "FutureIsNowSetupStrategyoptions-FutureIsNowStrategyoptions-ExtendComponentStrategyoptions-SumGreedyStrategyUberAi") ??
+                   new ConnectClosestMinesAi();
+        }
+
         static void Main(string[] args)
         {
             Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
             int minMapPlayersCount = 1;
-            int maxMapPlayersCount = 2;
+            int maxMapPlayersCount = 8;
             int roundsCount = 100000;
             bool failOnExceptions = false;
 
             //var ais = AiFactoryRegistry.ForOnlineRunsFactories
             var ais = new List<AiFactory>()
             {
+                new AiFactory("final ai", CreateAi),
                 AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_0>(),
-                //AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_005>(),
                 AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_01>(),
-                //AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_02>(),
-                //AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_03>(),
-                //AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_04>(),
-                //AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_05>(),
-                //AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi_1>(),
-                ////AiFactoryRegistry.CreateFactory<FutureIsNowAi>(),
-                //AiFactoryRegistry.CreateFactory<ConnectClosestMinesAi>(),
-                //AiFactoryRegistry.CreateFactory<AntiLochDinicKillerAi>(),
+                AiFactoryRegistry.CreateFactory<FutureIsNowAi>(),
                 AiFactoryRegistry.CreateFactory<LochDinicKillerAi>(),
                 AiFactoryRegistry.CreateFactory<OptAntiLochDinicKillerAi>(),
-                //AiFactoryRegistry.CreateFactory<LochMaxVertexWeighterKillerAi>(),
+                AiFactoryRegistry.CreateFactory<LochMaxVertexWeighterKillerAi>(),
                 AiFactoryRegistry.CreateFactory<AllComponentsMaxReachableVertexWeightAi>(),
                 AiFactoryRegistry.CreateFactory<MaxReachableVertexWeightAi>(),
                 AiFactoryRegistry.CreateFactory<ConnectClosestMinesAi>(),
                 AiFactoryRegistry.CreateFactory<GreedyAi>(),
                 AiFactoryRegistry.CreateFactory<RandomEWAi>(),
-                //AiFactoryRegistry.CreateFactory<TheUberfullessnessAi>(),
+                AiFactoryRegistry.CreateFactory<TheUberfullessnessAi>(),
             }
             .Select(f => new PlayerTournamentResult(f)).ToList();
             var maps = MapLoader.LoadOnlineMaps()
