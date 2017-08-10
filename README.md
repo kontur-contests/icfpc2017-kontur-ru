@@ -53,6 +53,8 @@ Hey all, fill in your areas of responsibility please!
   * Support of splurges in the protocol.
   * Development of the transport protocol at the initial stage.
 * Denis Ionov
+  * Game simulator that implements all rules of game. It helps us to play with our AI, and determine which are the best
+  * Some code to visualiser to better understanding of bot moves during the game
 * Grigory Ovchinnikov
 * Igor Lukanin
 * Ivan Dashkevich
