@@ -5,7 +5,7 @@
 As one would expect from a team this large, we've conjured a *lot* of strategies for the game. ~15 of the most feasible ones are in lib/Strategies, including:
 
 1. An algorithm that extends a connected component of our rivers towards the closest reachable disconnected mine.
-2. A greedy algorithm with with a variety of different cost functions.
+2. A greedy algorithm with a variety of different cost functions.
 3. An evil algorithm that finds and takes over minimal cuts between mines, so that rivals can't connect them.
 4. A vicious algorithm that takes over all rivers that are directly connected to mines, so that weak unprepared rivals leave with nothing.
 5. An opening algorithm that calculates and connects safe but profitable futures with corresponding mines.
