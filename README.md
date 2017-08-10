@@ -69,6 +69,7 @@ Hey all, fill in your areas of responsibility please!
   * Options support to force teammates use it in their strategies.
   * BrutalTester to select the best strategy from hundreds of combinations during the last seconds of the contest.
 * Stanislav Fedjanin
+  * Development of online protocol and fixes
 * Timofey Yefimov
 * Yuri Okulovsky
 
