@@ -30,7 +30,7 @@ Monitoring:
 
 Everything is written in C#, except for *Online Statistics Monitor* (JavaScript, HTML, CSS), *Data Science Stuff* (Python, Jupiter Notebook), and Ansible configs for Apache Kafka.
 
-*Note. There're [ready-to-use binaries](_prebuild-binaries) for Brutal Tester, Visualizer, Visualizer for Replays, and Punter. Run them with `mono` on Mac/Linux or execute them on Windows.*
+There're [ready-to-use binaries](_prebuild-binaries) for Brutal Tester, Visualizer, Visualizer for Replays, and Punter. Run them with `mono` on Mac/Linux or execute them on Windows.
 
 
 ## Key ideas
@@ -86,12 +86,12 @@ Some of them had pretty good win rates, some failed miserably, but in the end th
   — strategy parameters analysis (with Yuri Okulovsky and Timofey Yefimov);
   — playing a *lot* of online games (with Alexey Dubrovin and Igor Lukanin);
   — final ultimate tournament between our strategies (with Andrew Kostousov and Ivan Dashkevich).
-* Initial version of the `FutureIsNow` strategy (with Pavel Egorov).
+* Initial version of the *FutureIsNow* strategy (with Pavel Egorov).
 
-**Alexey Kungurtsev** [@KungA](http://github.com/KungA)**
+**Alexey Kungurtsev [@KungA](http://github.com/KungA)**
 *To be added.*
 
-**Andrew Kostousov [@AndrewKostousov](http://github.com/AndrewKostousov)** & **Ivan Dashkevich [@spaceorc](http://github.com/spaceorc)**
+**Andrew Kostousov [@AndrewKostousov](http://github.com/AndrewKostousov)** and **Ivan Dashkevich [@spaceorc](http://github.com/spaceorc)**
 * General API for AIs.
 * Work on strategies.
 * *Punter* with our final strategy.
@@ -131,7 +131,7 @@ Some of them had pretty good win rates, some failed miserably, but in the end th
 **Pavel Egorov [@xoposhiy](http://github.com/xoposhiy)**
 * *Visualizer* and *Visualizer for Replays* to help teammates procrastinate and maybe debug their strategies.
 * Performance improvements to Firebase-related replays collection code.
-* *FutureIsNow* strategy to exploit futures and gain ~5 % more scores.
+* *FutureIsNow* strategy to exploit futures and gain ~5 % more scores (with Alexey Kirpichnikov).
 * Support for *options* to force teammates to use them in their strategies (with Igor Lukanin).
 * *Brutal Tester* to select the best strategy from hundreds of combinations during the last seconds of the contest.
 
@@ -155,6 +155,6 @@ Some of them had pretty good win rates, some failed miserably, but in the end th
 
 ![Brutal Tester](demo/BrutalTester.png)
 
-*Online Statistics Monitor* & *Online Game Monitor*, respectively:
+*Online Statistics Monitor* and *Online Game Monitor*, respectively:
 
 ![Online Monitors](demo/OnlineMonitors.png)
