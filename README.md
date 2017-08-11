@@ -77,7 +77,7 @@ Some of them had pretty good win rates, some failed miserably, but in the end th
 ## Members
 
 **Alexey Dubrovin [@Griboedoff](http://github.com/Griboedoff)**
-* Initial version of *Brutal Tester*.
+* Runner code for *Game Simulator*.
 * Improvements and fixes to *online protocol code*.
 * Improvements to *Replay Collector*, creation of *Worker* and *Foreman* (with Alexey Kirpichnikov).
 
