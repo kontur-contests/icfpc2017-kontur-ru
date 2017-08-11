@@ -6,13 +6,14 @@ There're 16 members in team kontur.ru and here's the code we've written.
 ## Code breakdown
 
 Strategy:
-* **[10+ strategies](lib/Strategies) and [20+ AIs](lib/Ai/)** based on these strategies. See *Key ideas* below.
+* **[10+ strategies](lib/Strategies)** and 280 AIs based on these strategies, orchestrated by [UberfullessnessAi](lib/Ai/StrategicFizzBuzz/UberfullessnessAi.cs). See *Key ideas* below.
+* **[20+ most powerful AIs](lib/Ai/)** that we hand-picked after the ultimate final tournament. See *Brutal Tester* below. 
 
 Playing:
 * **[Game Simulator](lib/Simulator).** A library which implements game rules according to [task specification](task) and enables our bots to interact.
 * **[Punter](punter)**. A console app which uses our final AI to play matches offline. Connects to organizers' [Lambda Duct](https://icfpcontest2017.github.io/post/lambdaduct/) to play matches online. *This is the app we've submitted to organizers in the end of the contest.*
 * **[Replay Collector](ReplayCollector).** A console app which plays our AIs against other bots on organizers' servers and saves replay data to Firebase.
-* **[Worker](worker).** A task which plays matches online like *Replay Collector*, but is being run on a computing cluster (10 to 40 instances, 3 threads per instance).
+* **[Worker](worker).** A task which plays matches online like *Replay Collector*, but is being run on a computing cluster (10 to 40 instances, up to 10 threads per instance).
 * **[Foreman](foreman).** A console app which looks for matches on organizers' servers and assigns jobs to *Workers* via Apache Kafka.
 
 Visualization:
@@ -82,13 +83,14 @@ Some of them had pretty good win rates, some failed miserably, but in the end th
 * Improvements to *Replay Collector*, creation of *Worker* and *Foreman* (with Alexey Kirpichnikov).
 
 **Alexey Kirpichnikov [@beevee](http://github.com/beevee)**
-* Message broker and workers ecosystem that helped with:
-  — strategy parameters analysis (with Yuri Okulovsky and Timofey Yefimov);
-  — playing a *lot* of online games (with Alexey Dubrovin and Igor Lukanin);
-  — final ultimate tournament between our strategies (with Andrew Kostousov and Ivan Dashkevich).
+* Message broker and workers ecosystem that helped with:  
+  — strategy parameters analysis (with Yuri Okulovsky and Timofey Yefimov);  
+  — playing a *lot* of online games (with Alexey Dubrovin and Igor Lukanin);  
+  — ultimate final tournament between our strategies (with Andrew Kostousov and Ivan Dashkevich).
 * Initial version of the *FutureIsNow* strategy (with Pavel Egorov).
 
 **Alexey Kungurtsev [@KungA](http://github.com/KungA)**
+
 *To be added.*
 
 **Andrew Kostousov [@AndrewKostousov](http://github.com/AndrewKostousov)** and **Ivan Dashkevich [@spaceorc](http://github.com/spaceorc)**
