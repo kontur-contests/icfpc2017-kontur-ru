@@ -90,8 +90,8 @@ Some of them had pretty good win rates, some failed miserably, but in the end th
 * Initial version of the *FutureIsNow* strategy (with Pavel Egorov).
 
 **Alexey Kungurtsev [@KungA](http://github.com/KungA)**
-
-*To be added.*
+* Shared code for distance, score, and maximum flow calculation in graph data structures.
+* Work on strategies.
 
 **Andrew Kostousov [@AndrewKostousov](http://github.com/AndrewKostousov)** and **Ivan Dashkevich [@spaceorc](http://github.com/spaceorc)**
 * General API for AIs.
